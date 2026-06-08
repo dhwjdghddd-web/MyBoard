@@ -54,10 +54,18 @@ class QuickAddTaskActivity : AppCompatActivity() {
 
         Thread {
             val success = tryApiCall(title)
-            if (!success) storePending(title)
+            if (!success) {
+                val tempId = "pending_temp_${System.currentTimeMillis()}"
+                pushToWidget(title, tempId)
+                storePending(title)
+            }
 
             runOnUiThread {
-                if (success) Toast.makeText(this, "태스크가 추가됐어요 ✓", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    if (success) "태스크가 추가됐어요 ✓" else "태스크가 추가됐어요 (대기 중) ✓",
+                    Toast.LENGTH_SHORT
+                ).show()
                 finish()
             }
         }.start()
@@ -109,6 +117,7 @@ class QuickAddTaskActivity : AppCompatActivity() {
     private fun pushToWidget(title: String, newId: String) {
         val prefs = getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val edit  = prefs.edit()
+        
         // 기존 항목 한 칸씩 뒤로
         for (i in 2 downTo 1) {
             edit.putString("task_$i",       prefs.getString("task_${i-1}", "")       ?: "")
@@ -118,6 +127,15 @@ class QuickAddTaskActivity : AppCompatActivity() {
         edit.putString("task_0",       title)
         edit.putString("task_0_id",    newId)
         edit.putString("task_0_done",  "false")
+
+        // 태스크 개수 계산하여 반영
+        var count = 0
+        if (title.isNotEmpty()) count++
+        for (i in 1..2) {
+            val t = prefs.getString("task_$i", "") ?: ""
+            if (t.isNotEmpty()) count++
+        }
+        edit.putString("task_count", count.toString())
         edit.apply()
 
         val manager = AppWidgetManager.getInstance(applicationContext)

@@ -108,11 +108,18 @@ class WidgetService {
 
   static Future<void> updateGmail(List<GmailMessage> messages) async {
     try {
-      final unread = messages.where((m) => m.isUnread).length;
+      final sorted = List<GmailMessage>.from(messages);
+      sorted.sort((a, b) {
+        final dA = parseEmailDate(a.date) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final dB = parseEmailDate(b.date) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return dB.compareTo(dA);
+      });
+
+      final unread = sorted.where((m) => m.isUnread).length;
       await HomeWidget.saveWidgetData<String>('gmail_unread', '$unread');
       for (var i = 0; i < 4; i++) {
-        if (i < messages.length) {
-          final m = messages[i];
+        if (i < sorted.length) {
+          final m = sorted[i];
           // 발신자 표시 이름
           final sender = m.displayName.isNotEmpty ? m.displayName : m.from;
           // 시간: gmail_service의 formatEmailDate 사용
