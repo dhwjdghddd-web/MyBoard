@@ -110,9 +110,9 @@ class WidgetService {
     try {
       final sorted = List<GmailMessage>.from(messages);
       sorted.sort((a, b) {
-        final dA = parseEmailDate(a.date) ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final dB = parseEmailDate(b.date) ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return dB.compareTo(dA);
+        final valA = int.tryParse(a.internalDate) ?? 0;
+        final valB = int.tryParse(b.internalDate) ?? 0;
+        return valB.compareTo(valA);
       });
 
       final unread = sorted.where((m) => m.isUnread).length;

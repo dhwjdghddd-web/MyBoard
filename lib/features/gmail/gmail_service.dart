@@ -92,6 +92,7 @@ class GmailMessage {
   final String date;
   final String snippet;
   final List<String> labelIds;
+  final String internalDate;
 
   const GmailMessage({
     required this.id,
@@ -100,6 +101,7 @@ class GmailMessage {
     required this.date,
     required this.snippet,
     required this.labelIds,
+    required this.internalDate,
   });
 
   bool get isUnread => labelIds.contains('UNREAD');
@@ -119,7 +121,7 @@ class GmailMessage {
 
   GmailMessage copyWith({List<String>? labelIds}) =>
       GmailMessage(id: id, from: from, subject: subject, date: date, snippet: snippet,
-          labelIds: labelIds ?? this.labelIds);
+          labelIds: labelIds ?? this.labelIds, internalDate: internalDate);
 
   factory GmailMessage.fromJson(Map<String, dynamic> j) {
     String header(String name) {
@@ -135,6 +137,7 @@ class GmailMessage {
       date: header('Date'),
       snippet: (j['snippet'] as String?) ?? '',
       labelIds: (j['labelIds'] as List?)?.cast<String>() ?? [],
+      internalDate: (j['internalDate'] as String?) ?? '0',
     );
   }
 }
