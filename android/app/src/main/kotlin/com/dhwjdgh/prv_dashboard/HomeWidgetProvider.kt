@@ -413,7 +413,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
                 // Bind PendingIntent template for list items
                 val clickIntentTemplate = Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 }
                 val clickPendingIntentTemplate = PendingIntent.getActivity(
                     context,
@@ -444,7 +444,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, tab,
                 Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("tab", tab)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -454,7 +454,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, 550,
                 Intent(context, QuickAddTaskActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
@@ -463,7 +463,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, when (action) { "create_task" -> 500; "create_event" -> 501; "compose_email" -> 503; else -> 502 },
                 Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("action", action)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -473,7 +473,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, 850,
                 Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("date_key", dateKey)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -485,7 +485,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, 600 + index,
                 Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("event_id", eventId)
                     putExtra("date_key", dateKey)
                 },
@@ -496,7 +496,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, 300 + index,
                 Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("tab", 2)
                     if (emailId.isNotEmpty()) putExtra("email_id", emailId)
                 },
