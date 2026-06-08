@@ -349,32 +349,43 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val titlesRaw = prefs.getString("cal_day_${compactKey}_titles", "") ?: ""
             val timesRaw  = prefs.getString("cal_day_${compactKey}_times",  "") ?: ""
             val idsRaw    = prefs.getString("cal_day_${compactKey}_ids",    "") ?: ""
+            val colorsRaw = prefs.getString("cal_day_${compactKey}_colors", "") ?: ""
 
             val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
             val times  = if (timesRaw.isEmpty())  emptyList() else timesRaw.split("|")
             val ids    = if (idsRaw.isEmpty())     emptyList() else idsRaw.split("|")
+            val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
 
-            val dayRowIds = listOf(
-                Triple(R.id.cal_day_row_0, R.id.cal_day_time_0, R.id.cal_day_title_0),
-                Triple(R.id.cal_day_row_1, R.id.cal_day_time_1, R.id.cal_day_title_1),
-                Triple(R.id.cal_day_row_2, R.id.cal_day_time_2, R.id.cal_day_title_2),
-                Triple(R.id.cal_day_row_3, R.id.cal_day_time_3, R.id.cal_day_title_3),
+            data class DayRow(val row: Int, val time: Int, val title: Int, val colorBar: Int)
+            val dayRows = listOf(
+                DayRow(R.id.cal_day_row_0, R.id.cal_day_time_0, R.id.cal_day_title_0, R.id.cal_day_color_0),
+                DayRow(R.id.cal_day_row_1, R.id.cal_day_time_1, R.id.cal_day_title_1, R.id.cal_day_color_1),
+                DayRow(R.id.cal_day_row_2, R.id.cal_day_time_2, R.id.cal_day_title_2, R.id.cal_day_color_2),
+                DayRow(R.id.cal_day_row_3, R.id.cal_day_time_3, R.id.cal_day_title_3, R.id.cal_day_color_3),
             )
             var visible = 0
-            for ((i, row) in dayRowIds.withIndex()) {
-                val (rowId, timeId, titleId) = row
+            for ((i, r) in dayRows.withIndex()) {
                 if (i < titles.size && titles[i].isNotEmpty()) {
-                    views.setViewVisibility(rowId, View.VISIBLE)
-                    views.setTextViewText(timeId, times.getOrElse(i) { "" })
-                    views.setTextViewText(titleId, titles[i])
+                    views.setViewVisibility(r.row, View.VISIBLE)
+                    views.setTextViewText(r.time, times.getOrElse(i) { "" })
+                    views.setTextViewText(r.title, titles[i])
+                    
+                    val colorStr = colors.getOrNull(i)
+                    val eventColor = try {
+                        if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#4285F4")
+                    } catch (e: Exception) {
+                        Color.parseColor("#4285F4")
+                    }
+                    views.setInt(r.colorBar, "setBackgroundColor", eventColor)
+
                     val evId = ids.getOrElse(i) { "" }
-                    views.setOnClickPendingIntent(rowId,
+                    views.setOnClickPendingIntent(r.row,
                         if (evId.isNotEmpty()) openEventDetailIntent(context, evId, dateKey, i)
                         else openCalendarDateAppIntent(context, dateKey)
                     )
                     visible++
                 } else {
-                    views.setViewVisibility(rowId, View.GONE)
+                    views.setViewVisibility(r.row, View.GONE)
                 }
             }
             views.setViewVisibility(R.id.cal_day_empty, if (visible == 0) View.VISIBLE else View.GONE)

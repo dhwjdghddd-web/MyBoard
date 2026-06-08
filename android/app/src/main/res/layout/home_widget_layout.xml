@@ -239,7 +239,7 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:layout_width="4dp" android:layout_height="match_parent"
+                <FrameLayout android:id="@+id/cal_day_color_0" android:layout_width="4dp" android:layout_height="match_parent"
                     android:background="#4285F4" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_0"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -255,7 +255,7 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:layout_width="4dp" android:layout_height="match_parent"
+                <FrameLayout android:id="@+id/cal_day_color_1" android:layout_width="4dp" android:layout_height="match_parent"
                     android:background="#0F9D58" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_1"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -271,7 +271,7 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:layout_width="4dp" android:layout_height="match_parent"
+                <FrameLayout android:id="@+id/cal_day_color_2" android:layout_width="4dp" android:layout_height="match_parent"
                     android:background="#FBBC04" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_2"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -287,7 +287,7 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:layout_width="4dp" android:layout_height="match_parent"
+                <FrameLayout android:id="@+id/cal_day_color_3" android:layout_width="4dp" android:layout_height="match_parent"
                     android:background="#EA4335" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_3"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
