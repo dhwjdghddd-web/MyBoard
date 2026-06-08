@@ -94,6 +94,10 @@ class _MainScreenState extends ConsumerState<MainScreen>
   }
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
+    if (mounted) {
+      Navigator.popUntil(context, (route) => route.isFirst);
+    }
+
     switch (call.method) {
       case 'switchTab':
         final tab = call.arguments as int;

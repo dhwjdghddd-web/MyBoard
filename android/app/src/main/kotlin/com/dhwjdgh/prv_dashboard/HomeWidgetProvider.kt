@@ -140,6 +140,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             bindCalendar(context, views, prefs)
             bindGmail(context, views, prefs)
 
+            manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
+
             manager.updateAppWidget(widgetId, views)
         }
 
@@ -395,35 +397,33 @@ class HomeWidgetProvider : AppWidgetProvider() {
         //  Gmail 섹션
         // ─────────────────────────────────────────────────────────────────
         private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences) {
-            data class GRow(val row: Int, val sender: Int, val time: Int, val subject: Int, val div: Int?)
-            val rows = listOf(
-                GRow(R.id.gmail_row_0, R.id.gmail_sender_0, R.id.gmail_time_0, R.id.gmail_subject_0, R.id.gmail_div_0),
-                GRow(R.id.gmail_row_1, R.id.gmail_sender_1, R.id.gmail_time_1, R.id.gmail_subject_1, R.id.gmail_div_1),
-                GRow(R.id.gmail_row_2, R.id.gmail_sender_2, R.id.gmail_time_2, R.id.gmail_subject_2, R.id.gmail_div_2),
-                GRow(R.id.gmail_row_3, R.id.gmail_sender_3, R.id.gmail_time_3, R.id.gmail_subject_3, null),
-            )
-            var visible = 0
-            for ((i, r) in rows.withIndex()) {
-                val sender  = prefs.getString("gmail_${i}_sender",  "") ?: ""
-                val time    = prefs.getString("gmail_${i}_time",    "") ?: ""
-                val subject = prefs.getString("gmail_${i}_subject", "") ?: ""
-                val unread  = prefs.getString("gmail_${i}_unread",  "false") == "true"
-                val emailId = prefs.getString("gmail_${i}_id",      "") ?: ""
-                if (sender.isEmpty() && subject.isEmpty()) {
-                    views.setViewVisibility(r.row, View.GONE)
-                    r.div?.let { views.setViewVisibility(it, View.GONE) }
-                } else {
-                    views.setViewVisibility(r.row, View.VISIBLE)
-                    r.div?.let { views.setViewVisibility(it, View.VISIBLE) }
-                    views.setTextViewText(r.sender, sender.ifEmpty { "(이름 없음)" })
-                    views.setTextColor(r.sender, if (unread) Color.WHITE else Color.parseColor("#B0B0C0"))
-                    views.setTextViewText(r.time, time)
-                    views.setTextViewText(r.subject, subject)
-                    views.setOnClickPendingIntent(r.row, openEmailIntent(context, emailId, i))
-                    visible++
+            val countStr = prefs.getString("gmail_count", "0") ?: "0"
+            val count = countStr.toIntOrNull() ?: prefs.getInt("gmail_count", 0)
+
+            if (count == 0) {
+                views.setViewVisibility(R.id.gmail_list_view, View.GONE)
+                views.setViewVisibility(R.id.gmail_empty, View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.gmail_list_view, View.VISIBLE)
+                views.setViewVisibility(R.id.gmail_empty, View.GONE)
+
+                // Bind ListView to RemoteViewsService
+                val intent = Intent(context, GmailWidgetService::class.java)
+                views.setRemoteAdapter(R.id.gmail_list_view, intent)
+
+                // Bind PendingIntent template for list items
+                val clickIntentTemplate = Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
+                val clickPendingIntentTemplate = PendingIntent.getActivity(
+                    context,
+                    350,
+                    clickIntentTemplate,
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+                views.setPendingIntentTemplate(R.id.gmail_list_view, clickPendingIntentTemplate)
             }
-            views.setViewVisibility(R.id.gmail_empty, if (visible == 0) View.VISIBLE else View.GONE)
+
             // compose 버튼 → 앱의 Gmail 작성 화면
             views.setOnClickPendingIntent(R.id.gmail_compose_btn, openAppWithActionIntent(context, "compose_email"))
         }

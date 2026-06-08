@@ -117,14 +117,18 @@ class WidgetService {
 
       final unread = sorted.where((m) => m.isUnread).length;
       await HomeWidget.saveWidgetData<String>('gmail_unread', '$unread');
-      for (var i = 0; i < 4; i++) {
+
+      final gmailCount = sorted.length < 25 ? sorted.length : 25;
+      await HomeWidget.saveWidgetData<int>('gmail_count', gmailCount);
+
+      for (var i = 0; i < 25; i++) {
         if (i < sorted.length) {
           final m = sorted[i];
           // 발신자 표시 이름
           final sender = m.displayName.isNotEmpty ? m.displayName : m.from;
           // 시간: gmail_service의 formatEmailDate 사용
           final timeStr = formatEmailDate(m.date);
-          // subject + snippet 합산 (snippet이 있으면 subject만, 없으면 제목만)
+          // subject
           final subjectLine = m.subject.isNotEmpty ? m.subject : '(제목 없음)';
           await HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  sender);
           await HomeWidget.saveWidgetData<String>('gmail_${i}_time',    timeStr);

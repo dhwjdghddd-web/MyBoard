@@ -168,6 +168,9 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
         try { await addTask(title); } catch (_) {}
       }
     }
+
+    // 항상 최신 태스크 목록 서버에서 가져와 동기화
+    await loadTasks();
   }
 
   Future<void> deleteTask(String taskId) async {

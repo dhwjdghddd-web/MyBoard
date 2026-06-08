@@ -15,6 +15,7 @@ import androidx.security.crypto.MasterKeys
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 class QuickAddTaskActivity : AppCompatActivity() {
 
@@ -74,10 +75,64 @@ class QuickAddTaskActivity : AppCompatActivity() {
 
     private fun tryApiCall(title: String): Boolean {
         return try {
-            val token = readToken() ?: return false
+            val gAccount = GoogleSignIn.getLastSignedInAccount(this)
+            var token = readToken()
 
+            if (token.isNullOrEmpty() && gAccount != null && gAccount.account != null) {
+                token = fetchFreshToken(gAccount.account!!)
+            }
+
+            if (token.isNullOrEmpty()) return false
+
+            var result = doPostRequest(token, title)
+
+            if (result.code == 401 && gAccount != null && gAccount.account != null) {
+                try {
+                    com.google.android.gms.auth.GoogleAuthUtil.invalidateToken(this, token)
+                } catch (_: Exception) {}
+
+                token = fetchFreshToken(gAccount.account!!)
+                if (!token.isNullOrEmpty()) {
+                    result = doPostRequest(token, title)
+                }
+            }
+
+            if (result.code in 200..299) {
+                val newId = try { JSONObject(result.body).getString("id") } catch (_: Exception) { "" }
+                pushToWidget(title, newId)
+                true
+            } else {
+                false
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun fetchFreshToken(account: android.accounts.Account): String? {
+        return try {
+            val scopesStr = "oauth2:https://www.googleapis.com/auth/tasks"
+            val freshToken = com.google.android.gms.auth.GoogleAuthUtil.getToken(
+                this,
+                account,
+                scopesStr
+            )
+            if (!freshToken.isNullOrEmpty()) {
+                writeToken(freshToken)
+            }
+            freshToken
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private data class ApiResponse(val code: Int, val body: String)
+
+    private fun doPostRequest(token: String, title: String): ApiResponse {
+        var conn: HttpURLConnection? = null
+        return try {
             val url  = URL("https://tasks.googleapis.com/tasks/v1/lists/%40default/tasks")
-            val conn = (url.openConnection() as HttpURLConnection).apply {
+            conn = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
                 setRequestProperty("Authorization", "Bearer $token")
                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
@@ -89,17 +144,31 @@ class QuickAddTaskActivity : AppCompatActivity() {
             val body = JSONObject().apply { put("title", title) }.toString()
             conn.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
 
-            val code     = conn.responseCode
-            val response = if (code in 200..299) conn.inputStream.bufferedReader().readText() else ""
-            conn.disconnect()
+            val code = conn.responseCode
+            val response = if (code in 200..299) {
+                conn.inputStream.bufferedReader().use { it.readText() }
+            } else {
+                conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+            }
+            ApiResponse(code, response)
+        } catch (e: Exception) {
+            ApiResponse(500, e.message ?: "")
+        } finally {
+            conn?.disconnect()
+        }
+    }
 
-            if (code in 200..299) {
-                val newId = try { JSONObject(response).getString("id") } catch (_: Exception) { "" }
-                pushToWidget(title, newId)
-                true
-            } else false
-
-        } catch (_: Exception) { false }
+    private fun writeToken(newToken: String) {
+        try {
+            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            EncryptedSharedPreferences.create(
+                "FlutterSecureStorage",
+                masterKeyAlias,
+                this,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            ).edit().putString("VGtWcmJHbHVaMjl1_access_token", newToken).apply()
+        } catch (_: Exception) {}
     }
 
     private fun readToken(): String? {
@@ -111,7 +180,7 @@ class QuickAddTaskActivity : AppCompatActivity() {
                 this,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            ).getString("access_token", null)
+            ).getString("VGtWcmJHbHVaMjl1_access_token", null)
         } catch (_: Exception) { null }
     }
 
