@@ -397,8 +397,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
         //  Gmail 섹션
         // ─────────────────────────────────────────────────────────────────
         private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences) {
-            val countStr = prefs.getString("gmail_count", "0") ?: "0"
-            val count = countStr.toIntOrNull() ?: prefs.getInt("gmail_count", 0)
+            val count = try {
+                prefs.getInt("gmail_count", 0)
+            } catch (e: ClassCastException) {
+                prefs.getString("gmail_count", "0")?.toIntOrNull() ?: 0
+            }
 
             if (count == 0) {
                 views.setViewVisibility(R.id.gmail_list_view, View.GONE)

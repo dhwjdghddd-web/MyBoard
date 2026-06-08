@@ -332,9 +332,8 @@
             android:scrollbars="none"
             android:visibility="gone" />
 
-        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
         <TextView android:id="@+id/gmail_empty"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
             android:text="새 메일 없음" android:textSize="11sp" android:textColor="#606070"
             android:gravity="center" android:visibility="gone"/>
     </LinearLayout>

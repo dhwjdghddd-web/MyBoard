@@ -83,8 +83,11 @@ class GmailWidgetFactory(private val context: Context) : RemoteViewsService.Remo
     private fun loadData() {
         emailsList.clear()
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val countVal = prefs.getString("gmail_count", "0") ?: "0"
-        val count = countVal.toIntOrNull() ?: prefs.getInt("gmail_count", 0)
+        val count = try {
+            prefs.getInt("gmail_count", 0)
+        } catch (e: ClassCastException) {
+            prefs.getString("gmail_count", "0")?.toIntOrNull() ?: 0
+        }
 
         for (i in 0 until count) {
             val sender = prefs.getString("gmail_${i}_sender", "") ?: ""
