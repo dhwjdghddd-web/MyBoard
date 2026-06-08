@@ -30,12 +30,27 @@ class GmailScreen extends ConsumerStatefulWidget {
 
 class _GmailScreenState extends ConsumerState<GmailScreen> {
   final _searchCtrl = TextEditingController();
+  final _scrollCtrl = ScrollController();
   bool _searching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollCtrl.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchCtrl.dispose();
+    _scrollCtrl.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollCtrl.position.pixels >= _scrollCtrl.position.maxScrollExtent - 200) {
+      final query = _searching ? _searchCtrl.text.trim() : null;
+      ref.read(gmailProvider.notifier).loadMoreMessages(query: query);
+    }
   }
 
   void _search() {
@@ -188,9 +203,16 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                             await ref.read(gmailProvider.notifier).loadLabelCounts();
                           },
                           child: ListView.builder(
+                            controller: _scrollCtrl,
                             padding: EdgeInsets.zero,
-                            itemCount: gmail.messages.length,
+                            itemCount: gmail.messages.length + (gmail.loadingMore ? 1 : 0),
                             itemBuilder: (_, i) {
+                              if (i >= gmail.messages.length) {
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  child: Center(child: CircularProgressIndicator()),
+                                );
+                              }
                               final msg = gmail.messages[i];
                               final selected = gmail.selectedIds.contains(msg.id);
                               return Column(

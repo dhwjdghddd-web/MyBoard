@@ -150,6 +150,8 @@ class GmailState {
   final Map<String, int> labelCounts;
   final Set<String> selectedIds;
   final bool loading;
+  final bool loadingMore;
+  final String? nextPageToken;
   final String? error;
 
   const GmailState({
@@ -158,6 +160,8 @@ class GmailState {
     this.labelCounts = const {},
     this.selectedIds = const {},
     this.loading = false,
+    this.loadingMore = false,
+    this.nextPageToken,
     this.error,
   });
 
@@ -167,13 +171,15 @@ class GmailState {
   GmailState copyWith({
     String? label, List<GmailMessage>? messages,
     Map<String, int>? labelCounts, Set<String>? selectedIds,
-    bool? loading, String? error,
+    bool? loading, bool? loadingMore, String? nextPageToken, String? error,
   }) => GmailState(
     label: label ?? this.label,
     messages: messages ?? this.messages,
     labelCounts: labelCounts ?? this.labelCounts,
     selectedIds: selectedIds ?? this.selectedIds,
     loading: loading ?? this.loading,
+    loadingMore: loadingMore ?? this.loadingMore,
+    nextPageToken: nextPageToken ?? this.nextPageToken,
     error: error,
   );
 }
@@ -196,9 +202,9 @@ class GmailNotifier extends StateNotifier<GmailState> {
   final ApiClient _api;
 
   Future<void> loadMessages({String? query}) async {
-    state = state.copyWith(loading: true, error: null, selectedIds: {});
+    state = state.copyWith(loading: true, error: null, selectedIds: {}, nextPageToken: null);
     try {
-      final params = <String, String>{'maxResults': '25'};
+      final params = <String, String>{'maxResults': '10'};
       if (query != null && query.isNotEmpty) {
         params['q'] = query;
       } else {
@@ -207,8 +213,9 @@ class GmailNotifier extends StateNotifier<GmailState> {
 
       final data = await _api.get('$_base/messages', params: params);
       final ids = (data['messages'] as List?) ?? [];
+      final nextToken = data['nextPageToken'] as String?;
       if (ids.isEmpty) {
-        state = state.copyWith(messages: [], loading: false);
+        state = state.copyWith(messages: [], loading: false, nextPageToken: null);
         return;
       }
 
@@ -222,10 +229,56 @@ class GmailNotifier extends StateNotifier<GmailState> {
       final messages = details
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
           .toList();
-      state = state.copyWith(messages: messages, loading: false);
+      state = state.copyWith(messages: messages, loading: false, nextPageToken: nextToken);
       WidgetService.updateGmail(messages);
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
+    }
+  }
+
+  Future<void> loadMoreMessages({String? query}) async {
+    if (state.loadingMore || state.nextPageToken == null) return;
+    state = state.copyWith(loadingMore: true);
+    try {
+      final params = <String, String>{
+        'maxResults': '10',
+        'pageToken': state.nextPageToken!,
+      };
+      if (query != null && query.isNotEmpty) {
+        params['q'] = query;
+      } else {
+        params['labelIds'] = state.label;
+      }
+
+      final data = await _api.get('$_base/messages', params: params);
+      final ids = (data['messages'] as List?) ?? [];
+      final nextToken = data['nextPageToken'] as String?;
+      if (ids.isEmpty) {
+        state = state.copyWith(loadingMore: false, nextPageToken: null);
+        return;
+      }
+
+      final details = await Future.wait(
+        ids.map((m) => _api.get(
+          '$_base/messages/${m['id']}',
+          params: {'format': 'metadata', 'metadataHeaders': ['From', 'Subject', 'Date']},
+        )),
+      );
+
+      final newMessages = details
+          .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
+          .toList();
+
+      final currentIds = state.messages.map((m) => m.id).toSet();
+      final filteredNew = newMessages.where((m) => !currentIds.contains(m.id)).toList();
+
+      state = state.copyWith(
+        messages: [...state.messages, ...filteredNew],
+        loadingMore: false,
+        nextPageToken: nextToken,
+      );
+    } catch (e) {
+      state = state.copyWith(loadingMore: false);
     }
   }
 
