@@ -4,14 +4,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="#FFFFFF">
+    android:background="@drawable/dialog_background">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="태스크 추가"
         android:textSize="18sp"
-        android:textColor="#202124"
+        android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:paddingBottom="16dp" />
 
@@ -24,22 +24,23 @@
         android:maxLines="2"
         android:imeOptions="actionDone"
         android:textSize="16sp"
-        android:textColor="#202124"
-        android:textColorHint="#9E9E9E" />
+        android:textColor="#FFFFFF"
+        android:textColorHint="#707088"
+        android:backgroundTint="#4285F4" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
-        android:paddingTop="20dp">
+        android:paddingTop="24dp">
 
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="취소"
-            android:textColor="#5F6368"
+            android:textColor="#A0A0C0"
             android:background="@android:color/transparent"
             android:paddingStart="16dp"
             android:paddingEnd="16dp" />
@@ -51,7 +52,7 @@
             android:text="추가"
             android:layout_marginStart="8dp"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#1A73E8" />
+            android:backgroundTint="#4285F4" />
 
     </LinearLayout>
 

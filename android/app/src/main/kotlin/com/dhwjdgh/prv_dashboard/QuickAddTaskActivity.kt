@@ -25,6 +25,7 @@ class QuickAddTaskActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.quick_add_task_layout)
+        window.setBackgroundDrawableResource(android.R.color.transparent)
 
         taskInput  = findViewById(R.id.task_input)
         btnAdd     = findViewById(R.id.btn_add)

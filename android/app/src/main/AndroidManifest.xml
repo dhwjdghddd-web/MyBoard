@@ -41,7 +41,7 @@
         <activity
             android:name=".QuickAddTaskActivity"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <!-- 홈화면 위젯 -->
