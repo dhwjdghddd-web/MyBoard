@@ -267,7 +267,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         
                         // 날짜 부분 스타일 지정 (10sp, 볼드여부, 요일별 색상)
                         val dayColor = when {
-                            isToday  -> Color.WHITE
+                            isToday  -> Color.parseColor("#4285F4")
                             col == 0 -> Color.parseColor("#FF6B6B")
                             col == 6 -> Color.parseColor("#6B9FFF")
                             else     -> Color.parseColor("#D0D0E0")

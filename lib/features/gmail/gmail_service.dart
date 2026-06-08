@@ -316,12 +316,15 @@ class GmailNotifier extends StateNotifier<GmailState> {
   // 메시지 조작
   Future<void> trashMessage(String id) async {
     final prev = state.messages;
-    state = state.copyWith(messages: prev.where((m) => m.id != id).toList());
+    final updated = prev.where((m) => m.id != id).toList();
+    state = state.copyWith(messages: updated);
+    WidgetService.updateGmail(updated);
     try {
       await _api.post('$_base/messages/$id/trash');
       await loadLabelCounts();
     } catch (_) {
       state = state.copyWith(messages: prev);
+      WidgetService.updateGmail(prev);
     }
   }
 
@@ -370,10 +373,12 @@ class GmailNotifier extends StateNotifier<GmailState> {
     } else {
       await Future.wait(ids.map((id) => _api.post('$_base/messages/$id/trash')));
     }
+    final updatedMessages = state.messages.where((m) => !ids.contains(m.id)).toList();
     state = state.copyWith(
-      messages: state.messages.where((m) => !ids.contains(m.id)).toList(),
+      messages: updatedMessages,
       selectedIds: {},
     );
+    WidgetService.updateGmail(updatedMessages);
     await loadLabelCounts();
   }
 
