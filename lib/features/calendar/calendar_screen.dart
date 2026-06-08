@@ -115,7 +115,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     )
                   : ListView.separated(
                       itemCount: allMonthItems.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1, indent: 56),
+                      separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
                       itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
                     ),
             ),

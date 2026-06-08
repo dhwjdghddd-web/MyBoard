@@ -9,6 +9,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.view.View
 import android.widget.RemoteViews
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.graphics.Typeface
 
 class HomeWidgetProvider : AppWidgetProvider() {
 
@@ -225,10 +231,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
             ))
             views.setOnClickPendingIntent(R.id.cal_add_btn, openAppWithActionIntent(context, "create_event"))
 
-            val evRaw = (prefs.getString("cal_ev_${dispYear}_${dispMonth}", null)
-                ?: prefs.getString("cal_event_days", "")) ?: ""
-            val eventDays = evRaw.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
-
             val cal = java.util.Calendar.getInstance()
             cal.set(dispYear, dispMonth - 1, 1)
             val firstDow    = cal.get(java.util.Calendar.DAY_OF_WEEK) - 1
@@ -245,20 +247,63 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
                     } else {
                         val isToday  = dispYear == actualYear && dispMonth == actualMonth && day == actualToday
-                        val hasEvent = day in eventDays
-                        views.setTextViewText(cellId, if (hasEvent && !isToday) "$day\n·" else day.toString())
-                        views.setTextColor(cellId, when {
+                        
+                        val dateKey = "%04d-%02d-%02d".format(dispYear, dispMonth, day)
+                        val compactKey = "%04d%02d%02d".format(dispYear, dispMonth, day)
+                        
+                        val titlesRaw = prefs.getString("cal_day_${compactKey}_titles", "") ?: ""
+                        val colorsRaw = prefs.getString("cal_day_${compactKey}_colors", "") ?: ""
+
+                        val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
+                        val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
+
+                        val ssb = SpannableStringBuilder()
+                        
+                        // 1. 날짜 숫자 추가
+                        val dayStr = day.toString()
+                        ssb.append(dayStr)
+                        
+                        // 날짜 부분 스타일 지정 (10sp, 볼드여부, 요일별 색상)
+                        val dayColor = when {
                             isToday  -> Color.WHITE
                             col == 0 -> Color.parseColor("#FF6B6B")
                             col == 6 -> Color.parseColor("#6B9FFF")
-                            hasEvent -> Color.parseColor("#60D8A0")
                             else     -> Color.parseColor("#D0D0E0")
-                        })
+                        }
+                        ssb.setSpan(AbsoluteSizeSpan(10, true), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        ssb.setSpan(ForegroundColorSpan(dayColor), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        if (isToday) {
+                            ssb.setSpan(StyleSpan(Typeface.BOLD), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        }
+
+                        // 2. 일정 제목 추가 (최대 2개)
+                        val displayTitles = titles.take(2)
+                        for (i in displayTitles.indices) {
+                            ssb.append("\n")
+                            val start = ssb.length
+                            val title = displayTitles[i]
+                            // 너무 길면 4글자 + .. 처리 (셀 크기가 매우 좁음)
+                            val truncatedTitle = if (title.length > 5) title.substring(0, 4) + ".." else title
+                            ssb.append(truncatedTitle)
+                            val end = ssb.length
+
+                            val colorStr = colors.getOrNull(i)
+                            val eventColor = try {
+                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#60D8A0")
+                            } catch (e: Exception) {
+                                Color.parseColor("#60D8A0")
+                            }
+
+                            ssb.setSpan(AbsoluteSizeSpan(7, true), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            ssb.setSpan(ForegroundColorSpan(eventColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        }
+
+                        views.setTextViewText(cellId, ssb)
+
                         if (isToday) views.setInt(cellId, "setBackgroundResource", R.drawable.cal_today_bg)
                         else         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
 
                         // 날짜 탭 → 위젯 내 일정 패널로 전환 (앱 열지 않음)
-                        val dateKey = "%04d-%02d-%02d".format(dispYear, dispMonth, day)
                         views.setOnClickPendingIntent(cellId, PendingIntent.getBroadcast(
                             context, 800 + idx,
                             Intent(context, HomeWidgetProvider::class.java).apply {

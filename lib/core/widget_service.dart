@@ -92,9 +92,14 @@ class WidgetService {
           return '';
         }).join('|');
         final ids = evList.map((e) => e.id).join('|');
+        final colors = evList.map((e) {
+          final hex = e.color.value.toRadixString(16).padLeft(8, '0');
+          return '#$hex';
+        }).join('|');
         await HomeWidget.saveWidgetData<String>('cal_day_${key}_titles', titles);
         await HomeWidget.saveWidgetData<String>('cal_day_${key}_times',  times);
         await HomeWidget.saveWidgetData<String>('cal_day_${key}_ids',    ids);
+        await HomeWidget.saveWidgetData<String>('cal_day_${key}_colors', colors);
       }
 
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
