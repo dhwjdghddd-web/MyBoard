@@ -37,12 +37,26 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- 태스크 빠른 추가 다이얼로그 -->
+        <activity
+            android:name=".QuickAddTaskActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
         <!-- 홈화면 위젯 -->
         <receiver
             android:name=".HomeWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.dhwjdgh.prv_dashboard.COMPLETE_TASK" />
+                <action android:name="com.dhwjdgh.prv_dashboard.DELETE_TASK" />
+                <action android:name="com.dhwjdgh.prv_dashboard.SWITCH_WIDGET_TAB" />
+                <action android:name="com.dhwjdgh.prv_dashboard.CAL_PREV_MONTH" />
+                <action android:name="com.dhwjdgh.prv_dashboard.CAL_NEXT_MONTH" />
+                <action android:name="com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE" />
+                <action android:name="com.dhwjdgh.prv_dashboard.CAL_BACK" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

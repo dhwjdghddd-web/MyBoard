@@ -65,9 +65,6 @@ class _TaskListView extends ConsumerWidget {
       onRefresh: () => ref.read(taskServiceProvider.notifier).loadTasks(),
       child: ListView(
         children: [
-          if (active.isEmpty && done.isNotEmpty)
-            const _AllDoneView(),
-
           for (final task in active)
             _TaskItem(task: task),
 
@@ -77,7 +74,7 @@ class _TaskListView extends ConsumerWidget {
               _TaskItem(task: task),
           ],
 
-          const SizedBox(height: 80), // FAB 여백
+          const SizedBox(height: 80),
         ],
       ),
     );
@@ -110,11 +107,14 @@ class _TaskItem extends ConsumerWidget {
         );
       },
       child: ListTile(
-        leading: Checkbox(
-          value: task.isCompleted,
-          shape: const CircleBorder(),
-          activeColor: Colors.green,
-          onChanged: (_) => ref.read(taskServiceProvider.notifier).toggleComplete(task),
+        leading: Transform.scale(
+          scale: 1.2,
+          child: Checkbox(
+            value: task.isCompleted,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+            activeColor: Colors.green,
+            onChanged: (_) => ref.read(taskServiceProvider.notifier).toggleComplete(task),
+          ),
         ),
         title: Text(
           task.title,
@@ -200,7 +200,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ── 빈 화면 / 완료 화면 / 오류 화면 ─────────────────────────────────────
+// ── 빈 화면 / 오류 화면 ──────────────────────────────────────────────────
 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
@@ -215,22 +215,6 @@ class _EmptyView extends StatelessWidget {
         Text('태스크가 없어요', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16)),
         const SizedBox(height: 8),
         Text('+ 버튼으로 추가해보세요', style: TextStyle(color: scheme.outline, fontSize: 13)),
-      ]),
-    );
-  }
-}
-
-class _AllDoneView extends StatelessWidget {
-  const _AllDoneView();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(children: [
-        const Text('🎉', style: TextStyle(fontSize: 48)),
-        const SizedBox(height: 8),
-        Text('모두 완료!', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 16, fontWeight: FontWeight.w600)),
       ]),
     );
   }

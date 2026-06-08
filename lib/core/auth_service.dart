@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 const _scopes = [
   'https://www.googleapis.com/auth/tasks',
   'https://www.googleapis.com/auth/calendar.events',
+  'https://www.googleapis.com/auth/calendar.readonly',
   'https://www.googleapis.com/auth/gmail.modify',
 ];
 

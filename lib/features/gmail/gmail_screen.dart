@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import 'email_detail_screen.dart';
+import 'gmail_compose_screen.dart';
 import 'gmail_service.dart';
 
 const _avatarColors = [
@@ -82,9 +83,23 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
     }
   }
 
+  void _openEmail(GmailMessage msg) {
+    if (msg.isUnread) ref.read(gmailProvider.notifier).markRead(msg.id);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EmailDetailScreen(
+          messageId: msg.id,
+          isInTrash: ref.read(gmailProvider).isInTrash,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final gmail = ref.watch(gmailProvider);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -133,6 +148,14 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
           ],
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const GmailComposeScreen())),
+        icon: const Icon(Icons.edit_outlined),
+        label: const Text('작성'),
+        backgroundColor: const Color(0xFF4285F4),
+        foregroundColor: Colors.white,
+      ),
       body: Column(children: [
         // 라벨 선택 스트립
         _LabelStrip(
@@ -165,44 +188,45 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                             await ref.read(gmailProvider.notifier).loadLabelCounts();
                           },
                           child: ListView.builder(
+                            padding: EdgeInsets.zero,
                             itemCount: gmail.messages.length,
                             itemBuilder: (_, i) {
                               final msg = gmail.messages[i];
                               final selected = gmail.selectedIds.contains(msg.id);
-                              return _MessageTile(
-                                message: msg,
-                                selected: selected,
-                                isInTrash: gmail.isInTrash,
-                                onTap: () {
-                                  if (gmail.hasSelection) {
-                                    ref.read(gmailProvider.notifier).toggleSelect(msg.id);
-                                  } else {
-                                    if (msg.isUnread) {
-                                      ref.read(gmailProvider.notifier).markRead(msg.id);
-                                    }
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => EmailDetailScreen(
-                                          messageId: msg.id,
-                                          isInTrash: gmail.isInTrash,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                onLongPress: () => ref.read(gmailProvider.notifier).toggleSelect(msg.id),
-                                onDismissDelete: () async {
-                                  if (gmail.isInTrash) {
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                      content: Text('이미 휴지통에 있습니다. 30일 후 자동 삭제됩니다.'),
-                                    ));
-                                    ref.read(gmailProvider.notifier).loadMessages();
-                                  } else {
-                                    await ref.read(gmailProvider.notifier).trashMessage(msg.id);
-                                  }
-                                },
-                                onDismissRead: () => ref.read(gmailProvider.notifier).markRead(msg.id),
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _MessageTile(
+                                    message: msg,
+                                    selected: selected,
+                                    isInTrash: gmail.isInTrash,
+                                    onTap: () {
+                                      if (gmail.hasSelection) {
+                                        ref.read(gmailProvider.notifier).toggleSelect(msg.id);
+                                      } else {
+                                        _openEmail(msg);
+                                      }
+                                    },
+                                    onLongPress: () => ref.read(gmailProvider.notifier).toggleSelect(msg.id),
+                                    onDismissDelete: () async {
+                                      if (gmail.isInTrash) {
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                          content: Text('이미 휴지통에 있습니다. 30일 후 자동 삭제됩니다.'),
+                                        ));
+                                        ref.read(gmailProvider.notifier).loadMessages();
+                                      } else {
+                                        await ref.read(gmailProvider.notifier).trashMessage(msg.id);
+                                      }
+                                    },
+                                    onDismissRead: () => ref.read(gmailProvider.notifier).markRead(msg.id),
+                                  ),
+                                  if (i < gmail.messages.length - 1)
+                                    Divider(
+                                      height: 1,
+                                      indent: 68,
+                                      color: scheme.outlineVariant.withAlpha(120),
+                                    ),
+                                ],
                               );
                             },
                           ),
@@ -314,6 +338,7 @@ class _MessageTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final initial = message.initial;
     final avatarColor = _avatarColor(initial);
+    final isUnread = message.isUnread;
 
     return Dismissible(
       key: ValueKey(message.id),
@@ -342,45 +367,77 @@ class _MessageTile extends StatelessWidget {
         child: Container(
           color: selected
               ? scheme.primaryContainer.withAlpha(100)
-              : (message.isUnread ? scheme.primaryContainer.withAlpha(40) : null),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(children: [
+              : (isUnread ? scheme.primaryContainer.withAlpha(30) : null),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // 아바타
             GestureDetector(
               onTap: onLongPress,
               child: CircleAvatar(
-                radius: 20,
+                radius: 18,
                 backgroundColor: selected ? scheme.primary : avatarColor,
                 child: selected
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
-                    : Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ? const Icon(Icons.check, color: Colors.white, size: 18)
+                    : Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             // 본문
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Expanded(
-                  child: Text(
-                    message.displayName,
-                    style: TextStyle(fontWeight: message.isUnread ? FontWeight.bold : FontWeight.normal, fontSize: 14),
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Expanded(
+                    child: Text(
+                      message.displayName,
+                      style: TextStyle(
+                        fontWeight: isUnread ? FontWeight.bold : FontWeight.w500,
+                        fontSize: 14,
+                        color: isUnread ? scheme.onSurface : scheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
+                  const SizedBox(width: 6),
+                  Text(
+                    formatEmailDate(message.date),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isUnread ? scheme.primary : scheme.onSurfaceVariant,
+                      fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                  if (isUnread) ...[
+                    const SizedBox(width: 4),
+                    Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF1A73E8), shape: BoxShape.circle)),
+                  ],
+                ]),
+                const SizedBox(height: 1),
+                Text(
+                  message.subject.isEmpty ? '(제목 없음)' : message.subject,
+                  style: TextStyle(
+                    fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 13,
+                    color: isUnread ? scheme.onSurface : scheme.onSurface.withAlpha(200),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Text(formatEmailDate(message.date), style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant)),
+                if (message.snippet.isNotEmpty)
+                  Text(
+                    message.snippet,
+                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ]),
-              const SizedBox(height: 2),
-              Text(
-                message.subject.isEmpty ? '(제목 없음)' : message.subject,
-                style: TextStyle(fontWeight: message.isUnread ? FontWeight.w600 : FontWeight.normal, fontSize: 13),
-                maxLines: 1, overflow: TextOverflow.ellipsis,
+            ),
+            // 별표
+            if (message.isStarred)
+              Padding(
+                padding: const EdgeInsets.only(left: 4, top: 2),
+                child: Icon(Icons.star, size: 16, color: Colors.amber[600]),
               ),
-              Text(message.snippet, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant), maxLines: 1, overflow: TextOverflow.ellipsis),
-            ])),
-            const SizedBox(width: 8),
-            // 미읽음 점
-            if (message.isUnread)
-              Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFF1A73E8), shape: BoxShape.circle)),
           ]),
         ),
       ),

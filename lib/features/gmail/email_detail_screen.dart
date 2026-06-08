@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/api_client.dart';
 import 'gmail_service.dart';
 
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
-// PROMPT.md 명세: 다크모드 강제 차단 HTML 래퍼
 String _wrapHtml(String body) => '''
 <!DOCTYPE html>
 <html>
@@ -56,10 +55,15 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
   Map<String, dynamic>? _full;
   bool _loading = true;
   String? _error;
+  late final WebViewController _webController;
 
   @override
   void initState() {
     super.initState();
+    _webController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.disabled)
+      ..setBackgroundColor(const Color(0xFFFFFFFF));
+
     _loadFull();
   }
 
@@ -71,6 +75,9 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         params: {'format': 'full'},
       );
       setState(() { _full = data as Map<String, dynamic>; _loading = false; });
+      final body = getEmailBody(_full?['payload'] as Map<String, dynamic>? ?? {}) ??
+          '<p style="padding:16px;color:#999">본문이 없습니다</p>';
+      await _webController.loadHtmlString(_wrapHtml(body));
     } catch (e) {
       setState(() { _error = e.toString(); _loading = false; });
     }
@@ -155,7 +162,6 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                   FilledButton(onPressed: _loadFull, child: const Text('다시 시도')),
                 ]))
               : Column(children: [
-                  // 헤더
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     decoration: BoxDecoration(
@@ -172,53 +178,30 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                       _InfoRow('받는사람', _header('To')),
                       _InfoRow('날짜', formatEmailDate(_header('Date'))),
                       const SizedBox(height: 10),
-                      // 액션 버튼
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: [
-                          _ActionBtn(
+                      Row(children: [
+                          Expanded(child: _ActionBtn(
                             icon: Icons.delete_outline,
                             label: widget.isInTrash ? '영구삭제 불가' : '삭제',
                             onTap: _delete,
                             color: Colors.red[400],
-                          ),
+                          )),
                           const SizedBox(width: 8),
-                          _ActionBtn(
+                          Expanded(child: _ActionBtn(
                             icon: _isSpam ? Icons.check_circle_outline : Icons.block,
                             label: _isSpam ? '스팸 해제' : '스팸',
                             onTap: _spam,
-                          ),
+                          )),
                           const SizedBox(width: 8),
-                          _ActionBtn(
+                          Expanded(child: _ActionBtn(
                             icon: _isStarred ? Icons.star : Icons.star_border,
                             label: _isStarred ? '중요 해제' : '중요',
                             onTap: _star,
                             color: _isStarred ? Colors.amber : null,
-                          ),
+                          )),
                         ]),
-                      ),
                     ]),
                   ),
-                  // 본문 (InAppWebView - 다크모드 강제 차단)
-                  Expanded(
-                    child: InAppWebView(
-                      initialData: InAppWebViewInitialData(
-                        data: _wrapHtml(
-                          getEmailBody(_full?['payload'] as Map<String, dynamic>? ?? {}) ??
-                              '<p style="padding:16px;color:#999">본문이 없습니다</p>',
-                        ),
-                        mimeType: 'text/html',
-                        encoding: 'utf-8',
-                        baseUrl: WebUri('about:blank'),
-                      ),
-                      initialSettings: InAppWebViewSettings(
-                        javaScriptEnabled: false,
-                        transparentBackground: false,
-                        forceDark: ForceDark.OFF,
-                        algorithmicDarkeningAllowed: false,
-                      ),
-                    ),
-                  ),
+                  Expanded(child: WebViewWidget(controller: _webController)),
                 ]),
     );
   }
@@ -260,8 +243,8 @@ class _ActionBtn extends StatelessWidget {
       label: Text(label, style: TextStyle(fontSize: 12, color: color)),
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        minimumSize: Size.zero,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        minimumSize: const Size(double.infinity, 0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         side: color != null ? BorderSide(color: color!) : null,
       ),

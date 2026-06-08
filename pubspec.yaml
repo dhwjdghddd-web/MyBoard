@@ -51,7 +51,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
 
   # 메일 본문 렌더링
-  flutter_inappwebview: ^6.1.5
+  webview_flutter: ^4.10.0
 
   # 로컬 알림
   flutter_local_notifications: ^18.0.1

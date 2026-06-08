@@ -79,7 +79,19 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
           .toList();
       final sorted = _sorted(tasks);
       state = AsyncValue.data(sorted);
-      WidgetService.update(sorted);
+      WidgetService.updateTasks(sorted);
+
+      // 위젯에서 체크한 태스크 동기화
+      final pending = await WidgetService.getPendingCompletions();
+      if (pending.isNotEmpty) {
+        await WidgetService.clearPendingCompletions();
+        for (final taskId in pending) {
+          try {
+            final task = sorted.firstWhere((t) => t.id == taskId && !t.isCompleted);
+            await toggleComplete(task);
+          } catch (_) {}
+        }
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -99,7 +111,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
       final current = state.value ?? [];
       final sorted = _sorted([newTask, ...current]);
       state = AsyncValue.data(sorted);
-      WidgetService.update(sorted);
+      WidgetService.updateTasks(sorted);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -119,9 +131,42 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       await _api.patch('$_base/lists/$_listId/tasks/${task.id}', body: body);
-      WidgetService.update(state.value ?? []);
+      WidgetService.updateTasks(state.value ?? []);
     } catch (_) {
       state = AsyncValue.data(_sorted(current)); // 실패 시 원복
+    }
+  }
+
+  Future<void> syncPendingFromWidget() async {
+    // 완료 동기화
+    final completions = await WidgetService.getPendingCompletions();
+    if (completions.isNotEmpty) {
+      await WidgetService.clearPendingCompletions();
+      final current = state.value ?? [];
+      for (final taskId in completions) {
+        try {
+          final task = current.firstWhere((t) => t.id == taskId && !t.isCompleted);
+          await toggleComplete(task);
+        } catch (_) {}
+      }
+    }
+
+    // 삭제 동기화
+    final deletions = await WidgetService.getPendingDeletions();
+    if (deletions.isNotEmpty) {
+      await WidgetService.clearPendingDeletions();
+      for (final taskId in deletions) {
+        try { await deleteTask(taskId); } catch (_) {}
+      }
+    }
+
+    // 위젯에서 추가한 태스크 동기화 (API 호출 실패했던 경우)
+    final newTasks = await WidgetService.getPendingNewTasks();
+    if (newTasks.isNotEmpty) {
+      await WidgetService.clearPendingNewTasks();
+      for (final title in newTasks) {
+        try { await addTask(title); } catch (_) {}
+      }
     }
   }
 
@@ -132,7 +177,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       await _api.delete('$_base/lists/$_listId/tasks/$taskId');
-      WidgetService.update(state.value ?? []);
+      WidgetService.updateTasks(state.value ?? []);
     } catch (_) {
       state = AsyncValue.data(current); // 실패 시 원복
     }

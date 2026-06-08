@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
+import '../../core/widget_service.dart';
 
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
@@ -210,7 +212,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
       final details = await Future.wait(
         ids.map((m) => _api.get(
           '$_base/messages/${m['id']}',
-          params: {'format': 'metadata', 'metadataHeaders': 'From,Subject,Date'},
+          params: {'format': 'metadata', 'metadataHeaders': ['From', 'Subject', 'Date']},
         )),
       );
 
@@ -218,6 +220,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
           .toList();
       state = state.copyWith(messages: messages, loading: false);
+      WidgetService.updateGmail(messages);
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
     }
@@ -359,6 +362,34 @@ class GmailNotifier extends StateNotifier<GmailState> {
       state = state.copyWith(loading: false, error: e.toString());
       rethrow;
     }
+  }
+
+  Future<void> sendEmail({
+    required String to,
+    required String subject,
+    required String body,
+  }) async {
+    final raw = _buildRaw(to: to, subject: subject, body: body);
+    await _api.post('$_base/messages/send', body: {'raw': raw});
+    await loadLabelCounts();
+  }
+
+  static String _buildRaw({
+    required String to,
+    required String subject,
+    required String body,
+  }) {
+    final message = [
+      'To: $to',
+      'Subject: =?utf-8?B?${base64.encode(utf8.encode(subject))}?=',
+      'MIME-Version: 1.0',
+      'Content-Type: text/plain; charset="UTF-8"',
+      'Content-Transfer-Encoding: base64',
+      '',
+      base64.encode(utf8.encode(body)),
+    ].join('\r\n');
+    // URL-safe base64 without padding
+    return base64Url.encode(Uint8List.fromList(utf8.encode(message))).replaceAll('=', '');
   }
 
   void _updateLabels(String id, {List<String> add = const [], List<String> remove = const []}) {

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/api_client.dart';
 import 'core/mail_poller.dart';
 import 'core/notification_service.dart';
 import 'features/tasks/task_service.dart';
 import 'features/tasks/tasks_screen.dart';
+import 'features/tasks/add_task_sheet.dart';
 import 'features/calendar/calendar_screen.dart';
+import 'features/calendar/calendar_service.dart';
+import 'features/calendar/event_form_screen.dart';
+import 'features/calendar/event_detail_sheet.dart';
 import 'features/gmail/gmail_screen.dart';
+import 'features/gmail/gmail_compose_screen.dart';
+import 'features/gmail/email_detail_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -15,9 +22,12 @@ class MainScreen extends ConsumerStatefulWidget {
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen>
+    with WidgetsBindingObserver {
   int _index = 0;
   MailPoller? _poller;
+
+  static const _channel = MethodChannel('widget_channel');
 
   static const _screens = <Widget>[
     TasksScreen(),
@@ -28,15 +38,162 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _channel.setMethodCallHandler(_handleMethodCall);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await NotificationService.requestPermission();
       _poller = MailPoller(ref.read(apiClientProvider));
       _poller!.start();
+      _applyInitialIntent();
     });
+  }
+
+  Future<void> _applyInitialIntent() async {
+    try {
+      final emailId = await _channel.invokeMethod<String>('getInitialEmailId') ?? '';
+      if (emailId.isNotEmpty && mounted) {
+        setState(() => _index = 2);
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (mounted) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => EmailDetailScreen(messageId: emailId, isInTrash: false)));
+        }
+        return;
+      }
+
+      final eventId = await _channel.invokeMethod<String>('getInitialEventId') ?? '';
+      final dateKey = await _channel.invokeMethod<String>('getInitialDateKey') ?? '';
+      if (dateKey.isNotEmpty && mounted) {
+        setState(() => _index = 1);
+        await Future.delayed(const Duration(milliseconds: 400));
+        _openCalendarDate(eventId, dateKey);
+        return;
+      }
+
+      final action = await _channel.invokeMethod<String>('getInitialAction') ?? '';
+      if (action.isNotEmpty && mounted) {
+        if (action == 'create_task') {
+          setState(() => _index = 0);
+          await Future.delayed(const Duration(milliseconds: 300));
+          _showAddTaskSheet();
+        } else if (action == 'create_event') {
+          setState(() => _index = 1);
+          await Future.delayed(const Duration(milliseconds: 300));
+          _showCreateEventScreen();
+        } else if (action == 'compose_email') {
+          setState(() => _index = 2);
+          await Future.delayed(const Duration(milliseconds: 300));
+          _showComposeScreen();
+        }
+        return;
+      }
+
+      final tab = await _channel.invokeMethod<int>('getInitialTab') ?? -1;
+      if (tab >= 0 && mounted) setState(() => _index = tab);
+    } catch (_) {}
+  }
+
+  Future<dynamic> _handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'switchTab':
+        final tab = call.arguments as int;
+        if (mounted) setState(() => _index = tab);
+
+      case 'openEmail':
+        final emailId = call.arguments as String;
+        if (mounted) {
+          setState(() => _index = 2);
+          await Future.delayed(const Duration(milliseconds: 200));
+          if (mounted) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => EmailDetailScreen(messageId: emailId, isInTrash: false)));
+          }
+        }
+
+      case 'openCalendarDate':
+        final args = call.arguments as Map;
+        final eventId = args['eventId'] as String;
+        final dateKey = args['dateKey'] as String;
+        if (mounted) {
+          setState(() => _index = 1);
+          await Future.delayed(const Duration(milliseconds: 200));
+          _openCalendarDate(eventId, dateKey);
+        }
+
+      case 'openCreateTask':
+        if (mounted) {
+          setState(() => _index = 0);
+          await Future.delayed(const Duration(milliseconds: 200));
+          _showAddTaskSheet();
+        }
+
+      case 'openCreateEvent':
+        if (mounted) {
+          setState(() => _index = 1);
+          await Future.delayed(const Duration(milliseconds: 200));
+          _showCreateEventScreen();
+        }
+
+      case 'openComposeEmail':
+        if (mounted) {
+          setState(() => _index = 2);
+          await Future.delayed(const Duration(milliseconds: 200));
+          _showComposeScreen();
+        }
+    }
+  }
+
+  void _openCalendarDate(String eventId, String dateKey) {
+    if (!mounted) return;
+    final events = ref.read(calendarProvider).events
+        .where((e) => e.dateKey == dateKey)
+        .toList();
+    if (events.isEmpty) return; // 이벤트 없으면 캘린더 탭만 전환
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) => EventDetailSheet(dateKey: dateKey, events: events),
+    );
+  }
+
+  void _showAddTaskSheet() {
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) => const AddTaskSheet(),
+    );
+  }
+
+  void _showComposeScreen() {
+    if (!mounted) return;
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => const GmailComposeScreen()));
+  }
+
+  void _showCreateEventScreen() {
+    if (!mounted) return;
+    final now = DateTime.now();
+    final dateKey =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => EventFormScreen(initialDateKey: dateKey)));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(taskServiceProvider.notifier).syncPendingFromWidget();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _poller?.stop();
     super.dispose();
   }

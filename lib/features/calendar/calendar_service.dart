@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_client.dart';
+import '../../core/widget_service.dart';
 
 // ── 유틸 ──────────────────────────────────────────────────────────────────
 
@@ -269,6 +270,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       });
 
       state = state.copyWith(events: events, loading: false);
+      WidgetService.updateCalendar(events);
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
     }
