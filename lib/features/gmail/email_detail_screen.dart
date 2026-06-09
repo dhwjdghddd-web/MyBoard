@@ -165,7 +165,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                   // 헤더: 수신자가 많아도 스크롤 가능하도록 최대 높이 제한
                   ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.42,
+                      maxHeight: MediaQuery.of(context).size.height * 0.28,
                     ),
                     child: SingleChildScrollView(
                       child: Container(

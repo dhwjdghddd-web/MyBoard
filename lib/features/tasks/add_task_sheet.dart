@@ -61,9 +61,10 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
     final scheme = Theme.of(context).colorScheme;
     final bottom = MediaQuery.of(context).viewInsets.bottom;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, 20, 16, bottom + 20),
-      child: Column(
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, 20, 16, bottom + 20),
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -158,6 +159,7 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
           ),
         ],
       ),
+    ),
     );
   }
 }

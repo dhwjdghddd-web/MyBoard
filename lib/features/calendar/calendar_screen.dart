@@ -341,7 +341,7 @@ class _CalendarGrid extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7, childAspectRatio: 0.9,
+        crossAxisCount: 7, childAspectRatio: 0.75,
       ),
       itemCount: rows * 7,
       itemBuilder: (context, i) {
