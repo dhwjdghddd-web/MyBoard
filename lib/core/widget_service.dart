@@ -4,6 +4,12 @@ import '../features/calendar/calendar_service.dart';
 import '../features/gmail/gmail_service.dart';
 
 class WidgetService {
+  static Future<void> saveTaskListId(String listId) async {
+    try {
+      await HomeWidget.saveWidgetData<String>('task_list_id', listId);
+    } catch (_) {}
+  }
+
   static Future<void> updateTasks(List<Task> tasks) async {
     try {
       final active = tasks.where((t) => !t.isCompleted).toList();

@@ -41,6 +41,8 @@
             android:name=".QuickAddTaskActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog.Alert"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <!-- 홈화면 위젯 -->
@@ -56,6 +58,10 @@
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_NEXT_MONTH" />
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE" />
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_BACK" />
+                <action android:name="com.dhwjdgh.prv_dashboard.GMAIL_ITEM" />
+                <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_GMAIL" />
+                <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_TASKS" />
+                <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_CALENDAR" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -66,6 +72,21 @@
             android:name=".GmailWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
+
+        <service
+            android:name=".CalendarSyncJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
+
+        <service
+            android:name=".GmailSyncJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
+
+        <service
+            android:name=".TasksSyncJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

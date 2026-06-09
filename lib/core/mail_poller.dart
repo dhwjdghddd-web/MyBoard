@@ -5,9 +5,10 @@ import 'notification_service.dart';
 const _gmailBase = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
 class MailPoller {
-  MailPoller(this._api);
+  MailPoller(this._api, {this.onNewMail});
 
   final ApiClient _api;
+  final Future<void> Function()? onNewMail;
   Timer? _timer;
   int _lastUnread = -1; // -1 = 아직 기준값 없음
 
@@ -36,6 +37,7 @@ class MailPoller {
       if (unread > _lastUnread) {
         final newCount = unread - _lastUnread;
         await _notifyNew(newCount);
+        await onNewMail?.call();
       }
       _lastUnread = unread;
     } catch (_) {

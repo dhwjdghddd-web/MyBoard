@@ -53,13 +53,19 @@ class GmailWidgetFactory(private val context: Context) : RemoteViewsService.Remo
 
         views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) Color.WHITE else Color.parseColor("#B0B0C0"))
         
-        val fillInIntent = Intent().apply {
+        val openIntent = Intent().apply {
+            putExtra("gmail_item_action", "open")
             putExtra("tab", 2)
-            if (item.emailId.isNotEmpty()) {
-                putExtra("email_id", item.emailId)
-            }
+            if (item.emailId.isNotEmpty()) putExtra("email_id", item.emailId)
         }
-        views.setOnClickFillInIntent(R.id.gmail_item_root, fillInIntent)
+        views.setOnClickFillInIntent(R.id.gmail_item_root, openIntent)
+
+        val deleteIntent = Intent().apply {
+            putExtra("gmail_item_action", "delete")
+            putExtra("email_id", item.emailId)
+            putExtra("email_idx", position)
+        }
+        views.setOnClickFillInIntent(R.id.gmail_item_delete, deleteIntent)
         
         return views
     }

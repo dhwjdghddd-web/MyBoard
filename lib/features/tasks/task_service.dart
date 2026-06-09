@@ -70,6 +70,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
         return;
       }
       _listId = items[0]['id'] as String;
+      await WidgetService.saveTaskListId(_listId!);
       final data = await _api.get(
         '$_base/lists/$_listId/tasks',
         params: {'showCompleted': 'true', 'maxResults': '100'},
@@ -184,6 +185,18 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     } catch (_) {
       state = AsyncValue.data(current); // 실패 시 원복
     }
+  }
+
+  void markTaskCompletedLocal(String taskId) {
+    final current = state.value ?? [];
+    state = AsyncValue.data(
+      _sorted(current.map((t) => t.id == taskId ? t.copyWith(status: 'completed') : t).toList()),
+    );
+  }
+
+  void deleteTaskLocal(String taskId) {
+    final current = state.value ?? [];
+    state = AsyncValue.data(current.where((t) => t.id != taskId).toList());
   }
 
   List<Task> _sorted(List<Task> tasks) {

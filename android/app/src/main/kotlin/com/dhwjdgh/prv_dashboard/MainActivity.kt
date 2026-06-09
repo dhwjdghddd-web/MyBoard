@@ -10,9 +10,14 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL = "widget_channel"
     private var methodChannel: MethodChannel? = null
 
+    companion object {
+        var activeChannel: MethodChannel? = null
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        activeChannel = methodChannel
         methodChannel!!.setMethodCallHandler { call, result ->
             when (call.method) {
                 "getInitialTab"     -> result.success(intent?.getIntExtra("tab", -1) ?: -1)
@@ -23,6 +28,13 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (activeChannel == methodChannel) {
+            activeChannel = null
+        }
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent) {

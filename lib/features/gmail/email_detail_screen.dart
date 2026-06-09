@@ -162,44 +162,52 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                   FilledButton(onPressed: _loadFull, child: const Text('다시 시도')),
                 ]))
               : Column(children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+                  // 헤더: 수신자가 많아도 스크롤 가능하도록 최대 높이 제한
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.42,
                     ),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(
-                        _header('Subject').isEmpty ? '(제목 없음)' : _header('Subject'),
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      _InfoRow('보낸사람', _header('From')),
-                      _InfoRow('받는사람', _header('To')),
-                      _InfoRow('날짜', formatEmailDate(_header('Date'))),
-                      const SizedBox(height: 10),
-                      Row(children: [
-                          Expanded(child: _ActionBtn(
-                            icon: Icons.delete_outline,
-                            label: widget.isInTrash ? '영구삭제 불가' : '삭제',
-                            onTap: _delete,
-                            color: Colors.red[400],
-                          )),
-                          const SizedBox(width: 8),
-                          Expanded(child: _ActionBtn(
-                            icon: _isSpam ? Icons.check_circle_outline : Icons.block,
-                            label: _isSpam ? '스팸 해제' : '스팸',
-                            onTap: _spam,
-                          )),
-                          const SizedBox(width: 8),
-                          Expanded(child: _ActionBtn(
-                            icon: _isStarred ? Icons.star : Icons.star_border,
-                            label: _isStarred ? '중요 해제' : '중요',
-                            onTap: _star,
-                            color: _isStarred ? Colors.amber : null,
-                          )),
+                    child: SingleChildScrollView(
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+                        ),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(
+                            _header('Subject').isEmpty ? '(제목 없음)' : _header('Subject'),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          _InfoRow('보낸사람', _header('From')),
+                          _InfoRow('받는사람', _header('To')),
+                          _InfoRow('날짜', formatEmailDate(_header('Date'))),
+                          const SizedBox(height: 10),
+                          Row(children: [
+                            Expanded(child: _ActionBtn(
+                              icon: Icons.delete_outline,
+                              label: widget.isInTrash ? '영구삭제 불가' : '삭제',
+                              onTap: _delete,
+                              color: Colors.red[400],
+                            )),
+                            const SizedBox(width: 8),
+                            Expanded(child: _ActionBtn(
+                              icon: _isSpam ? Icons.check_circle_outline : Icons.block,
+                              label: _isSpam ? '스팸 해제' : '스팸',
+                              onTap: _spam,
+                            )),
+                            const SizedBox(width: 8),
+                            Expanded(child: _ActionBtn(
+                              icon: _isStarred ? Icons.star : Icons.star_border,
+                              label: _isStarred ? '중요 해제' : '중요',
+                              onTap: _star,
+                              color: _isStarred ? Colors.amber : null,
+                            )),
+                          ]),
                         ]),
-                    ]),
+                      ),
+                    ),
                   ),
                   Expanded(child: WebViewWidget(controller: _webController)),
                 ]),

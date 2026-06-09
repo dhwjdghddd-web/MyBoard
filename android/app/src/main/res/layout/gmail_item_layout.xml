@@ -3,43 +3,63 @@
     android:id="@+id/gmail_item_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
 
+    <!-- 텍스트 영역 (발신자 + 제목) -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/gmail_item_sender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/gmail_item_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#7070A0"
+                android:paddingStart="6dp" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/gmail_item_sender"
-            android:layout_width="0dp"
+            android:id="@+id/gmail_item_subject"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
+            android:textSize="11sp"
+            android:textColor="#9090A8"
             android:maxLines="1"
             android:ellipsize="end" />
 
-        <TextView
-            android:id="@+id/gmail_item_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:textColor="#7070A0"
-            android:paddingStart="6dp" />
-
     </LinearLayout>
 
+    <!-- 삭제 버튼 -->
     <TextView
-        android:id="@+id/gmail_item_subject"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="11sp"
-        android:textColor="#9090A8"
-        android:maxLines="1"
-        android:ellipsize="end" />
+        android:id="@+id/gmail_item_delete"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:text="✕"
+        android:textSize="12sp"
+        android:textColor="#505060"
+        android:gravity="center" />
 
 </LinearLayout>

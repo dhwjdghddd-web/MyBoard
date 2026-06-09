@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import android.text.SpannableStringBuilder
@@ -36,6 +37,15 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     .putString("pending_completions", if (current.isEmpty()) taskId else "$current,$taskId")
                     .apply()
                 redraw(context)
+
+                // 백그라운드 API 동기화 구동 (앱 켜짐 없음)
+                val pendingResult = goAsync()
+                TasksSyncJobService.executeComplete(context, taskId, true) {
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        MainActivity.activeChannel?.invokeMethod("taskCompleted", taskId)
+                    }
+                    pendingResult.finish()
+                }
             }
             ACTION_DELETE_TASK -> {
                 val taskId    = intent.getStringExtra("task_id") ?: return
@@ -48,6 +58,15 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     .putString("task_${taskIndex}_done", "false")
                     .apply()
                 redraw(context)
+
+                // 백그라운드 API 동기화 구동 (앱 켜짐 없음)
+                val pendingResult = goAsync()
+                TasksSyncJobService.executeDelete(context, taskId) {
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        MainActivity.activeChannel?.invokeMethod("taskDeleted", taskId)
+                    }
+                    pendingResult.finish()
+                }
             }
             ACTION_SWITCH_TAB -> {
                 val tab = intent.getIntExtra("tab", 0)
@@ -61,6 +80,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 prefs.edit().putInt("cal_display_year", y).putInt("cal_display_month", m)
                     .putBoolean("cal_show_day_panel", false).apply()
                 redraw(context)
+                val pendingResult = goAsync()
+                CalendarSyncJobService.executeSync(context, y, m) { pendingResult.finish() }
             }
             ACTION_CAL_NEXT_MONTH -> {
                 var y = prefs.getInt("cal_display_year",  now().get(java.util.Calendar.YEAR))
@@ -69,6 +90,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 prefs.edit().putInt("cal_display_year", y).putInt("cal_display_month", m)
                     .putBoolean("cal_show_day_panel", false).apply()
                 redraw(context)
+                val pendingResult = goAsync()
+                CalendarSyncJobService.executeSync(context, y, m) { pendingResult.finish() }
             }
             ACTION_CAL_SELECT_DATE -> {
                 val dateKey = intent.getStringExtra("date_key") ?: return
@@ -79,6 +102,88 @@ class HomeWidgetProvider : AppWidgetProvider() {
             ACTION_CAL_BACK -> {
                 prefs.edit().putBoolean("cal_show_day_panel", false).apply()
                 redraw(context)
+            }
+            ACTION_REFRESH_GMAIL -> {
+                Log.d("HomeWidget", "REFRESH_GMAIL received")
+                val pendingResult = goAsync()
+                prefs.edit().putBoolean("gmail_scroll_to_top", true).apply()
+                partiallySetBtnColor(context, R.id.gmail_refresh_btn, "#FFA000")
+                GmailSyncJobService.executeSync(context) {
+                    val mgr = AppWidgetManager.getInstance(context)
+                    val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
+                    Log.d("HomeWidget", "sync done → updating ${ids.size} widget(s), gmail_count=${context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt("gmail_count", -1)}")
+                    partiallySetBtnColor(context, R.id.gmail_refresh_btn, "#4CAF50")
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        partiallySetBtnColor(context, R.id.gmail_refresh_btn, "#FFFFFF")
+                    }, 1500)
+                    for (id in ids) updateWidget(context, mgr, id)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        MainActivity.activeChannel?.invokeMethod("refreshData", null)
+                    }
+                    pendingResult.finish()
+                }
+            }
+            ACTION_REFRESH_TASKS -> {
+                val pendingResult = goAsync()
+                partiallySetBtnColor(context, R.id.task_refresh_btn, "#FFA000")
+                TasksSyncJobService.executeSync(context) {
+                    val mgr = AppWidgetManager.getInstance(context)
+                    val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
+                    partiallySetBtnColor(context, R.id.task_refresh_btn, "#4CAF50")
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        partiallySetBtnColor(context, R.id.task_refresh_btn, "#FFFFFF")
+                    }, 1500)
+                    for (id in ids) updateWidget(context, mgr, id)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        MainActivity.activeChannel?.invokeMethod("refreshData", null)
+                    }
+                    pendingResult.finish()
+                }
+            }
+            ACTION_REFRESH_CALENDAR -> {
+                val y = prefs.getInt("cal_display_year",  now().get(java.util.Calendar.YEAR))
+                val m = prefs.getInt("cal_display_month", now().get(java.util.Calendar.MONTH) + 1)
+                val pendingResult = goAsync()
+                partiallySetBtnColor(context, R.id.cal_refresh_btn, "#FFA000")
+                CalendarSyncJobService.executeSync(context, y, m) {
+                    partiallySetBtnColor(context, R.id.cal_refresh_btn, "#4CAF50")
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        partiallySetBtnColor(context, R.id.cal_refresh_btn, "#FFFFFF")
+                    }, 1500)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        MainActivity.activeChannel?.invokeMethod("refreshData", null)
+                    }
+                    pendingResult.finish()
+                }
+            }
+            ACTION_GMAIL_ITEM -> {
+                when (intent.getStringExtra("gmail_item_action")) {
+                    "delete" -> {
+                        val emailId = intent.getStringExtra("email_id") ?: ""
+                        val idx     = intent.getIntExtra("email_idx", -1)
+                        deleteGmailItemLocal(context, prefs, idx)
+                        redraw(context)
+                        if (emailId.isNotEmpty()) {
+                            val pendingResult = goAsync()
+                            GmailSyncJobService.executeTrash(context, emailId) {
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                    MainActivity.activeChannel?.invokeMethod("gmailDeleted", emailId)
+                                }
+                                pendingResult.finish()
+                            }
+                        }
+                    }
+                    else -> {
+                        val emailId = intent.getStringExtra("email_id") ?: ""
+                        context.startActivity(
+                            Intent(context, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                putExtra("tab", 2)
+                                if (emailId.isNotEmpty()) putExtra("email_id", emailId)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -92,6 +197,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
         const val ACTION_CAL_NEXT_MONTH  = "com.dhwjdgh.prv_dashboard.CAL_NEXT_MONTH"
         const val ACTION_CAL_SELECT_DATE = "com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE"
         const val ACTION_CAL_BACK        = "com.dhwjdgh.prv_dashboard.CAL_BACK"
+        const val ACTION_GMAIL_ITEM      = "com.dhwjdgh.prv_dashboard.GMAIL_ITEM"
+        const val ACTION_REFRESH_GMAIL   = "com.dhwjdgh.prv_dashboard.REFRESH_GMAIL"
+        const val ACTION_REFRESH_TASKS   = "com.dhwjdgh.prv_dashboard.REFRESH_TASKS"
+        const val ACTION_REFRESH_CALENDAR = "com.dhwjdgh.prv_dashboard.REFRESH_CALENDAR"
 
         private val CELL_IDS = arrayOf(
             intArrayOf(R.id.c00, R.id.c01, R.id.c02, R.id.c03, R.id.c04, R.id.c05, R.id.c06),
@@ -136,11 +245,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.tab_calendar, switchTabIntent(context, 1))
             views.setOnClickPendingIntent(R.id.tab_gmail,    switchTabIntent(context, 2))
 
-            bindTasks(context, views, prefs)
-            bindCalendar(context, views, prefs)
-            bindGmail(context, views, prefs)
+            // only bind the active tab — avoids 42-cell calendar render on every tab switch
+            when (activeTab) {
+                0 -> bindTasks(context, views, prefs)
+                1 -> bindCalendar(context, views, prefs)
+                2 -> bindGmail(context, views, prefs)
+            }
 
-            manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
+            if (activeTab == 2) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
 
             manager.updateAppWidget(widgetId, views)
         }
@@ -192,6 +304,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             views.setViewVisibility(R.id.task_empty, if (visible == 0) View.VISIBLE else View.GONE)
             views.setOnClickPendingIntent(R.id.task_add_btn, quickAddTaskIntent(context))
+            views.setOnClickPendingIntent(R.id.task_launch_btn, openAppIntent(context, 0))
+            views.setOnClickPendingIntent(R.id.task_refresh_btn, PendingIntent.getBroadcast(
+                context, 150,
+                Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_REFRESH_TASKS },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ))
         }
 
         // ─────────────────────────────────────────────────────────────────
@@ -229,6 +347,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.cal_next, PendingIntent.getBroadcast(
                 context, 701,
                 Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_CAL_NEXT_MONTH },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ))
+            views.setOnClickPendingIntent(R.id.cal_launch_btn, openAppIntent(context, 1))
+            views.setOnClickPendingIntent(R.id.cal_refresh_btn, PendingIntent.getBroadcast(
+                context, 704,
+                Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_REFRESH_CALENDAR },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
             views.setOnClickPendingIntent(R.id.cal_add_btn, openAppWithActionIntent(context, "create_event"))
@@ -391,6 +515,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 }
             }
             views.setViewVisibility(R.id.cal_day_empty, if (visible == 0) View.VISIBLE else View.GONE)
+
+            val backIntent = PendingIntent.getBroadcast(
+                context, 703,
+                Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_CAL_BACK },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.cal_day_swipe_back, backIntent)
+            views.setOnClickPendingIntent(R.id.cal_day_empty, backIntent)
         }
 
         // ─────────────────────────────────────────────────────────────────
@@ -414,21 +546,48 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 val intent = Intent(context, GmailWidgetService::class.java)
                 views.setRemoteAdapter(R.id.gmail_list_view, intent)
 
-                // Bind PendingIntent template for list items
-                val clickIntentTemplate = Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                }
-                val clickPendingIntentTemplate = PendingIntent.getActivity(
-                    context,
-                    350,
-                    clickIntentTemplate,
+                // Broadcast template → HomeWidgetProvider handles open/delete
+                val template = PendingIntent.getBroadcast(
+                    context, 350,
+                    Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_GMAIL_ITEM },
                     PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
-                views.setPendingIntentTemplate(R.id.gmail_list_view, clickPendingIntentTemplate)
+                views.setPendingIntentTemplate(R.id.gmail_list_view, template)
+
+                // 상단 스크롤 플래그 확인 및 스크롤 처리
+                val scrollToTop = prefs.getBoolean("gmail_scroll_to_top", false)
+                if (scrollToTop) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        views.setScrollPosition(R.id.gmail_list_view, 0)
+                    }
+                    prefs.edit().putBoolean("gmail_scroll_to_top", false).apply()
+                }
             }
 
+            // 앱 실행 숏컷 버튼
+            views.setOnClickPendingIntent(R.id.gmail_launch_btn, openAppIntent(context, 2))
+            // 새로고침 버튼 → GmailSyncJobService 스케줄
+            views.setOnClickPendingIntent(R.id.gmail_refresh_btn, PendingIntent.getBroadcast(
+                context, 460,
+                Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_REFRESH_GMAIL },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ))
             // compose 버튼 → 앱의 Gmail 작성 화면
             views.setOnClickPendingIntent(R.id.gmail_compose_btn, openAppWithActionIntent(context, "compose_email"))
+            // 하단 스와이프 존: 탭 이동
+            views.setOnClickPendingIntent(R.id.swipe_prev_gmail, switchTabIntent(context, 1))
+            views.setOnClickPendingIntent(R.id.swipe_next_gmail, switchTabIntent(context, 0))
+        }
+
+        private fun partiallySetBtnColor(context: Context, viewId: Int, colorHex: String) {
+            val mgr = AppWidgetManager.getInstance(context)
+            val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
+            val color = android.graphics.Color.parseColor(colorHex)
+            for (id in ids) {
+                val v = RemoteViews(context.packageName, R.layout.home_widget_layout)
+                v.setTextColor(viewId, color)
+                mgr.partiallyUpdateAppWidget(id, v)
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────
@@ -457,10 +616,37 @@ class HomeWidgetProvider : AppWidgetProvider() {
             PendingIntent.getActivity(
                 context, 550,
                 Intent(context, QuickAddTaskActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
+
+        private fun deleteGmailItemLocal(
+            context: Context,
+            prefs: android.content.SharedPreferences,
+            idx: Int
+        ) {
+            val count = try { prefs.getInt("gmail_count", 0) }
+                        catch (e: ClassCastException) { prefs.getString("gmail_count","0")?.toIntOrNull() ?: 0 }
+            if (idx < 0 || idx >= count) return
+
+            val edit = prefs.edit()
+            for (i in idx until count - 1) {
+                edit.putString("gmail_${i}_sender",  prefs.getString("gmail_${i+1}_sender",  ""))
+                edit.putString("gmail_${i}_time",    prefs.getString("gmail_${i+1}_time",    ""))
+                edit.putString("gmail_${i}_subject", prefs.getString("gmail_${i+1}_subject", ""))
+                edit.putString("gmail_${i}_unread",  prefs.getString("gmail_${i+1}_unread",  "false"))
+                edit.putString("gmail_${i}_id",      prefs.getString("gmail_${i+1}_id",      ""))
+            }
+            val last = count - 1
+            edit.putString("gmail_${last}_sender",  "")
+            edit.putString("gmail_${last}_time",    "")
+            edit.putString("gmail_${last}_subject", "")
+            edit.putString("gmail_${last}_unread",  "false")
+            edit.putString("gmail_${last}_id",      "")
+            edit.putInt("gmail_count", last)
+            edit.apply()
+        }
 
         private fun openAppWithActionIntent(context: Context, action: String): PendingIntent =
             PendingIntent.getActivity(

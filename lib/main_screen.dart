@@ -12,6 +12,7 @@ import 'features/calendar/calendar_service.dart';
 import 'features/calendar/event_form_screen.dart';
 import 'features/calendar/event_detail_sheet.dart';
 import 'features/gmail/gmail_screen.dart';
+import 'features/gmail/gmail_service.dart';
 import 'features/gmail/gmail_compose_screen.dart';
 import 'features/gmail/email_detail_screen.dart';
 
@@ -42,7 +43,14 @@ class _MainScreenState extends ConsumerState<MainScreen>
     _channel.setMethodCallHandler(_handleMethodCall);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await NotificationService.requestPermission();
-      _poller = MailPoller(ref.read(apiClientProvider));
+      _poller = MailPoller(
+        ref.read(apiClientProvider),
+        onNewMail: () async {
+          if (mounted) {
+            await ref.read(gmailProvider.notifier).loadMessages();
+          }
+        },
+      );
       _poller!.start();
       _applyInitialIntent();
     });
@@ -94,11 +102,42 @@ class _MainScreenState extends ConsumerState<MainScreen>
   }
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
-    if (mounted) {
+    final navMethods = {
+      'switchTab',
+      'openEmail',
+      'openCalendarDate',
+      'openCreateTask',
+      'openCreateEvent',
+      'openComposeEmail'
+    };
+    if (navMethods.contains(call.method) && mounted) {
       Navigator.popUntil(context, (route) => route.isFirst);
     }
 
     switch (call.method) {
+      case 'refreshData':
+        if (mounted) {
+          ref.read(taskServiceProvider.notifier).loadTasks();
+          ref.read(calendarProvider.notifier).loadEvents();
+          ref.read(gmailProvider.notifier).loadMessages();
+          ref.read(gmailProvider.notifier).loadLabelCounts();
+        }
+      case 'gmailDeleted':
+        final emailId = call.arguments as String;
+        if (mounted) {
+          ref.read(gmailProvider.notifier).removeMessageLocal(emailId);
+          ref.read(gmailProvider.notifier).loadLabelCounts();
+        }
+      case 'taskCompleted':
+        final taskId = call.arguments as String;
+        if (mounted) {
+          ref.read(taskServiceProvider.notifier).markTaskCompletedLocal(taskId);
+        }
+      case 'taskDeleted':
+        final taskId = call.arguments as String;
+        if (mounted) {
+          ref.read(taskServiceProvider.notifier).deleteTaskLocal(taskId);
+        }
       case 'switchTab':
         final tab = call.arguments as int;
         if (mounted) setState(() => _index = tab);
@@ -192,6 +231,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.read(taskServiceProvider.notifier).syncPendingFromWidget();
+      ref.read(gmailProvider.notifier).loadLabelCounts();
     }
   }
 

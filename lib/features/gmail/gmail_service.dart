@@ -230,7 +230,9 @@ class GmailNotifier extends StateNotifier<GmailState> {
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
           .toList();
       state = state.copyWith(messages: messages, loading: false, nextPageToken: nextToken);
-      WidgetService.updateGmail(messages);
+      if (state.label == 'INBOX') {
+        WidgetService.updateGmail(messages);
+      }
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
     }
@@ -318,13 +320,17 @@ class GmailNotifier extends StateNotifier<GmailState> {
     final prev = state.messages;
     final updated = prev.where((m) => m.id != id).toList();
     state = state.copyWith(messages: updated);
-    WidgetService.updateGmail(updated);
+    if (state.label == 'INBOX') {
+      WidgetService.updateGmail(updated);
+    }
     try {
       await _api.post('$_base/messages/$id/trash');
       await loadLabelCounts();
     } catch (_) {
       state = state.copyWith(messages: prev);
-      WidgetService.updateGmail(prev);
+      if (state.label == 'INBOX') {
+        WidgetService.updateGmail(prev);
+      }
     }
   }
 
@@ -378,7 +384,9 @@ class GmailNotifier extends StateNotifier<GmailState> {
       messages: updatedMessages,
       selectedIds: {},
     );
-    WidgetService.updateGmail(updatedMessages);
+    if (state.label == 'INBOX') {
+      WidgetService.updateGmail(updatedMessages);
+    }
     await loadLabelCounts();
   }
 
@@ -451,6 +459,12 @@ class GmailNotifier extends StateNotifier<GmailState> {
     ].join('\r\n');
     // URL-safe base64 without padding
     return base64Url.encode(Uint8List.fromList(utf8.encode(message))).replaceAll('=', '');
+  }
+
+  void removeMessageLocal(String id) {
+    final prev = state.messages;
+    final updated = prev.where((m) => m.id != id).toList();
+    state = state.copyWith(messages: updated);
   }
 
   void _updateLabels(String id, {List<String> add = const [], List<String> remove = const []}) {

@@ -70,57 +70,56 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ],
       ),
       body: Stack(children: [
-        Column(children: [
-          // 요일 헤더
-          _DowHeader(),
-          // 달력 그리드 (자연 높이)
-          _CalendarGrid(
-            year: cal.year,
-            month: cal.month,
-            eventsByDate: cal.eventsByDate,
-            tasksByDate: tasksByDate,
-          ),
-          const Divider(height: 1),
-          // 이달 일정 목록 헤더
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                letterSpacing: 0.3,
+        RefreshIndicator(
+          onRefresh: () => ref.read(calendarProvider.notifier).loadEvents(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(children: [
+              // 요일 헤더
+              _DowHeader(),
+              // 달력 그리드 (자연 높이)
+              _CalendarGrid(
+                year: cal.year,
+                month: cal.month,
+                eventsByDate: cal.eventsByDate,
+                tasksByDate: tasksByDate,
               ),
-            ),
-          ),
-          // 이달 일정 스크롤 리스트
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => ref.read(calendarProvider.notifier).loadEvents(),
-              child: allMonthItems.isEmpty
-                  ? ListView(
-                      children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Text(
-                              '이번 달 일정이 없어요',
-                              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                            ),
-                          ),
+              const Divider(height: 1),
+              // 이달 일정 목록 헤더
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+              // 이달 일정 리스트
+              allMonthItems.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text(
+                          '이번 달 일정이 없어요',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
-                      ],
+                      ),
                     )
                   : ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: allMonthItems.length,
                       separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
                       itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
                     ),
-            ),
+            ]),
           ),
-        ]),
+        ),
         // 캘린더 필터 패널
         if (_showFilter)
           GestureDetector(
@@ -348,7 +347,15 @@ class _CalendarGrid extends ConsumerWidget {
       itemBuilder: (context, i) {
         final dayNum = i - startOffset + 1;
         if (dayNum < 1 || dayNum > lastDay.day) {
-          return const SizedBox.shrink();
+          final bColor = Theme.of(context).colorScheme.outlineVariant;
+          return Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right:  BorderSide(color: bColor, width: 0.5),
+                bottom: BorderSide(color: bColor, width: 0.5),
+              ),
+            ),
+          );
         }
         final dateKey = '$year-${month.toString().padLeft(2,'0')}-${dayNum.toString().padLeft(2,'0')}';
         final isToday = dayNum == today.day && month == today.month && year == today.year;
@@ -395,8 +402,8 @@ class _DayCell extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     final allItems = [
-      ...events.map((e) => (title: e.summary, color: e.color, isTask: false)),
-      ...tasks.map((t) => (title: t.title, color: const Color(0xFF1A73E8), isTask: true)),
+      ...events.map((e) => (title: e.summary, color: e.color, isTask: false, isAllDay: e.isAllDay)),
+      ...tasks.map((t) => (title: t.title, color: const Color(0xFF1A73E8), isTask: true, isAllDay: false)),
     ];
     final visible = allItems.take(2).toList();
     final extra = allItems.length - visible.length;
@@ -442,6 +449,7 @@ class _DayCell extends StatelessWidget {
             )
           else
             Container(
+              width: double.infinity,
               margin: const EdgeInsets.fromLTRB(2, 1, 2, 0),
               padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
               decoration: BoxDecoration(color: item.color, borderRadius: BorderRadius.circular(2)),

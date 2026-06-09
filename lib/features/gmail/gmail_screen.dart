@@ -205,6 +205,7 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                           child: ListView.builder(
                             controller: _scrollCtrl,
                             padding: EdgeInsets.zero,
+                            physics: const AlwaysScrollableScrollPhysics(),
                             itemCount: gmail.messages.length + (gmail.loadingMore ? 1 : 0),
                             itemBuilder: (_, i) {
                               if (i >= gmail.messages.length) {
@@ -230,17 +231,16 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                                       }
                                     },
                                     onLongPress: () => ref.read(gmailProvider.notifier).toggleSelect(msg.id),
-                                    onDismissDelete: () async {
+                                    onDismissDelete: () {
                                       if (gmail.isInTrash) {
+                                        ref.read(gmailProvider.notifier).removeMessageLocal(msg.id);
                                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                           content: Text('이미 휴지통에 있습니다. 30일 후 자동 삭제됩니다.'),
                                         ));
-                                        ref.read(gmailProvider.notifier).loadMessages();
                                       } else {
-                                        await ref.read(gmailProvider.notifier).trashMessage(msg.id);
+                                        ref.read(gmailProvider.notifier).trashMessage(msg.id);
                                       }
                                     },
-                                    onDismissRead: () => ref.read(gmailProvider.notifier).markRead(msg.id),
                                   ),
                                   if (i < gmail.messages.length - 1)
                                     Divider(
@@ -348,12 +348,12 @@ class _MessageTile extends StatelessWidget {
   const _MessageTile({
     required this.message, required this.selected, required this.isInTrash,
     required this.onTap, required this.onLongPress,
-    required this.onDismissDelete, required this.onDismissRead,
+    required this.onDismissDelete,
   });
 
   final GmailMessage message;
   final bool selected, isInTrash;
-  final VoidCallback onTap, onLongPress, onDismissDelete, onDismissRead;
+  final VoidCallback onTap, onLongPress, onDismissDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -364,25 +364,14 @@ class _MessageTile extends StatelessWidget {
 
     return Dismissible(
       key: ValueKey(message.id),
+      direction: DismissDirection.endToStart,
       background: Container(
-        color: Colors.blue[100],
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.only(left: 20),
-        child: const Icon(Icons.mark_email_read, color: Colors.blue),
-      ),
-      secondaryBackground: Container(
         color: Colors.red[100],
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         child: const Icon(Icons.delete, color: Colors.red),
       ),
-      onDismissed: (dir) {
-        if (dir == DismissDirection.startToEnd) {
-          onDismissRead();
-        } else {
-          onDismissDelete();
-        }
-      },
+      onDismissed: (_) => onDismissDelete(),
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
