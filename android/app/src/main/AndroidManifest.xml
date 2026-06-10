@@ -59,6 +59,7 @@
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_NEXT_MONTH" />
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE" />
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_BACK" />
+                <action android:name="com.dhwjdgh.prv_dashboard.TASK_ITEM" />
                 <action android:name="com.dhwjdgh.prv_dashboard.GMAIL_ITEM" />
                 <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_GMAIL" />
                 <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_TASKS" />
@@ -68,6 +69,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/home_widget_info" />
         </receiver>
+
+        <service
+            android:name=".TaskWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
 
         <service
             android:name=".GmailWidgetService"

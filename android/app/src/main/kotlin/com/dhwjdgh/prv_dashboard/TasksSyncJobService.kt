@@ -153,19 +153,20 @@ class TasksSyncJobService : JobService() {
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val edit = prefs.edit()
             
-            edit.putString("task_count", activeTasks.size.toString())
-            
-            for (i in 0 until 3) {
-                if (i < sorted.size) {
-                    val task = sorted[i]
-                    edit.putString("task_$i", task.title)
-                    edit.putString("task_${i}_id", task.id)
-                    edit.putString("task_${i}_done", if (task.isCompleted) "true" else "false")
-                } else {
-                    edit.putString("task_$i", "")
-                    edit.putString("task_${i}_id", "")
-                    edit.putString("task_${i}_done", "false")
-                }
+            edit.putString("task_count", sorted.size.toString())
+
+            for (i in sorted.indices) {
+                val task = sorted[i]
+                edit.putString("task_$i", task.title)
+                edit.putString("task_${i}_id", task.id)
+                edit.putString("task_${i}_done", if (task.isCompleted) "true" else "false")
+            }
+            // 이전 동기화에서 남은 슬롯 제거
+            for (i in sorted.size until sorted.size + 30) {
+                if ((prefs.getString("task_$i", "") ?: "").isEmpty()) break
+                edit.putString("task_$i", "")
+                edit.putString("task_${i}_id", "")
+                edit.putString("task_${i}_done", "false")
             }
             edit.commit()
             Log.d(TAG, "syncTasks written ${activeTasks.size} active tasks to prefs")

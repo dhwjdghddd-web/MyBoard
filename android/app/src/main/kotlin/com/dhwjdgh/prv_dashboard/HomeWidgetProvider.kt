@@ -161,6 +161,60 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     pendingResult.finish()
                 }
             }
+            ACTION_TASK_ITEM -> {
+                val taskId    = intent.getStringExtra("task_id") ?: ""
+                val taskIndex = intent.getIntExtra("task_index", -1)
+                when (intent.getStringExtra("task_item_action")) {
+                    "complete" -> {
+                        if (taskIndex >= 0) {
+                            prefs.edit().putString("task_${taskIndex}_done", "true").apply()
+                        }
+                        val mgr = AppWidgetManager.getInstance(context)
+                        val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
+                        ids.forEach { mgr.notifyAppWidgetViewDataChanged(it, R.id.task_list_view) }
+                        redraw(context)
+                        if (taskId.isNotEmpty()) {
+                            val pendingResult = goAsync()
+                            TasksSyncJobService.executeComplete(context, taskId, true) {
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                    MainActivity.activeChannel?.invokeMethod("taskCompleted", taskId)
+                                }
+                                pendingResult.finish()
+                            }
+                        }
+                    }
+                    "delete" -> {
+                        if (taskIndex >= 0) {
+                            prefs.edit()
+                                .putString("task_$taskIndex", "")
+                                .putString("task_${taskIndex}_id", "")
+                                .putString("task_${taskIndex}_done", "false")
+                                .apply()
+                        }
+                        val mgr = AppWidgetManager.getInstance(context)
+                        val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
+                        ids.forEach { mgr.notifyAppWidgetViewDataChanged(it, R.id.task_list_view) }
+                        redraw(context)
+                        if (taskId.isNotEmpty()) {
+                            val pendingResult = goAsync()
+                            TasksSyncJobService.executeDelete(context, taskId) {
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                    MainActivity.activeChannel?.invokeMethod("taskDeleted", taskId)
+                                }
+                                pendingResult.finish()
+                            }
+                        }
+                    }
+                    else -> {
+                        context.startActivity(
+                            Intent(context, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                putExtra("tab", 0)
+                            }
+                        )
+                    }
+                }
+            }
             ACTION_GMAIL_ITEM -> {
                 when (intent.getStringExtra("gmail_item_action")) {
                     "delete" -> {
@@ -197,6 +251,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
         private const val PREFS = "HomeWidgetPreferences"
         const val ACTION_COMPLETE_TASK   = "com.dhwjdgh.prv_dashboard.COMPLETE_TASK"
         const val ACTION_DELETE_TASK     = "com.dhwjdgh.prv_dashboard.DELETE_TASK"
+        const val ACTION_TASK_ITEM       = "com.dhwjdgh.prv_dashboard.TASK_ITEM"
         const val ACTION_SWITCH_TAB      = "com.dhwjdgh.prv_dashboard.SWITCH_WIDGET_TAB"
         const val ACTION_CAL_PREV_MONTH  = "com.dhwjdgh.prv_dashboard.CAL_PREV_MONTH"
         const val ACTION_CAL_NEXT_MONTH  = "com.dhwjdgh.prv_dashboard.CAL_NEXT_MONTH"
@@ -214,6 +269,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
             intArrayOf(R.id.c30, R.id.c31, R.id.c32, R.id.c33, R.id.c34, R.id.c35, R.id.c36),
             intArrayOf(R.id.c40, R.id.c41, R.id.c42, R.id.c43, R.id.c44, R.id.c45, R.id.c46),
             intArrayOf(R.id.c50, R.id.c51, R.id.c52, R.id.c53, R.id.c54, R.id.c55, R.id.c56),
+        )
+
+        private val WEEK_ROW_IDS = intArrayOf(
+            R.id.cal_week_0, R.id.cal_week_1, R.id.cal_week_2,
+            R.id.cal_week_3, R.id.cal_week_4, R.id.cal_week_5,
         )
 
         private fun now() = java.util.Calendar.getInstance()
@@ -254,14 +314,15 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val opts = manager.getAppWidgetOptions(widgetId)
             val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
-            // 커버화면: 가로가 세로보다 넓은 landscape 위젯 (홈화면은 항상 세로가 더 김)
-            val isCover = widgetWidth > 0 && widgetHeight > 0 && widgetWidth > widgetHeight
+            // 커버화면: 세로가 가로보다 긴 portrait 위젯에서 isCover=true (좁은 커버 화면)
+            val isCover = widgetWidth > 0 && widgetHeight > 0 && widgetWidth < widgetHeight
             when (activeTab) {
                 0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover)
                 1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover)
                 2 -> bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover)
             }
 
+            if (activeTab == 0) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.task_list_view)
             if (activeTab == 2) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
 
             manager.updateAppWidget(widgetId, views)
@@ -271,51 +332,26 @@ class HomeWidgetProvider : AppWidgetProvider() {
         //  태스크 섹션
         // ─────────────────────────────────────────────────────────────────
         private fun bindTasks(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
-            data class TRow(val row: Int, val title: Int, val check: Int, val del: Int)
-            val rows = listOf(
-                TRow(R.id.task_row_0, R.id.task_title_0, R.id.task_check_0, R.id.task_delete_0),
-                TRow(R.id.task_row_1, R.id.task_title_1, R.id.task_check_1, R.id.task_delete_1),
-                TRow(R.id.task_row_2, R.id.task_title_2, R.id.task_check_2, R.id.task_delete_2),
-            )
-            var visible = 0
-            for ((i, r) in rows.withIndex()) {
-                val title  = prefs.getString("task_$i", "") ?: ""
-                val done   = prefs.getString("task_${i}_done", "false") == "true"
-                val taskId = prefs.getString("task_${i}_id", "") ?: ""
-                if (title.isEmpty()) {
-                    views.setViewVisibility(r.row, View.GONE)
-                } else {
-                    views.setViewVisibility(r.row, View.VISIBLE)
-                    views.setTextViewText(r.title, title)
-                    views.setTextColor(r.title, if (done) Color.parseColor("#606070") else Color.WHITE)
-                    views.setTextViewText(r.check, if (done) "☑" else "☐")
-                    views.setTextColor(r.check, if (done) Color.parseColor("#606070") else Color.parseColor("#4285F4"))
-                    if (!done && taskId.isNotEmpty()) {
-                        views.setOnClickPendingIntent(r.check, PendingIntent.getBroadcast(
-                            context, 100 + i,
-                            Intent(context, HomeWidgetProvider::class.java).apply {
-                                action = ACTION_COMPLETE_TASK
-                                putExtra("task_id", taskId); putExtra("task_index", i)
-                            }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        ))
-                    }
-                    if (taskId.isNotEmpty()) {
-                        views.setOnClickPendingIntent(r.del, PendingIntent.getBroadcast(
-                            context, 400 + i,
-                            Intent(context, HomeWidgetProvider::class.java).apply {
-                                action = ACTION_DELETE_TASK
-                                putExtra("task_id", taskId); putExtra("task_index", i)
-                            }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        ))
-                    }
-                    views.setOnClickPendingIntent(r.row, openAppIntent(context, 0))
-                    visible++
-                }
+            val count = prefs.getString("task_count", "0")?.toIntOrNull() ?: 0
+            val hasAny = (0 until count).any { i -> (prefs.getString("task_$i", "") ?: "").isNotEmpty() }
+
+            if (hasAny) {
+                views.setViewVisibility(R.id.task_list_view, View.VISIBLE)
+                views.setViewVisibility(R.id.task_empty, View.GONE)
+                val serviceIntent = Intent(context, TaskWidgetService::class.java)
+                views.setRemoteAdapter(R.id.task_list_view, serviceIntent)
+                val template = PendingIntent.getBroadcast(
+                    context, 450,
+                    Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_TASK_ITEM },
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+                views.setPendingIntentTemplate(R.id.task_list_view, template)
+            } else {
+                views.setViewVisibility(R.id.task_list_view, View.GONE)
+                views.setViewVisibility(R.id.task_empty, View.VISIBLE)
             }
-            views.setViewVisibility(R.id.task_empty, if (visible == 0) View.VISIBLE else View.GONE)
-            val taskSp   = if (isCover) scaledSp(widgetWidth, widgetHeight, 16f, 19f) else scaledSp(widgetWidth, widgetHeight, 13f, 16f)
-            val addSp    = if (isCover) scaledSp(widgetWidth, widgetHeight, 15f, 17f) else scaledSp(widgetWidth, widgetHeight, 12f, 14f)
-            rows.forEach { r -> views.setTextViewTextSize(r.title, android.util.TypedValue.COMPLEX_UNIT_SP, taskSp) }
+
+            val addSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 15f, 17f) else scaledSp(widgetWidth, widgetHeight, 12f, 14f)
             views.setTextViewTextSize(R.id.task_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, addSp)
             views.setOnClickPendingIntent(R.id.task_add_btn, quickAddTaskIntent(context))
             views.setOnClickPendingIntent(R.id.task_launch_btn, openAppIntent(context, 0))
@@ -376,6 +412,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val firstDow    = cal.get(java.util.Calendar.DAY_OF_WEEK) - 1
             val daysInMonth = cal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
 
+            val neededRows = (firstDow + daysInMonth + 6) / 7
+            for (r in 0..5) {
+                views.setViewVisibility(WEEK_ROW_IDS[r], if (r < neededRows) View.VISIBLE else View.GONE)
+            }
+
             for (row in 0..5) {
                 for (col in 0..6) {
                     val idx    = row * 7 + col
@@ -410,7 +451,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             col == 6 -> Color.parseColor("#6B9FFF")
                             else     -> Color.parseColor("#D0D0E0")
                         }
-                        val dateSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 15f, 18f) else scaledSp(widgetWidth, widgetHeight, 11f, 14f)
+                        val dateSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 15f, 21f) else scaledSp(widgetWidth, widgetHeight, 11f, 17f)
                         ssb.setSpan(AbsoluteSizeSpan(dateSp.toInt(), true), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         ssb.setSpan(ForegroundColorSpan(dayColor), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         if (isToday) {
@@ -435,7 +476,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                 Color.parseColor("#60D8A0")
                             }
 
-                        val eventSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 11f, 14f) else scaledSp(widgetWidth, widgetHeight, 8f, 11f)
+                        val eventSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 11f, 17f) else scaledSp(widgetWidth, widgetHeight, 8f, 13f)
                             ssb.setSpan(AbsoluteSizeSpan(eventSp.toInt(), true), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                             ssb.setSpan(ForegroundColorSpan(eventColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         }
