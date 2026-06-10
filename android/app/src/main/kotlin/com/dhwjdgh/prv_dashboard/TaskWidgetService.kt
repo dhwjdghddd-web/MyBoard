@@ -76,7 +76,7 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
             val title = prefs.getString("task_$i", "") ?: ""
             val id = prefs.getString("task_${i}_id", "") ?: ""
             val done = prefs.getString("task_${i}_done", "false") == "true"
-            if (title.isNotEmpty()) {
+            if (title.isNotEmpty() && !done) {
                 tasksList.add(TaskItem(title, id, done, i))
             }
         }

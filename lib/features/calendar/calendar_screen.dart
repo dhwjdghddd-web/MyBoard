@@ -5,6 +5,7 @@ import '../tasks/task_service.dart';
 import 'calendar_service.dart';
 import 'event_detail_sheet.dart';
 import 'event_form_screen.dart';
+import '../settings/widget_settings_screen.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -51,6 +52,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         title: _MonthNav(cal: cal, ref: ref),
         titleSpacing: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.widgets_outlined),
+            tooltip: '위젯 설정',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
+          ),
           TextButton(
             onPressed: () => ref.read(calendarProvider.notifier).goToday(),
             child: const Text('오늘', style: TextStyle(color: Colors.white)),

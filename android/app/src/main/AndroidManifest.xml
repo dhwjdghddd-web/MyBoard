@@ -72,7 +72,9 @@
 
         <activity
             android:name=".WidgetConfigureActivity"
-            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:exported="true" />
 
         <service

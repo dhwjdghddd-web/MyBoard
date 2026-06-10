@@ -4,6 +4,7 @@ import '../../core/theme.dart';
 import 'email_detail_screen.dart';
 import 'gmail_compose_screen.dart';
 import 'gmail_service.dart';
+import '../settings/widget_settings_screen.dart';
 
 const _avatarColors = [
   Color(0xFFEA4335), Color(0xFF4285F4), Color(0xFF34A853),
@@ -148,6 +149,12 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                 onPressed: _confirmEmptyTrash,
                 child: const Text('비우기', style: TextStyle(color: Colors.white)),
               ),
+            IconButton(
+              icon: const Icon(Icons.widgets_outlined),
+              tooltip: '위젯 설정',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
+            ),
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: () => setState(() => _searching = true),

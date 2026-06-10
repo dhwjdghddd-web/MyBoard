@@ -4,6 +4,7 @@ import '../../core/api_client.dart';
 import '../../core/theme.dart';
 import 'add_task_sheet.dart';
 import 'task_service.dart';
+import '../settings/widget_settings_screen.dart';
 
 class TasksScreen extends ConsumerWidget {
   const TasksScreen({super.key});
@@ -16,6 +17,12 @@ class TasksScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('태스크'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.widgets_outlined),
+            tooltip: '위젯 설정',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
+          ),
           const ThemeToggleButton(),
           IconButton(
             icon: const Icon(Icons.refresh),
