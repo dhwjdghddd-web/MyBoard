@@ -20,8 +20,6 @@ import android.graphics.Typeface
 class HomeWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        // onUpdate는 각 위젯 호스트(홈/커버)에 맞는 context로 호출됨
-        // 여기서 displayMetrics를 읽어야 커버/홈화면을 정확히 구분할 수 있음
         val displayWidthDp = (context.resources.displayMetrics.widthPixels /
             context.resources.displayMetrics.density).toInt()
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -29,13 +27,13 @@ class HomeWidgetProvider : AppWidgetProvider() {
         for (id in appWidgetIds) {
             val opts = appWidgetManager.getAppWidgetOptions(id)
             val ww = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300)
-            // 커버화면 위젯: 좁은 화면(<420dp)을 85% 이상 채우는 위젯만 해당
-            // 홈화면 작은 위젯(315dp)은 displayW(411dp)의 76%→85% 미만이므로 제외됨
-            val isCover = displayWidthDp < 420
-                && ww < displayWidthDp
-                && ww.toFloat() / displayWidthDp > 0.85f
+            val wh = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
+            
+            // 실제 측정 결과 Z플립 커버스크린 위젯의 해상도 수치가 홈스크린보다 더 크게 감지됨 (커버 W:438 H:352 vs 홈 W:315 H:289)
+            // 따라서 가로가 415dp 이상이거나 세로가 320dp 이상인 위젯을 커버스크린 위젯으로 정확하게 판단
+            val isCover = ww >= 415 || wh >= 320
             edit.putBoolean("widget_is_cover_$id", isCover)
-            Log.d("HomeWidget", "onUpdate id=$id displayW=$displayWidthDp widgetW=$ww ratio=${ww.toFloat()/displayWidthDp} isCover=$isCover")
+            Log.d("HomeWidget", "onUpdate id=$id displayW=$displayWidthDp widgetW=$ww widgetH=$wh isCover=$isCover")
         }
         edit.apply()
         for (id in appWidgetIds) updateWidget(context, appWidgetManager, id)
@@ -43,16 +41,15 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: android.os.Bundle) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
-        // 위젯 크기 변경 시에도 커버 여부 갱신
         val displayWidthDp = (context.resources.displayMetrics.widthPixels /
             context.resources.displayMetrics.density).toInt()
         val ww = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300)
-        val isCover = displayWidthDp < 420
-            && ww < displayWidthDp
-            && ww.toFloat() / displayWidthDp > 0.85f
+        val wh = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
+        
+        val isCover = ww >= 415 || wh >= 320
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean("widget_is_cover_$appWidgetId", isCover).apply()
-        Log.d("HomeWidget", "optionsChanged id=$appWidgetId displayW=$displayWidthDp widgetW=$ww ratio=${ww.toFloat()/displayWidthDp} isCover=$isCover")
+        Log.d("HomeWidget", "optionsChanged id=$appWidgetId displayW=$displayWidthDp widgetW=$ww widgetH=$wh isCover=$isCover")
         updateWidget(context, appWidgetManager, appWidgetId)
     }
 
@@ -342,10 +339,13 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val opts = manager.getAppWidgetOptions(widgetId)
             val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
-            // onUpdate/onAppWidgetOptionsChanged에서 디스플레이 기반으로 저장한 값 사용
-            // (widgetWidth만으로는 홈화면 작은 위젯과 커버화면 위젯을 구분할 수 없음)
-            val isCover = prefs.getBoolean("widget_is_cover_$widgetId", false)
-            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight isCover=$isCover")
+            
+            // 실시간 및 SharedPreferences 다중 식별 적용
+            val category = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_HOST_CATEGORY, -1)
+            val isCoverDirect = widgetWidth >= 415 || widgetHeight >= 320
+            val isCover = isCoverDirect || prefs.getBoolean("widget_is_cover_$widgetId", false)
+            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight isCoverDirect=$isCoverDirect isCover=$isCover")
+            
             when (activeTab) {
                 0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover)
                 1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover)
@@ -452,13 +452,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val dateSp: Float
             val eventSp: Float
             if (isCover) {
-                // 커버화면: 이벤트 텍스트 최대화, 날짜 숫자는 최소화
-                // overhead = 외부패딩20 + 탭바26 + 네비34 + 요일12 ≈ 92dp
-                // 날짜(0.18) + 이벤트×2(0.35×2) ≈ 행 높이 × 0.88 (약간 여유)
-                val rowH = ((widgetHeight - 92f) / neededRows).coerceAtLeast(20f)
-                dateSp  = (rowH * 0.18f).coerceIn(8f, 13f)
-                eventSp = (rowH * 0.35f).coerceIn(10f, 22f)
-                Log.d("HomeWidget", "isCover rowH=$rowH dateSp=$dateSp eventSp=$eventSp")
+                // 커버화면: 커버 스크린의 특성(화면 대비 dp 수치가 작음)을 감안하여
+                // 비례방식이 아닌 눈으로 보기에 시원한 절대 비율의 큼직한 고정 폰트 크기 적용 (기존 10sp ➜ 16sp 상향)
+                dateSp  = 13f * rowFactor
+                eventSp = 16f * rowFactor
+                Log.d("HomeWidget", "isCover fixed fonts dateSp=$dateSp eventSp=$eventSp")
             } else {
                 dateSp  = scaledSp(widgetWidth, widgetHeight, 11f, 17f) * rowFactor
                 eventSp = scaledSp(widgetWidth, widgetHeight, 8f, 13f) * rowFactor
@@ -525,12 +523,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         }
 
                         views.setTextViewText(cellId, ssb)
-                        // 커버화면: 텍스트 중앙 정렬로 빈 공간을 위아래 균등 분배
-                        if (isCover) {
-                            views.setInt(cellId, "setGravity", android.view.Gravity.CENTER)
-                        } else {
-                            views.setInt(cellId, "setGravity", android.view.Gravity.TOP or android.view.Gravity.CENTER_HORIZONTAL)
-                        }
+                        // 홈화면처럼 상단 중앙 정렬하여 일정 텍스트가 아래쪽 여백을 꽉 채우도록 처리
+                        views.setInt(cellId, "setGravity", android.view.Gravity.TOP or android.view.Gravity.CENTER_HORIZONTAL)
 
                         if (isToday) views.setInt(cellId, "setBackgroundResource", R.drawable.cal_today_bg)
                         else         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
