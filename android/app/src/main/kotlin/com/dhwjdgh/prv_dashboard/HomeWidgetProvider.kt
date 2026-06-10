@@ -406,7 +406,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.task_empty, View.VISIBLE)
             }
 
-            val headerSp = if (isCover) 18f
+            val headerSp = if (isCover) 20f
                            else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.task_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
             val addSp = if (isCover) 18f else scaledSp(widgetWidth, widgetHeight, 12f, 14f)
@@ -447,7 +447,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
             val monthNames = arrayOf("","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
             views.setTextViewText(R.id.cal_month_label, "${dispYear}년 ${monthNames[dispMonth]}")
-            val monthLabelSp = if (isCover) 18f
+            val monthLabelSp = if (isCover) 20f
                                else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.cal_month_label, android.util.TypedValue.COMPLEX_UNIT_SP, monthLabelSp)
 
@@ -463,7 +463,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
             if (isCover) {
-                val dowSp = 13f
+                val dowSp = 14.5f
                 listOf(R.id.cal_dow_sun, R.id.cal_dow_mon, R.id.cal_dow_tue, R.id.cal_dow_wed,
                        R.id.cal_dow_thu, R.id.cal_dow_fri, R.id.cal_dow_sat).forEach {
                     views.setTextViewTextSize(it, android.util.TypedValue.COMPLEX_UNIT_SP, dowSp)
@@ -490,7 +490,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             // 행 수에 따라 글씨 크기 자동 조정
             val rowFactor = 5f / neededRows
             val eventSp = if (isCover) (14.5f * rowFactor) else (12.5f * rowFactor)
-            val dateSp = if (isCover) (11f * rowFactor) else (scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor)
+            val dateSp = if (isCover) (13.5f * rowFactor) else (scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor)
 
             for (row in 0..5) {
                 for (col in 0..6) {
@@ -726,7 +726,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 }
             }
 
-            val headerSp = if (isCover) 18f
+            val headerSp = if (isCover) 20f
                            else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.gmail_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
 
