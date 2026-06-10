@@ -31,19 +31,38 @@ class WidgetConfigureActivity : AppCompatActivity() {
         setContentView(R.layout.widget_configure_layout)
 
         val prefs = getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
-        val existing = prefs.getString("widget_cover_manual_$widgetId", null)
+        val existing = prefs.getString("widget_cover_manual_$widgetId", "auto") ?: "auto"
 
         val hint = findViewById<TextView>(R.id.configure_hint)
         hint.text = when {
-            existing == "cover" -> "현재 설정: 커버화면"
-            existing == "home"  -> "현재 설정: 홈화면"
-            HomeWidgetProvider.isFoldableDevice(this) -> "폴더블 기기 감지됨 — 화면을 선택하거나 자동 감지를 사용하세요"
-            else -> "화면을 선택하거나 자동 감지를 사용하세요"
+            existing == "cover" -> "현재 설정: 커버화면 위젯"
+            existing == "home"  -> "현재 설정: 홈화면 위젯"
+            HomeWidgetProvider.isFoldableDevice(this) -> "폴더블 기기 감지됨 — 화면 자동 감지 작동 중"
+            else -> "화면 자동 감지 작동 중"
         }
 
-        findViewById<Button>(R.id.btn_cover).setOnClickListener { saveAndFinish("cover") }
-        findViewById<Button>(R.id.btn_home).setOnClickListener  { saveAndFinish("home")  }
-        findViewById<Button>(R.id.btn_auto).setOnClickListener  { saveAndFinish("auto")  }
+        val btnCover = findViewById<Button>(R.id.btn_cover)
+        val btnHome = findViewById<Button>(R.id.btn_home)
+        val btnAuto = findViewById<Button>(R.id.btn_auto)
+
+        when (existing) {
+            "cover" -> {
+                btnCover.setBackgroundResource(R.drawable.btn_dialog_accent)
+                btnCover.setTextColor(android.graphics.Color.parseColor("#82B1FF"))
+            }
+            "home" -> {
+                btnHome.setBackgroundResource(R.drawable.btn_dialog_accent)
+                btnHome.setTextColor(android.graphics.Color.parseColor("#82B1FF"))
+            }
+            else -> {
+                btnAuto.setBackgroundResource(R.drawable.btn_dialog_accent)
+                btnAuto.setTextColor(android.graphics.Color.parseColor("#82B1FF"))
+            }
+        }
+
+        btnCover.setOnClickListener { saveAndFinish("cover") }
+        btnHome.setOnClickListener  { saveAndFinish("home")  }
+        btnAuto.setOnClickListener  { saveAndFinish("auto")  }
     }
 
     private fun saveAndFinish(choice: String) {

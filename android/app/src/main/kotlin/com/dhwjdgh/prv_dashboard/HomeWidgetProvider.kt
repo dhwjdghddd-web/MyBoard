@@ -489,8 +489,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             Log.d("HomeWidget", "bindCalendarGrid isCover=$isCover w=$widgetWidth h=$widgetHeight neededRows=$neededRows")
             // 행 수에 따라 글씨 크기 자동 조정
             val rowFactor = 5f / neededRows
-            val eventSp = 12.5f * rowFactor
-            val dateSp = if (isCover) (10f * rowFactor) else (scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor)
+            val eventSp = if (isCover) (14.5f * rowFactor) else (12.5f * rowFactor)
+            val dateSp = if (isCover) (11f * rowFactor) else (scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor)
 
             for (row in 0..5) {
                 for (col in 0..6) {
