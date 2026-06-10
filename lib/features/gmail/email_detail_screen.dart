@@ -106,6 +106,39 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
 
   Future<void> _downloadAttachment(Attachment att) async {
     if (_downloading.contains(att.attachmentId)) return;
+
+    // 기존 파일 존재 여부 확인
+    final existingUri = await _saveChannel.invokeMethod<String>(
+      'findExistingDownload', att.filename,
+    );
+    if (existingUri != null && mounted) {
+      final redownload = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('이미 다운로드된 파일'),
+          content: Text('"${att.filename}"이 이미 다운로드되어 있어요.\n다시 받을까요?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('바로 열기'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('다시 받기'),
+            ),
+          ],
+        ),
+      );
+      if (redownload == null) return; // 취소
+      if (redownload == false) {
+        await _saveChannel.invokeMethod('openFile', {
+          'uri': existingUri,
+          'mimeType': att.mimeType,
+        });
+        return;
+      }
+    }
+
     setState(() => _downloading.add(att.attachmentId));
     try {
       final resp = await ref.read(apiClientProvider).get(

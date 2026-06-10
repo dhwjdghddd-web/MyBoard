@@ -47,17 +47,23 @@ class MainActivity : FlutterActivity() {
                     val args = call.arguments as Map<*, *>
                     val uri      = args["uri"] as String
                     val mimeType = args["mimeType"] as String
-                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                    val base = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
                         setDataAndType(android.net.Uri.parse(uri), mimeType)
                         addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    val chooser = android.content.Intent.createChooser(base, "파일 열기").apply {
                         addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
                     try {
-                        startActivity(intent)
+                        startActivity(chooser)
                         result.success(null)
                     } catch (e: Exception) {
                         result.error("OPEN_FAILED", e.message, null)
                     }
+                }
+                "findExistingDownload" -> {
+                    val filename = call.arguments as String
+                    result.success(findExistingDownload(filename))
                 }
                 else -> result.notImplemented()
             }
@@ -77,6 +83,23 @@ class MainActivity : FlutterActivity() {
             mapOf("id" to id, "width" to width, "height" to height,
                   "manual" to manual, "isCover" to isCover)
         }
+    }
+
+    private fun findExistingDownload(filename: String): String? {
+        val projection = arrayOf(android.provider.MediaStore.Downloads._ID)
+        val selection  = "${android.provider.MediaStore.Downloads.DISPLAY_NAME} = ?"
+        contentResolver.query(
+            android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            projection, selection, arrayOf(filename), null
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(android.provider.MediaStore.Downloads._ID))
+                return android.content.ContentUris.withAppendedId(
+                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, id
+                ).toString()
+            }
+        }
+        return null
     }
 
     private fun saveAttachment(filename: String, mimeType: String, base64Data: String, result: io.flutter.plugin.common.MethodChannel.Result) {
