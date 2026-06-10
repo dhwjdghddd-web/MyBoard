@@ -18,6 +18,8 @@ class TasksScreen extends ConsumerWidget {
         title: const Text('태스크'),
         actions: [
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.widgets_outlined),
             tooltip: '위젯 설정',
             onPressed: () => Navigator.push(context,
@@ -25,6 +27,8 @@ class TasksScreen extends ConsumerWidget {
           ),
           const ThemeToggleButton(),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(taskServiceProvider.notifier).loadTasks(),
           ),

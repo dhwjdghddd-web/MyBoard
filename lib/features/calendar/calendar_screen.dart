@@ -286,6 +286,8 @@ class _MonthNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       IconButton(
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         icon: const Icon(Icons.chevron_left, color: Colors.white),
         onPressed: () => ref.read(calendarProvider.notifier).prevMonth(),
       ),
@@ -294,6 +296,8 @@ class _MonthNav extends StatelessWidget {
         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
       ),
       IconButton(
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         icon: const Icon(Icons.chevron_right, color: Colors.white),
         onPressed: () => ref.read(calendarProvider.notifier).nextMonth(),
       ),

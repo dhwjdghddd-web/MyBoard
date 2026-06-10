@@ -134,8 +134,15 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
             : Text(_labelName(gmail.label)),
         actions: [
           if (_searching) ...[
-            IconButton(icon: const Icon(Icons.search), onPressed: _search),
             IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              icon: const Icon(Icons.search),
+              onPressed: _search,
+            ),
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: const Icon(Icons.close),
               onPressed: () {
                 setState(() => _searching = false);
@@ -146,20 +153,27 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
           ] else ...[
             if (gmail.isInTrash)
               TextButton(
+                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 6)),
                 onPressed: _confirmEmptyTrash,
                 child: const Text('비우기', style: TextStyle(color: Colors.white)),
               ),
             IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: const Icon(Icons.widgets_outlined),
               tooltip: '위젯 설정',
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
             ),
             IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: const Icon(Icons.search),
               onPressed: () => setState(() => _searching = true),
             ),
             IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: const Icon(Icons.refresh),
               onPressed: () {
                 ref.read(gmailProvider.notifier).loadMessages();

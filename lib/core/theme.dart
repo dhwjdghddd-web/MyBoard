@@ -98,7 +98,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 }
 
 class ThemeToggleButton extends ConsumerWidget {
-  const ThemeToggleButton({super.key, this.compact = false});
+  const ThemeToggleButton({super.key, this.compact = true});
   final bool compact;
 
   @override
