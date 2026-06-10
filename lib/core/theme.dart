@@ -98,13 +98,16 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 }
 
 class ThemeToggleButton extends ConsumerWidget {
-  const ThemeToggleButton({super.key});
+  const ThemeToggleButton({super.key, this.compact = false});
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(themeModeProvider);
     final isDark = mode == ThemeMode.dark;
     return IconButton(
+      padding: compact ? EdgeInsets.zero : null,
+      constraints: compact ? const BoxConstraints(minWidth: 36, minHeight: 36) : null,
       icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
       tooltip: isDark ? '라이트 모드' : '다크 모드',
       onPressed: () => ref.read(themeModeProvider.notifier).toggle(),

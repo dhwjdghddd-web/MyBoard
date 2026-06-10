@@ -53,27 +53,34 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         titleSpacing: 0,
         actions: [
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.widgets_outlined),
             tooltip: '위젯 설정',
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
           ),
           TextButton(
+            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 6)),
             onPressed: () => ref.read(calendarProvider.notifier).goToday(),
             child: const Text('오늘', style: TextStyle(color: Colors.white)),
           ),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: cal.loading
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.refresh),
             onPressed: () => ref.read(calendarProvider.notifier).loadEvents(),
           ),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.filter_list),
             onPressed: () => setState(() => _showFilter = !_showFilter),
             tooltip: '캘린더 필터',
           ),
-          const ThemeToggleButton(),
+          const ThemeToggleButton(compact: true),
         ],
       ),
       body: Stack(children: [
