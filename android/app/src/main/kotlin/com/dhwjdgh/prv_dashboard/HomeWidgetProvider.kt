@@ -356,7 +356,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover")
 
             // 탭 텍스트 크기 동적 조정
-            val tabSp = if (isCover) 11f
+            val tabSp = if (isCover) 14f
                         else         scaledSp(widgetWidth, widgetHeight, 11f, 13f)
             views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)

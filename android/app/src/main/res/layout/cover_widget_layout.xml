@@ -1171,7 +1171,7 @@
     <!-- ══════════════ 하단 캡슐형 세그먼트 탭 ══════════════ -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="36dp"
         android:orientation="horizontal"
         android:layout_marginTop="4dp"
         android:gravity="center_vertical">
@@ -1188,18 +1188,18 @@
 
             <TextView android:id="@+id/tab_tasks"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="할 일" android:textSize="10sp" android:textStyle="bold"
+                android:text="할 일" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
                 android:background="@drawable/tab_active_bg" />
 
             <TextView android:id="@+id/tab_calendar"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="캘린더" android:textSize="10sp" android:textStyle="bold"
+                android:text="캘린더" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#A0A0B0" android:gravity="center" />
 
             <TextView android:id="@+id/tab_gmail"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="Gmail" android:textSize="10sp" android:textStyle="bold"
+                android:text="Gmail" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#A0A0B0" android:gravity="center" />
         </LinearLayout>
 
