@@ -535,6 +535,13 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         views.setTextViewTextSize(cellId, android.util.TypedValue.COMPLEX_UNIT_SP, dateSp)
 
                         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
+                        if (parentId != 0) {
+                            if (isToday) {
+                                views.setInt(parentId, "setBackgroundResource", R.drawable.today_cell_bg)
+                            } else {
+                                views.setInt(parentId, "setBackgroundColor", Color.TRANSPARENT)
+                            }
+                        }
 
                         // 2. 일정 바인딩 (최대 2개)
                         val displayTitles = titles.take(2)
