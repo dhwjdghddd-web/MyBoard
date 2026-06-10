@@ -43,6 +43,22 @@ class MainActivity : FlutterActivity() {
                     val base64Data = args["data"] as String
                     saveAttachment(filename, mimeType, base64Data, result)
                 }
+                "openFile" -> {
+                    val args = call.arguments as Map<*, *>
+                    val uri      = args["uri"] as String
+                    val mimeType = args["mimeType"] as String
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                        setDataAndType(android.net.Uri.parse(uri), mimeType)
+                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    try {
+                        startActivity(intent)
+                        result.success(null)
+                    } catch (e: Exception) {
+                        result.error("OPEN_FAILED", e.message, null)
+                    }
+                }
                 else -> result.notImplemented()
             }
         }

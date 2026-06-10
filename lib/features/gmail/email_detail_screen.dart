@@ -112,14 +112,25 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         '$_base/messages/${widget.messageId}/attachments/${att.attachmentId}',
       );
       final data = resp['data'] as String;
-      await _saveChannel.invokeMethod('saveAttachment', {
+      final uri = await _saveChannel.invokeMethod<String>('saveAttachment', {
         'filename': att.filename,
         'mimeType': att.mimeType,
         'data': data,
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${att.filename}" 다운로드 완료')),
+          SnackBar(
+            content: Text('"${att.filename}" 다운로드 완료'),
+            action: uri != null
+                ? SnackBarAction(
+                    label: '열기',
+                    onPressed: () => _saveChannel.invokeMethod('openFile', {
+                      'uri': uri,
+                      'mimeType': att.mimeType,
+                    }),
+                  )
+                : null,
+          ),
         );
       }
     } catch (e) {
@@ -259,13 +270,13 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                       ),
                     ),
                   ),
+                  Expanded(child: WebViewWidget(controller: _webController)),
                   if (_attachments.isNotEmpty)
                     _AttachmentBar(
                       attachments: _attachments,
                       downloading: _downloading,
                       onDownload: _downloadAttachment,
                     ),
-                  Expanded(child: WebViewWidget(controller: _webController)),
                 ]),
     );
   }
