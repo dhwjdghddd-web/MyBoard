@@ -45,14 +45,17 @@ class MainActivity : FlutterActivity() {
                 }
                 "openFile" -> {
                     val args = call.arguments as Map<*, *>
-                    val uri      = args["uri"] as String
+                    val uriStr   = args["uri"] as String
                     val mimeType = args["mimeType"] as String
+                    val uri = android.net.Uri.parse(uriStr)
                     val base = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-                        setDataAndType(android.net.Uri.parse(uri), mimeType)
+                        setDataAndType(uri, mimeType)
                         addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        clipData = android.content.ClipData.newRawUri("", uri)
                     }
                     val chooser = android.content.Intent.createChooser(base, "파일 열기").apply {
                         addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     try {
                         startActivity(chooser)
