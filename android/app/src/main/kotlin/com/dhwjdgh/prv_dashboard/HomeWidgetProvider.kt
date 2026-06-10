@@ -312,42 +312,52 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
         fun updateWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
             val prefs     = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            val views     = RemoteViews(context.packageName, R.layout.home_widget_layout)
+            
+            val opts = manager.getAppWidgetOptions(widgetId)
+            val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
+            val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
+            val isCover = resolveIsCover(context, prefs, widgetId, widgetWidth)
+            
+            val layoutId = if (isCover) R.layout.cover_widget_layout else R.layout.home_widget_layout
+            val views     = RemoteViews(context.packageName, layoutId)
             val activeTab = prefs.getInt("active_widget_tab", 0)
 
             views.setViewVisibility(R.id.section_tasks,    if (activeTab == 0) View.VISIBLE else View.GONE)
             views.setViewVisibility(R.id.section_calendar, if (activeTab == 1) View.VISIBLE else View.GONE)
             views.setViewVisibility(R.id.section_gmail,    if (activeTab == 2) View.VISIBLE else View.GONE)
 
-            val BLUE  = Color.parseColor("#4285F4")
-            val GREEN = Color.parseColor("#0F9D58")
-            val RED   = Color.parseColor("#EA4335")
-            val DIM   = Color.parseColor("#9090A0")
-            val DARK  = Color.parseColor("#2A2A3E")
+            val DIM   = Color.parseColor("#A0A0B0")
 
-            views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) BLUE  else DIM)
-            views.setTextColor(R.id.tab_calendar, if (activeTab == 1) GREEN else DIM)
-            views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) RED   else DIM)
-            views.setInt(R.id.ind_tasks,    "setBackgroundColor", if (activeTab == 0) BLUE  else DARK)
-            views.setInt(R.id.ind_calendar, "setBackgroundColor", if (activeTab == 1) GREEN else DARK)
-            views.setInt(R.id.ind_gmail,    "setBackgroundColor", if (activeTab == 2) RED   else DARK)
+            views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) Color.WHITE else DIM)
+            views.setTextColor(R.id.tab_calendar, if (activeTab == 1) Color.WHITE else DIM)
+            views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) Color.WHITE else DIM)
+            
+            if (activeTab == 0) {
+                views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_active_bg)
+            } else {
+                views.setInt(R.id.tab_tasks, "setBackgroundColor", Color.TRANSPARENT)
+            }
+            if (activeTab == 1) {
+                views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_active_bg)
+            } else {
+                views.setInt(R.id.tab_calendar, "setBackgroundColor", Color.TRANSPARENT)
+            }
+            if (activeTab == 2) {
+                views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_active_bg)
+            } else {
+                views.setInt(R.id.tab_gmail, "setBackgroundColor", Color.TRANSPARENT)
+            }
 
             views.setOnClickPendingIntent(R.id.tab_tasks,    switchTabIntent(context, 0))
             views.setOnClickPendingIntent(R.id.tab_calendar, switchTabIntent(context, 1))
             views.setOnClickPendingIntent(R.id.tab_gmail,    switchTabIntent(context, 2))
 
-            // only bind the active tab — avoids 42-cell calendar render on every tab switch
-            val opts = manager.getAppWidgetOptions(widgetId)
-            val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
-            val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
-            
-            val isCover = resolveIsCover(context, prefs, widgetId, widgetWidth)
             val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
             Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover")
 
             // 탭 텍스트 크기 동적 조정
-            val tabSp = if (isCover) 16f
-                        else         scaledSp(widgetWidth, widgetHeight, 14f, 16f)
+            val tabSp = if (isCover) 11f
+                        else         scaledSp(widgetWidth, widgetHeight, 11f, 13f)
             views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
@@ -360,13 +370,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val configPi = PendingIntent.getActivity(context, widgetId + 700, configIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_settings_btn, configPi)
-            views.setOnClickPendingIntent(R.id.widget_settings_btn_cal, configPi)
-            views.setOnClickPendingIntent(R.id.widget_settings_btn_gmail, configPi)
-            if (isCover) {
-                listOf(R.id.widget_settings_btn, R.id.widget_settings_btn_cal, R.id.widget_settings_btn_gmail).forEach {
-                    views.setTextViewTextSize(it, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                }
-            }
 
             when (activeTab) {
                 0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover)
@@ -496,14 +499,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
             // 행 수에 따라 글씨 크기 자동 조정
             val rowFactor = 5f / neededRows
             val dateSp: Float
-            val eventSp: Float
+            val eventSp = 8f * rowFactor
             if (isCover) {
-                dateSp  = 13f * rowFactor
-                eventSp = 16f * rowFactor
-                Log.d("HomeWidget", "isCover fixed fonts dateSp=$dateSp eventSp=$eventSp")
+                dateSp  = 10f * rowFactor
             } else {
-                dateSp  = scaledSp(widgetWidth, widgetHeight, 11f, 17f) * rowFactor
-                eventSp = scaledSp(widgetWidth, widgetHeight, 8f, 13f) * rowFactor
+                dateSp  = scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor
             }
 
             for (row in 0..5) {
@@ -511,10 +511,20 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     val idx    = row * 7 + col
                     val day    = idx - firstDow + 1
                     val cellId = CELL_IDS[row][col]
+                    val resName = context.resources.getResourceEntryName(cellId)
+                    
+                    val ev1Id = context.resources.getIdentifier("${resName}_ev1", "id", context.packageName)
+                    val ev2Id = context.resources.getIdentifier("${resName}_ev2", "id", context.packageName)
+                    val parentId = context.resources.getIdentifier("cell_${resName.substring(1)}", "id", context.packageName)
 
                     if (day < 1 || day > daysInMonth) {
                         views.setTextViewText(cellId, "")
-                        views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
+                        if (ev1Id != 0) views.setViewVisibility(ev1Id, View.GONE)
+                        if (ev2Id != 0) views.setViewVisibility(ev2Id, View.GONE)
+                        if (parentId != 0) {
+                            views.setInt(parentId, "setBackgroundColor", Color.TRANSPARENT)
+                            views.setOnClickPendingIntent(parentId, null)
+                        }
                     } else {
                         val isToday  = dispYear == actualYear && dispMonth == actualMonth && day == actualToday
 
@@ -527,61 +537,76 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
                         val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
 
-                        val ssb = SpannableStringBuilder()
-
-                        // 1. 날짜 숫자 추가
-                        val dayStr = day.toString()
-                        ssb.append(dayStr)
-
+                        // 1. 날짜 설정
+                        views.setTextViewText(cellId, day.toString())
                         val dayColor = when {
                             isToday  -> Color.parseColor("#4285F4")
-                            col == 0 -> Color.parseColor("#FF6B6B")
-                            col == 6 -> Color.parseColor("#6B9FFF")
+                            col == 0 -> Color.parseColor("#FF8A80")
+                            col == 6 -> Color.parseColor("#82B1FF")
                             else     -> Color.parseColor("#D0D0E0")
                         }
-                        ssb.setSpan(AbsoluteSizeSpan(dateSp.toInt(), true), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        ssb.setSpan(ForegroundColorSpan(dayColor), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        if (isToday) {
-                            ssb.setSpan(StyleSpan(Typeface.BOLD), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        }
+                        views.setTextColor(cellId, dayColor)
+                        views.setTextViewTextSize(cellId, android.util.TypedValue.COMPLEX_UNIT_SP, dateSp)
 
-                        // 2. 일정 제목 추가 (최대 2개)
+                        if (isToday) views.setInt(cellId, "setBackgroundResource", R.drawable.cal_today_bg)
+                        else         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
+
+                        // 2. 일정 바인딩 (최대 2개)
                         val displayTitles = titles.take(2)
-                        for (i in displayTitles.indices) {
-                            ssb.append("\n")
-                            val start = ssb.length
-                            val title = displayTitles[i]
-                            val truncatedTitle = if (title.length > 5) title.substring(0, 4) + ".." else title
-                            ssb.append(truncatedTitle)
-                            val end = ssb.length
-
-                            val colorStr = colors.getOrNull(i)
+                        
+                        if (displayTitles.size > 0 && ev1Id != 0) {
+                            views.setViewVisibility(ev1Id, View.VISIBLE)
+                            val title = displayTitles[0]
+                            val truncatedTitle = if (title.length > 5) title.substring(0, 5) + ".." else title
+                            
+                            val ssb = SpannableStringBuilder(truncatedTitle)
+                            ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            views.setTextViewText(ev1Id, ssb)
+                            views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
+                            
+                            val colorStr = colors.getOrNull(0)
                             val eventColor = try {
                                 if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#60D8A0")
                             } catch (e: Exception) {
                                 Color.parseColor("#60D8A0")
                             }
-
-                            ssb.setSpan(AbsoluteSizeSpan(eventSp.toInt(), true), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            ssb.setSpan(ForegroundColorSpan(eventColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            views.setTextColor(ev1Id, eventColor)
+                        } else if (ev1Id != 0) {
+                            views.setViewVisibility(ev1Id, View.GONE)
                         }
 
-                        views.setTextViewText(cellId, ssb)
-                        // 홈화면처럼 상단 중앙 정렬하여 일정 텍스트가 아래쪽 여백을 꽉 채우도록 처리
-                        views.setInt(cellId, "setGravity", android.view.Gravity.TOP or android.view.Gravity.CENTER_HORIZONTAL)
-
-                        if (isToday) views.setInt(cellId, "setBackgroundResource", R.drawable.cal_today_bg)
-                        else         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
+                        if (displayTitles.size > 1 && ev2Id != 0) {
+                            views.setViewVisibility(ev2Id, View.VISIBLE)
+                            val title = displayTitles[1]
+                            val truncatedTitle = if (title.length > 5) title.substring(0, 5) + ".." else title
+                            
+                            val ssb = SpannableStringBuilder(truncatedTitle)
+                            ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            views.setTextViewText(ev2Id, ssb)
+                            views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
+                            
+                            val colorStr = colors.getOrNull(1)
+                            val eventColor = try {
+                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#60D8A0")
+                            } catch (e: Exception) {
+                                Color.parseColor("#60D8A0")
+                            }
+                            views.setTextColor(ev2Id, eventColor)
+                        } else if (ev2Id != 0) {
+                            views.setViewVisibility(ev2Id, View.GONE)
+                        }
 
                         // 날짜 탭 → 위젯 내 일정 패널로 전환 (앱 열지 않음)
-                        views.setOnClickPendingIntent(cellId, PendingIntent.getBroadcast(
-                            context, 800 + idx,
-                            Intent(context, HomeWidgetProvider::class.java).apply {
-                                action = ACTION_CAL_SELECT_DATE
-                                putExtra("date_key", dateKey)
-                            },
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        ))
+                        if (parentId != 0) {
+                            views.setOnClickPendingIntent(parentId, PendingIntent.getBroadcast(
+                                context, 800 + idx,
+                                Intent(context, HomeWidgetProvider::class.java).apply {
+                                    action = ACTION_CAL_SELECT_DATE
+                                    putExtra("date_key", dateKey)
+                                },
+                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                            ))
+                        }
                     }
                 }
             }
@@ -775,14 +800,16 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val mgr = AppWidgetManager.getInstance(context)
             val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
             val color = android.graphics.Color.parseColor(colorHex)
+            val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             for (id in ids) {
-                val v = RemoteViews(context.packageName, R.layout.home_widget_layout)
-                v.setTextColor(viewId, color)
+                val isCover = resolveIsCover(context, prefs, id, 300)
+                val layoutId = if (isCover) R.layout.cover_widget_layout else R.layout.home_widget_layout
+                val v = RemoteViews(context.packageName, layoutId)
+                v.setInt(viewId, "setColorFilter", color)
                 mgr.partiallyUpdateAppWidget(id, v)
             }
         }
 
-        // ─────────────────────────────────────────────────────────────────
         //  PendingIntent 팩토리
         // ─────────────────────────────────────────────────────────────────
         private fun switchTabIntent(context: Context, tab: Int): PendingIntent =

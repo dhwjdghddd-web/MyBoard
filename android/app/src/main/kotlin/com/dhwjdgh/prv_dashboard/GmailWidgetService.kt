@@ -46,22 +46,23 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        val views = RemoteViews(context.packageName, R.layout.gmail_item_layout)
+        val layoutId = if (isCover) R.layout.cover_gmail_item_layout else R.layout.gmail_item_layout
+        val views = RemoteViews(context.packageName, layoutId)
         if (position >= emailsList.size) return views
 
         val item = emailsList[position]
         
         val sender = item.sender.ifEmpty { "(이름 없음)" }
-        val combined = if (item.subject.isNotEmpty()) "$sender - ${item.subject}" else sender
-        views.setTextViewText(R.id.gmail_item_sender, combined)
+        views.setTextViewText(R.id.gmail_item_sender, sender)
+        views.setTextViewText(R.id.gmail_item_subject, item.subject.ifEmpty { "(제목 없음)" })
         views.setTextViewText(R.id.gmail_item_time, item.time)
 
-        views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) Color.WHITE else Color.parseColor("#B0B0C0"))
-        if (isCover) {
-            views.setTextViewTextSize(R.id.gmail_item_sender, android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-            views.setTextViewTextSize(R.id.gmail_item_time,   android.util.TypedValue.COMPLEX_UNIT_SP, 16f)
-            views.setTextViewTextSize(R.id.gmail_item_delete, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-        }
+        val unreadColor = Color.WHITE
+        val readSenderColor = Color.parseColor("#B0B0C0")
+        val readSubjectColor = Color.parseColor("#707080")
+
+        views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) unreadColor else readSenderColor)
+        views.setTextColor(R.id.gmail_item_subject, if (item.isUnread) Color.parseColor("#E0E0FF") else readSubjectColor)
         
         val openIntent = Intent().apply {
             putExtra("gmail_item_action", "open")
@@ -69,13 +70,6 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
             if (item.emailId.isNotEmpty()) putExtra("email_id", item.emailId)
         }
         views.setOnClickFillInIntent(R.id.gmail_item_root, openIntent)
-
-        val deleteIntent = Intent().apply {
-            putExtra("gmail_item_action", "delete")
-            putExtra("email_id", item.emailId)
-            putExtra("email_idx", position)
-        }
-        views.setOnClickFillInIntent(R.id.gmail_item_delete, deleteIntent)
         
         return views
     }
