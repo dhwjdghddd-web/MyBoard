@@ -321,7 +321,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
             // 탭 텍스트 크기 동적 조정
             val tabSp = if (isCover) 16f
-                        else         scaledSp(widgetWidth, widgetHeight, 10f, 13f)
+                        else         scaledSp(widgetWidth, widgetHeight, 14f, 16f)
             views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
@@ -338,7 +338,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_settings_btn_gmail, configPi)
             if (isCover) {
                 listOf(R.id.widget_settings_btn, R.id.widget_settings_btn_cal, R.id.widget_settings_btn_gmail).forEach {
-                    views.setTextViewTextSize(it, android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+                    views.setTextViewTextSize(it, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
                 }
             }
 
@@ -384,8 +384,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setTextViewTextSize(R.id.task_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, addSp)
             views.setOnClickPendingIntent(R.id.task_add_btn, quickAddTaskIntent(context))
             if (isCover) {
-                views.setTextViewTextSize(R.id.task_launch_btn,   android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-                views.setTextViewTextSize(R.id.task_refresh_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+                views.setTextViewTextSize(R.id.task_launch_btn,   android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                views.setTextViewTextSize(R.id.task_refresh_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
             }
             views.setOnClickPendingIntent(R.id.task_launch_btn, openAppIntent(context, 0))
             views.setOnClickPendingIntent(R.id.task_refresh_btn, PendingIntent.getBroadcast(
@@ -440,9 +440,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
             if (isCover) {
-                views.setTextViewTextSize(R.id.cal_launch_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-                views.setTextViewTextSize(R.id.cal_refresh_btn, android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-                views.setTextViewTextSize(R.id.cal_add_btn,     android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+                views.setTextViewTextSize(R.id.cal_launch_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                views.setTextViewTextSize(R.id.cal_refresh_btn, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                views.setTextViewTextSize(R.id.cal_add_btn,     android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                val dowSp = 13f
+                listOf(R.id.cal_dow_sun, R.id.cal_dow_mon, R.id.cal_dow_tue, R.id.cal_dow_wed,
+                       R.id.cal_dow_thu, R.id.cal_dow_fri, R.id.cal_dow_sat).forEach {
+                    views.setTextViewTextSize(it, android.util.TypedValue.COMPLEX_UNIT_SP, dowSp)
+                }
             }
             views.setOnClickPendingIntent(R.id.cal_launch_btn, openAppIntent(context, 1))
             views.setOnClickPendingIntent(R.id.cal_refresh_btn, PendingIntent.getBroadcast(
@@ -577,8 +582,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
             // 뒤로 버튼
             if (isCover) {
-                views.setTextViewTextSize(R.id.cal_back_btn,    android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-                views.setTextViewTextSize(R.id.cal_day_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+                views.setTextViewTextSize(R.id.cal_back_btn,    android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                views.setTextViewTextSize(R.id.cal_day_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
             }
             views.setOnClickPendingIntent(R.id.cal_back_btn, PendingIntent.getBroadcast(
                 context, 702,
@@ -693,9 +698,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setTextViewTextSize(R.id.gmail_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
 
             if (isCover) {
-                views.setTextViewTextSize(R.id.gmail_launch_btn,   android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-                views.setTextViewTextSize(R.id.gmail_refresh_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-                views.setTextViewTextSize(R.id.gmail_compose_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+                views.setTextViewTextSize(R.id.gmail_launch_btn,   android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                views.setTextViewTextSize(R.id.gmail_refresh_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+                views.setTextViewTextSize(R.id.gmail_compose_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
             }
             // 앱 실행 숏컷 버튼
             views.setOnClickPendingIntent(R.id.gmail_launch_btn, openAppIntent(context, 2))

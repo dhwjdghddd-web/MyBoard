@@ -73,18 +73,17 @@
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingBottom="6dp">
                 <TextView android:id="@+id/cal_prev"
-                    android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="2"
-                    android:text="‹" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="start|center_vertical"
-                    android:paddingStart="4dp"/>
+                    android:layout_width="wrap_content" android:layout_height="28dp"
+                    android:text="‹" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="center_vertical"
+                    android:paddingStart="4dp" android:paddingEnd="8dp"/>
                 <TextView android:id="@+id/cal_month_label"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="6월" android:textSize="14sp" android:textStyle="bold"
-                    android:textColor="#FFFFFF" android:paddingStart="4dp" android:paddingEnd="4dp"/>
+                    android:textColor="#FFFFFF" android:gravity="center"/>
                 <TextView android:id="@+id/cal_next"
-                    android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="2"
-                    android:text="›" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="end|center_vertical"
-                    android:paddingEnd="4dp"/>
-                <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+                    android:layout_width="wrap_content" android:layout_height="28dp"
+                    android:text="›" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="center_vertical"
+                    android:paddingStart="8dp" android:paddingEnd="4dp"/>
                 <TextView android:id="@+id/cal_launch_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
                     android:text="⇱" android:textSize="14sp" android:textColor="#A0A0B0" android:gravity="center"/>
@@ -102,19 +101,19 @@
             <!-- 요일 헤더 -->
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:paddingBottom="1dp">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="일" android:textSize="11sp" android:textColor="#FF6B6B" android:gravity="center"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="월" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="화" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="수" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="목" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="금" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="토" android:textSize="11sp" android:textColor="#6B9FFF" android:gravity="center"/>
             </LinearLayout>
 
