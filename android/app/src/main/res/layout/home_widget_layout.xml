@@ -326,6 +326,8 @@
             <FrameLayout android:id="@+id/ind_gmail"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:background="#2A2A3E"/>
+            <FrameLayout android:layout_width="22dp" android:layout_height="match_parent"
+                android:background="#1A1A2E"/>
         </LinearLayout>
 
         <!-- 탭 텍스트 -->
@@ -346,6 +348,10 @@
                 android:text="Gmail" android:textSize="12sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
                 android:paddingTop="4dp" android:paddingBottom="4dp"/>
+            <TextView android:id="@+id/widget_settings_btn"
+                android:layout_width="22dp" android:layout_height="wrap_content"
+                android:text="⚙" android:textSize="11sp" android:textColor="#404055"
+                android:gravity="center" android:paddingTop="4dp" android:paddingBottom="4dp"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -46,18 +46,27 @@ class MainActivity : FlutterActivity() {
                 "openFile" -> {
                     val args     = call.arguments as Map<*, *>
                     val filePath = args["uri"] as String
-                    val mimeType = args["mimeType"] as String
+                    val rawMime  = args["mimeType"] as String
                     try {
                         val file = java.io.File(filePath)
                         val uri  = androidx.core.content.FileProvider.getUriForFile(
                             this, "${packageName}.fileprovider", file
                         )
+                        // 확장자로 MIME 타입 보정 (Gmail이 octet-stream 반환할 때 대비)
+                        val ext = file.extension.lowercase()
+                        val mimeType = if (rawMime == "application/octet-stream" || rawMime.isBlank()) {
+                            android.webkit.MimeTypeMap.getSingleton()
+                                .getMimeTypeFromExtension(ext) ?: rawMime
+                        } else rawMime
+
                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
                             setDataAndType(uri, mimeType)
                             addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            clipData = android.content.ClipData.newRawUri("", uri)
                         }
                         val chooser = android.content.Intent.createChooser(intent, "파일 열기").apply {
                             addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
                         startActivity(chooser)
                         result.success(null)

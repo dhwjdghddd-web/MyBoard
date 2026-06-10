@@ -9,4 +9,5 @@
     android:previewLayout="@layout/home_widget_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:configure="com.dhwjdgh.prv_dashboard.WidgetConfigureActivity" />
+    android:configure="com.dhwjdgh.prv_dashboard.WidgetConfigureActivity"
+    android:widgetFeatures="reconfigurable" />

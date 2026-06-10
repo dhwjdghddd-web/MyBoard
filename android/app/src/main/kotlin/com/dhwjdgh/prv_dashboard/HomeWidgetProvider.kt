@@ -319,6 +319,17 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
             Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover")
             
+            // ⚙ 버튼 → WidgetConfigureActivity 직접 실행 (런처 무관)
+            val configIntent = Intent(context, WidgetConfigureActivity::class.java).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            views.setOnClickPendingIntent(
+                R.id.widget_settings_btn,
+                PendingIntent.getActivity(context, widgetId + 700, configIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            )
+
             when (activeTab) {
                 0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover)
                 1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover)
