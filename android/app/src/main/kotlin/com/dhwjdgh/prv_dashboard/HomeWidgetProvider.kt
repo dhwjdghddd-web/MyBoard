@@ -29,9 +29,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val ww = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300)
             val wh = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
             
-            // 실제 측정 결과 Z플립 커버스크린 위젯의 해상도 수치가 홈스크린보다 더 크게 감지됨 (커버 W:438 H:352 vs 홈 W:315 H:289)
-            // 따라서 가로가 415dp 이상이거나 세로가 320dp 이상인 위젯을 커버스크린 위젯으로 정확하게 판단
-            val isCover = ww >= 415 || wh >= 320
+            // 커버 W:438 / 홈대형 W:457 → 415..455 범위로 커버만 포착, 홈대형(457) 제외
+            val isCover = ww in 415..455
             edit.putBoolean("widget_is_cover_$id", isCover)
             Log.d("HomeWidget", "onUpdate id=$id displayW=$displayWidthDp widgetW=$ww widgetH=$wh isCover=$isCover")
         }
@@ -46,7 +45,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
         val ww = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300)
         val wh = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
         
-        val isCover = ww >= 415 || wh >= 320
+        val isCover = ww in 415..455
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean("widget_is_cover_$appWidgetId", isCover).apply()
         Log.d("HomeWidget", "optionsChanged id=$appWidgetId displayW=$displayWidthDp widgetW=$ww widgetH=$wh isCover=$isCover")
@@ -340,9 +339,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
             
-            // 실시간 및 SharedPreferences 다중 식별 적용
-            val category = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_HOST_CATEGORY, -1)
-            val isCoverDirect = widgetWidth >= 415 || widgetHeight >= 320
+            val isCoverDirect = widgetWidth in 415..455
             val isCover = isCoverDirect || prefs.getBoolean("widget_is_cover_$widgetId", false)
             Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight isCoverDirect=$isCoverDirect isCover=$isCover")
             
@@ -368,10 +365,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             if (hasAny) {
                 views.setViewVisibility(R.id.task_list_view, View.VISIBLE)
                 views.setViewVisibility(R.id.task_empty, View.GONE)
-                val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
-                    putExtra("is_cover", isCover)
-                }
-                views.setRemoteAdapter(R.id.task_list_view, serviceIntent)
+                val svcClass = if (isCover) TaskWidgetServiceCover::class.java else TaskWidgetService::class.java
+                views.setRemoteAdapter(R.id.task_list_view, Intent(context, svcClass))
                 val template = PendingIntent.getBroadcast(
                     context, 450,
                     Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_TASK_ITEM },
@@ -649,10 +644,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.gmail_empty, View.GONE)
 
                 // Bind ListView to RemoteViewsService
-                val intent = Intent(context, GmailWidgetService::class.java).apply {
-                    putExtra("is_cover", isCover)
-                }
-                views.setRemoteAdapter(R.id.gmail_list_view, intent)
+                val gmailSvcClass = if (isCover) GmailWidgetServiceCover::class.java else GmailWidgetService::class.java
+                views.setRemoteAdapter(R.id.gmail_list_view, Intent(context, gmailSvcClass))
 
                 // Broadcast template → HomeWidgetProvider handles open/delete
                 val template = PendingIntent.getBroadcast(

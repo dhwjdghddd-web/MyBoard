@@ -7,9 +7,13 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 
 class TaskWidgetService : RemoteViewsService() {
-    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return TaskWidgetFactory(applicationContext, intent.getBooleanExtra("is_cover", false))
-    }
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
+        TaskWidgetFactory(applicationContext, isCover = false)
+}
+
+class TaskWidgetServiceCover : RemoteViewsService() {
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
+        TaskWidgetFactory(applicationContext, isCover = true)
 }
 
 class TaskWidgetFactory(private val context: Context, private val isCover: Boolean = false) : RemoteViewsService.RemoteViewsFactory {

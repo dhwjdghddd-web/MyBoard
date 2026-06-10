@@ -7,9 +7,13 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 
 class GmailWidgetService : RemoteViewsService() {
-    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return GmailWidgetFactory(applicationContext, intent.getBooleanExtra("is_cover", false))
-    }
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
+        GmailWidgetFactory(applicationContext, isCover = false)
+}
+
+class GmailWidgetServiceCover : RemoteViewsService() {
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
+        GmailWidgetFactory(applicationContext, isCover = true)
 }
 
 class GmailWidgetFactory(private val context: Context, private val isCover: Boolean = false) : RemoteViewsService.RemoteViewsFactory {
