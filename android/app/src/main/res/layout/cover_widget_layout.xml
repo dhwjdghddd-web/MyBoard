@@ -31,10 +31,10 @@
                 android:textColor="#FFFFFF"/>
             <ImageView android:id="@+id/task_launch_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"/>
             <ImageView android:id="@+id/task_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"/>
         </LinearLayout>
 
         <ListView android:id="@+id/task_list_view"
@@ -52,8 +52,12 @@
 
         <TextView android:id="@+id/task_add_btn"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="＋  할 일 추가" android:textSize="12sp" android:textColor="#4285F4"
-            android:gravity="center" android:paddingTop="4dp" android:paddingBottom="2dp"/>
+            android:text="＋  할 일 추가" android:textSize="11sp" android:textColor="#82B1FF"
+            android:gravity="center"
+            android:paddingTop="6dp" android:paddingBottom="6dp"
+            android:layout_marginTop="4dp" android:layout_marginBottom="2dp"
+            android:layout_marginStart="4dp" android:layout_marginEnd="4dp"
+            android:background="@drawable/task_add_btn_bg"/>
     </LinearLayout>
 
     <!-- ══════════════ 캘린더 섹션 ══════════════ -->
@@ -72,23 +76,23 @@
                 android:paddingStart="4dp" android:paddingEnd="4dp">
                 <ImageView android:id="@+id/cal_prev"
                     android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp"/>
                 <TextView android:id="@+id/cal_month_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="6월" android:textSize="13sp" android:textStyle="bold"
                     android:textColor="#FFFFFF" android:gravity="center"/>
                 <ImageView android:id="@+id/cal_next"
                     android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp"/>
                 <ImageView android:id="@+id/cal_launch_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"/>
                 <ImageView android:id="@+id/cal_refresh_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"/>
                 <ImageView android:id="@+id/cal_add_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"/>
             </LinearLayout>
 
             <!-- 요일 헤더 -->
@@ -124,13 +128,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c00_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c00_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -145,13 +149,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c01_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c01_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -166,13 +170,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c02_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c02_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -187,13 +191,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c03_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c03_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -208,13 +212,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c04_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c04_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -229,13 +233,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c05_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c05_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -250,13 +254,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c06_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c06_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -276,13 +280,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c10_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c10_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -297,13 +301,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c11_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c11_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -318,13 +322,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c12_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c12_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -339,13 +343,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c13_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c13_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -360,13 +364,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c14_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c14_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -381,13 +385,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c15_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c15_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -402,13 +406,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c16_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c16_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -428,13 +432,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c20_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c20_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -449,13 +453,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c21_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c21_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -470,13 +474,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c22_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c22_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -491,13 +495,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c23_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c23_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -512,13 +516,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c24_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c24_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -533,13 +537,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c25_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c25_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -554,13 +558,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c26_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c26_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -580,13 +584,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c30_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c30_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -601,13 +605,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c31_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c31_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -622,13 +626,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c32_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c32_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -643,13 +647,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c33_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c33_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -664,13 +668,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c34_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c34_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -685,13 +689,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c35_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c35_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -706,13 +710,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c36_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c36_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -732,13 +736,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c40_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c40_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -753,13 +757,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c41_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c41_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -774,13 +778,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c42_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c42_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -795,13 +799,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c43_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c43_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -816,13 +820,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c44_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c44_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -837,13 +841,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c45_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c45_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -858,13 +862,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c46_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c46_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -884,13 +888,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c50_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c50_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -905,13 +909,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c51_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c51_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -926,13 +930,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c52_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c52_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -947,13 +951,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c53_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c53_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -968,13 +972,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c54_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c54_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -989,13 +993,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c55_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c55_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -1010,13 +1014,13 @@
                         android:textColor="#FFFFFF" android:textStyle="bold"/>
                     <TextView android:id="@+id/c56_ev1"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c56_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:gravity="center_vertical" android:textSize="8sp"
+                        android:gravity="center_vertical" android:textSize="10sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
@@ -1035,14 +1039,14 @@
                 android:paddingBottom="6dp">
                 <ImageView android:id="@+id/cal_back_btn"
                     android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp"/>
                 <TextView android:id="@+id/cal_day_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="" android:textSize="13sp" android:textStyle="bold"
                     android:textColor="#FFFFFF" android:paddingStart="4dp"/>
                 <ImageView android:id="@+id/cal_day_add_btn"
                     android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp" android:gravity="center"/>
+                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"/>
             </LinearLayout>
 
             <!-- 일정 행 0 -->
@@ -1133,13 +1137,13 @@
                 android:textColor="#FFFFFF"/>
             <ImageView android:id="@+id/gmail_launch_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"/>
             <ImageView android:id="@+id/gmail_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"/>
             <ImageView android:id="@+id/gmail_compose_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp" android:gravity="center"/>
+                android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp"/>
         </LinearLayout>
 
         <!-- Gmail 리스트뷰 -->

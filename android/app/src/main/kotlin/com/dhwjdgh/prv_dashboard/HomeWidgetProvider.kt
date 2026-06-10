@@ -412,10 +412,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val addSp = if (isCover) 18f else scaledSp(widgetWidth, widgetHeight, 12f, 14f)
             views.setTextViewTextSize(R.id.task_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, addSp)
             views.setOnClickPendingIntent(R.id.task_add_btn, quickAddTaskIntent(context))
-            if (isCover) {
-                views.setTextViewTextSize(R.id.task_launch_btn,   android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                views.setTextViewTextSize(R.id.task_refresh_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-            }
+
             views.setOnClickPendingIntent(R.id.task_launch_btn, openAppIntent(context, 0))
             views.setOnClickPendingIntent(R.id.task_refresh_btn, PendingIntent.getBroadcast(
                 context, 150,
@@ -453,10 +450,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val monthLabelSp = if (isCover) 18f
                                else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.cal_month_label, android.util.TypedValue.COMPLEX_UNIT_SP, monthLabelSp)
-            val navArrowSp = if (isCover) 22f
-                             else         scaledSp(widgetWidth, widgetHeight, 16f, 20f)
-            views.setTextViewTextSize(R.id.cal_prev, android.util.TypedValue.COMPLEX_UNIT_SP, navArrowSp)
-            views.setTextViewTextSize(R.id.cal_next, android.util.TypedValue.COMPLEX_UNIT_SP, navArrowSp)
+
 
             views.setOnClickPendingIntent(R.id.cal_prev, PendingIntent.getBroadcast(
                 context, 700,
@@ -469,9 +463,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
             if (isCover) {
-                views.setTextViewTextSize(R.id.cal_launch_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                views.setTextViewTextSize(R.id.cal_refresh_btn, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                views.setTextViewTextSize(R.id.cal_add_btn,     android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
                 val dowSp = 13f
                 listOf(R.id.cal_dow_sun, R.id.cal_dow_mon, R.id.cal_dow_tue, R.id.cal_dow_wed,
                        R.id.cal_dow_thu, R.id.cal_dow_fri, R.id.cal_dow_sat).forEach {
@@ -498,13 +489,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             Log.d("HomeWidget", "bindCalendarGrid isCover=$isCover w=$widgetWidth h=$widgetHeight neededRows=$neededRows")
             // 행 수에 따라 글씨 크기 자동 조정
             val rowFactor = 5f / neededRows
-            val dateSp: Float
-            val eventSp = 8f * rowFactor
-            if (isCover) {
-                dateSp  = 10f * rowFactor
-            } else {
-                dateSp  = scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor
-            }
+            val eventSp = if (isCover) (10.5f * rowFactor) else (11.5f * rowFactor)
+            val dateSp = if (isCover) (10f * rowFactor) else (scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor)
 
             for (row in 0..5) {
                 for (col in 0..6) {
@@ -548,8 +534,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         views.setTextColor(cellId, dayColor)
                         views.setTextViewTextSize(cellId, android.util.TypedValue.COMPLEX_UNIT_SP, dateSp)
 
-                        if (isToday) views.setInt(cellId, "setBackgroundResource", R.drawable.cal_today_bg)
-                        else         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
+                        views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
 
                         // 2. 일정 바인딩 (최대 2개)
                         val displayTitles = titles.take(2)
@@ -632,10 +617,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setTextViewTextSize(R.id.cal_day_label, android.util.TypedValue.COMPLEX_UNIT_SP, dayLabelSp)
 
             // 뒤로 버튼
-            if (isCover) {
-                views.setTextViewTextSize(R.id.cal_back_btn,    android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                views.setTextViewTextSize(R.id.cal_day_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-            }
+
             views.setOnClickPendingIntent(R.id.cal_back_btn, PendingIntent.getBroadcast(
                 context, 702,
                 Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_CAL_BACK },
@@ -748,11 +730,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                            else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.gmail_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
 
-            if (isCover) {
-                views.setTextViewTextSize(R.id.gmail_launch_btn,   android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                views.setTextViewTextSize(R.id.gmail_refresh_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-                views.setTextViewTextSize(R.id.gmail_compose_btn,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-            }
+
             // 앱 실행 숏컷 버튼
             views.setOnClickPendingIntent(R.id.gmail_launch_btn, openAppIntent(context, 2))
             // 새로고침 버튼 → GmailSyncJobService 스케줄
