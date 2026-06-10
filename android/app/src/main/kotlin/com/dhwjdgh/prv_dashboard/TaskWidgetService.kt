@@ -42,8 +42,9 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         views.setTextColor(R.id.task_item_title, if (item.done) Color.parseColor("#606070") else Color.WHITE)
         views.setTextColor(R.id.task_item_check, if (item.done) Color.parseColor("#606070") else Color.parseColor("#4285F4"))
         if (isCover) {
-            views.setTextViewTextSize(R.id.task_item_title, android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
-            views.setTextViewTextSize(R.id.task_item_check, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+            views.setTextViewTextSize(R.id.task_item_title,  android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+            views.setTextViewTextSize(R.id.task_item_check,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+            views.setTextViewTextSize(R.id.task_item_delete, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
         }
 
         val completeIntent = Intent().apply {

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/widget_background"
     android:padding="10dp">
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <!-- 콘텐츠 영역 (3개 섹션 공유) -->
     <FrameLayout
@@ -22,7 +24,8 @@
         <!-- 태스크 헤더 -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="6dp">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            <TextView android:id="@+id/task_header_title"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="할 일 목록" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#FFFFFF"/>
             <TextView android:id="@+id/task_launch_btn"
@@ -31,6 +34,9 @@
             <TextView android:id="@+id/task_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
                 android:text="↻" android:textSize="16sp" android:textColor="#A0A0B0" android:gravity="center"/>
+            <TextView android:id="@+id/widget_settings_btn"
+                android:layout_width="28dp" android:layout_height="28dp"
+                android:text="⚙" android:textSize="13sp" android:textColor="#A0A0B0" android:gravity="center"/>
         </LinearLayout>
 
         <ListView android:id="@+id/task_list_view"
@@ -65,9 +71,9 @@
             <!-- 월 네비게이션 (넓은 터치 영역으로 스와이프 대체) -->
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingBottom="2dp">
+                android:paddingBottom="6dp">
                 <TextView android:id="@+id/cal_prev"
-                    android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="2"
+                    android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="2"
                     android:text="‹" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="start|center_vertical"
                     android:paddingStart="4dp"/>
                 <TextView android:id="@+id/cal_month_label"
@@ -75,7 +81,7 @@
                     android:text="6월" android:textSize="14sp" android:textStyle="bold"
                     android:textColor="#FFFFFF" android:paddingStart="4dp" android:paddingEnd="4dp"/>
                 <TextView android:id="@+id/cal_next"
-                    android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="2"
+                    android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="2"
                     android:text="›" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="end|center_vertical"
                     android:paddingEnd="4dp"/>
                 <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
@@ -88,6 +94,9 @@
                 <TextView android:id="@+id/cal_add_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
                     android:text="＋" android:textSize="16sp" android:textColor="#60D8A0" android:gravity="center"/>
+                <TextView android:id="@+id/widget_settings_btn_cal"
+                    android:layout_width="28dp" android:layout_height="28dp"
+                    android:text="⚙" android:textSize="13sp" android:textColor="#A0A0B0" android:gravity="center"/>
             </LinearLayout>
 
             <!-- 요일 헤더 -->
@@ -272,7 +281,8 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="M" android:textSize="16sp" android:textStyle="bold"
                 android:textColor="#EA4335" android:paddingEnd="6dp"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            <TextView android:id="@+id/gmail_header_title"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="받은편지함" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#FFFFFF"/>
             <TextView android:id="@+id/gmail_launch_btn"
@@ -284,6 +294,9 @@
             <TextView android:id="@+id/gmail_compose_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
                 android:text="✎" android:textSize="16sp" android:textColor="#A0A0B0" android:gravity="center"/>
+            <TextView android:id="@+id/widget_settings_btn_gmail"
+                android:layout_width="28dp" android:layout_height="28dp"
+                android:text="⚙" android:textSize="13sp" android:textColor="#A0A0B0" android:gravity="center"/>
         </LinearLayout>
 
         <!-- Gmail 리스트뷰 -->
@@ -326,8 +339,6 @@
             <FrameLayout android:id="@+id/ind_gmail"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:background="#2A2A3E"/>
-            <FrameLayout android:layout_width="22dp" android:layout_height="match_parent"
-                android:background="#1A1A2E"/>
         </LinearLayout>
 
         <!-- 탭 텍스트 -->
@@ -348,12 +359,11 @@
                 android:text="Gmail" android:textSize="12sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
                 android:paddingTop="4dp" android:paddingBottom="4dp"/>
-            <TextView android:id="@+id/widget_settings_btn"
-                android:layout_width="22dp" android:layout_height="wrap_content"
-                android:text="⚙" android:textSize="11sp" android:textColor="#404055"
-                android:gravity="center" android:paddingTop="4dp" android:paddingBottom="4dp"/>
         </LinearLayout>
 
     </LinearLayout>
 
 </LinearLayout>
+
+
+</FrameLayout>

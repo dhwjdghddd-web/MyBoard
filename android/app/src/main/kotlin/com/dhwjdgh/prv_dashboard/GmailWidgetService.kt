@@ -57,9 +57,10 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
 
         views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) Color.WHITE else Color.parseColor("#B0B0C0"))
         if (isCover) {
-            views.setTextViewTextSize(R.id.gmail_item_sender,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
-            views.setTextViewTextSize(R.id.gmail_item_time,    android.util.TypedValue.COMPLEX_UNIT_SP, 14f)
-            views.setTextViewTextSize(R.id.gmail_item_subject, android.util.TypedValue.COMPLEX_UNIT_SP, 15f)
+            views.setTextViewTextSize(R.id.gmail_item_sender,  android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+            views.setTextViewTextSize(R.id.gmail_item_time,    android.util.TypedValue.COMPLEX_UNIT_SP, 16f)
+            views.setTextViewTextSize(R.id.gmail_item_subject, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+            views.setTextViewTextSize(R.id.gmail_item_delete,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
         }
         
         val openIntent = Intent().apply {
