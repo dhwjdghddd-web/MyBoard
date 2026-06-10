@@ -104,6 +104,17 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
     }
   }
 
+  Future<void> _openFile(String filePath, String mimeType, ScaffoldMessengerState messenger) async {
+    try {
+      await _saveChannel.invokeMethod<void>('openFile', {
+        'uri': filePath,
+        'mimeType': mimeType,
+      });
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('파일 열기 실패: $e')));
+    }
+  }
+
   Future<void> _downloadAttachment(Attachment att) async {
     if (_downloading.contains(att.attachmentId)) return;
 
@@ -131,10 +142,8 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       );
       if (redownload == null) return; // 취소
       if (redownload == false) {
-        await _saveChannel.invokeMethod('openFile', {
-          'uri': existingUri,
-          'mimeType': att.mimeType,
-        });
+        final messenger = ScaffoldMessenger.of(context);
+        await _openFile(existingUri, att.mimeType, messenger);
         return;
       }
     }
@@ -151,16 +160,14 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         'data': data,
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.showSnackBar(
           SnackBar(
             content: Text('"${att.filename}" 다운로드 완료'),
             action: uri != null
                 ? SnackBarAction(
                     label: '열기',
-                    onPressed: () => _saveChannel.invokeMethod('openFile', {
-                      'uri': uri,
-                      'mimeType': att.mimeType,
-                    }),
+                    onPressed: () => _openFile(uri, att.mimeType, messenger),
                   )
                 : null,
           ),
