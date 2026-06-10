@@ -368,7 +368,7 @@ class _AttachmentBar extends StatelessWidget {
           bottom: BorderSide(color: outline),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
