@@ -356,8 +356,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover")
 
             // 탭 텍스트 크기 동적 조정
-            val tabSp = if (isCover) 14f
-                        else         scaledSp(widgetWidth, widgetHeight, 11f, 13f)
+            val tabSp = if (isCover) 16f
+                        else         scaledSp(widgetWidth, widgetHeight, 14f, 16f)
             views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
             views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
@@ -463,7 +463,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
             if (isCover) {
-                val dowSp = 14.5f
+                val dowSp = 16f
                 listOf(R.id.cal_dow_sun, R.id.cal_dow_mon, R.id.cal_dow_tue, R.id.cal_dow_wed,
                        R.id.cal_dow_thu, R.id.cal_dow_fri, R.id.cal_dow_sat).forEach {
                     views.setTextViewTextSize(it, android.util.TypedValue.COMPLEX_UNIT_SP, dowSp)

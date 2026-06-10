@@ -97,19 +97,19 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="1dp">
                 <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="일" android:textSize="10sp" android:textColor="#FF8A80" android:gravity="center"/>
+                    android:text="일" android:textSize="13sp" android:textColor="#FF8A80" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="월" android:textSize="10sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="월" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="화" android:textSize="10sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="화" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="수" android:textSize="10sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="수" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="목" android:textSize="10sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="목" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="금" android:textSize="10sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="금" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="토" android:textSize="10sp" android:textColor="#82B1FF" android:gravity="center"/>
+                    android:text="토" android:textSize="13sp" android:textColor="#82B1FF" android:gravity="center"/>
             </LinearLayout>
 
             <!-- 주 0 -->
@@ -1171,9 +1171,9 @@
     <!-- ══════════════ 하단 캡슐형 세그먼트 탭 ══════════════ -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="42dp"
         android:orientation="horizontal"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:gravity="center_vertical">
         
         <LinearLayout
@@ -1188,24 +1188,24 @@
 
             <TextView android:id="@+id/tab_tasks"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="할 일" android:textSize="14sp" android:textStyle="bold"
+                android:text="할 일" android:textSize="16sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
                 android:background="@drawable/tab_active_bg" />
 
             <TextView android:id="@+id/tab_calendar"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="캘린더" android:textSize="14sp" android:textStyle="bold"
+                android:text="캘린더" android:textSize="16sp" android:textStyle="bold"
                 android:textColor="#A0A0B0" android:gravity="center" />
 
             <TextView android:id="@+id/tab_gmail"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="Gmail" android:textSize="14sp" android:textStyle="bold"
+                android:text="Gmail" android:textSize="16sp" android:textStyle="bold"
                 android:textColor="#A0A0B0" android:gravity="center" />
         </LinearLayout>
 
         <!-- 원형 설정 버튼 단 1개만 배치 -->
         <ImageView android:id="@+id/widget_settings_btn"
-            android:layout_width="32dp" android:layout_height="32dp"
+            android:layout_width="36dp" android:layout_height="36dp"
             android:src="@drawable/ic_settings" android:tint="#A0A0B0"
             android:padding="6dp" android:layout_marginStart="8dp" android:layout_marginEnd="4dp"
             android:background="@drawable/tab_active_bg"/>
