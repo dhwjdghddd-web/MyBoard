@@ -80,8 +80,23 @@ class CalendarSyncJobService : JobService() {
             }
         }
 
+        private fun readHiddenCalendars(context: Context): Set<String> {
+            val flutterPrefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+            val raw = flutterPrefs.getString("flutter.g-cal-filter-hidden", null) ?: return emptySet()
+            val listPrefix = "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIGxpc3Qu!"
+            val json = if (raw.startsWith(listPrefix)) raw.substring(listPrefix.length) else raw
+            return try {
+                val arr = org.json.JSONArray(json)
+                (0 until arr.length()).map { arr.getString(it) }.toSet()
+            } catch (e: Exception) {
+                emptySet()
+            }
+        }
+
         private fun syncCalendar(context: Context, token: String, year: Int, month: Int) {
             val calendars = fetchCalendars(token)
+            val hiddenCalendars = readHiddenCalendars(context)
+            Log.d(TAG, "hiddenCalendars: $hiddenCalendars")
 
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val edit  = prefs.edit()
@@ -101,6 +116,10 @@ class CalendarSyncJobService : JobService() {
 
             val calList = if (calendars.isEmpty()) listOf(Pair("primary", DEFAULT_COLOR)) else calendars
             for ((calId, calColor) in calList) {
+                if (hiddenCalendars.contains(calId)) {
+                    Log.d(TAG, "skipping hidden calendar: $calId")
+                    continue
+                }
                 runCatching {
                     val events = fetchEvents(token, calId, calColor, year, month)
                     for (ev in events) {

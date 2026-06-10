@@ -13,19 +13,21 @@ class WidgetService {
   static Future<void> updateTasks(List<Task> tasks) async {
     try {
       final active = tasks.where((t) => !t.isCompleted).toList();
-      final display = [...active, ...tasks.where((t) => t.isCompleted)].take(3).toList();
+      final display = [...active, ...tasks.where((t) => t.isCompleted)];
 
-      await HomeWidget.saveWidgetData<String>('task_count', '${active.length}');
-      for (var i = 0; i < 3; i++) {
-        if (i < display.length) {
-          await HomeWidget.saveWidgetData<String>('task_$i', display[i].title);
-          await HomeWidget.saveWidgetData<String>('task_${i}_id', display[i].id);
-          await HomeWidget.saveWidgetData<String>('task_${i}_done', display[i].isCompleted ? 'true' : 'false');
-        } else {
-          await HomeWidget.saveWidgetData<String>('task_$i', '');
-          await HomeWidget.saveWidgetData<String>('task_${i}_id', '');
-          await HomeWidget.saveWidgetData<String>('task_${i}_done', 'false');
-        }
+      await HomeWidget.saveWidgetData<String>('task_count', '${display.length}');
+      for (var i = 0; i < display.length; i++) {
+        await HomeWidget.saveWidgetData<String>('task_$i', display[i].title);
+        await HomeWidget.saveWidgetData<String>('task_${i}_id', display[i].id);
+        await HomeWidget.saveWidgetData<String>('task_${i}_done', display[i].isCompleted ? 'true' : 'false');
+      }
+      // 이전 동기화에서 남은 슬롯 제거
+      for (var i = display.length; i < display.length + 30; i++) {
+        final old = await HomeWidget.getWidgetData<String>('task_$i', defaultValue: '');
+        if (old == null || old.isEmpty) break;
+        await HomeWidget.saveWidgetData<String>('task_$i', '');
+        await HomeWidget.saveWidgetData<String>('task_${i}_id', '');
+        await HomeWidget.saveWidgetData<String>('task_${i}_done', 'false');
       }
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
     } catch (_) {}

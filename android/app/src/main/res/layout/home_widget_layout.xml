@@ -37,8 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:divider="#1A1A2E"
-            android:dividerHeight="1dp"
+            android:divider="@null"
             android:scrollbars="none"
             android:visibility="gone"/>
 
