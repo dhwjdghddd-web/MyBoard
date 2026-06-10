@@ -44,20 +44,21 @@ class MainActivity : FlutterActivity() {
                     saveAttachment(filename, mimeType, base64Data, result)
                 }
                 "openFile" -> {
-                    val args = call.arguments as Map<*, *>
-                    val uriStr   = args["uri"] as String
+                    val args     = call.arguments as Map<*, *>
+                    val filePath = args["uri"] as String
                     val mimeType = args["mimeType"] as String
-                    val uri = android.net.Uri.parse(uriStr)
-                    val base = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-                        setDataAndType(uri, mimeType)
-                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        clipData = android.content.ClipData.newRawUri("", uri)
-                    }
-                    val chooser = android.content.Intent.createChooser(base, "파일 열기").apply {
-                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
                     try {
+                        val file = java.io.File(filePath)
+                        val uri  = androidx.core.content.FileProvider.getUriForFile(
+                            this, "${packageName}.fileprovider", file
+                        )
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, mimeType)
+                            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        val chooser = android.content.Intent.createChooser(intent, "파일 열기").apply {
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
                         startActivity(chooser)
                         result.success(null)
                     } catch (e: Exception) {
@@ -88,21 +89,16 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    private fun downloadsDir(): java.io.File {
+        val dir = getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS)
+            ?: java.io.File(cacheDir, "downloads")
+        dir.mkdirs()
+        return dir
+    }
+
     private fun findExistingDownload(filename: String): String? {
-        val projection = arrayOf(android.provider.MediaStore.Downloads._ID)
-        val selection  = "${android.provider.MediaStore.Downloads.DISPLAY_NAME} = ?"
-        contentResolver.query(
-            android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-            projection, selection, arrayOf(filename), null
-        )?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(android.provider.MediaStore.Downloads._ID))
-                return android.content.ContentUris.withAppendedId(
-                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, id
-                ).toString()
-            }
-        }
-        return null
+        val file = java.io.File(downloadsDir(), filename)
+        return if (file.exists()) file.absolutePath else null
     }
 
     private fun saveAttachment(filename: String, mimeType: String, base64Data: String, result: io.flutter.plugin.common.MethodChannel.Result) {
@@ -110,23 +106,9 @@ class MainActivity : FlutterActivity() {
             val normalized = base64Data.replace("\n", "").replace(" ", "")
                 .replace("-", "+").replace("_", "/")
             val bytes = android.util.Base64.decode(normalized, android.util.Base64.DEFAULT)
-            val values = android.content.ContentValues().apply {
-                put(android.provider.MediaStore.Downloads.DISPLAY_NAME, filename)
-                put(android.provider.MediaStore.Downloads.MIME_TYPE, mimeType)
-                put(android.provider.MediaStore.Downloads.IS_PENDING, 1)
-            }
-            val uri = contentResolver.insert(
-                android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values
-            )
-            if (uri != null) {
-                contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
-                values.clear()
-                values.put(android.provider.MediaStore.Downloads.IS_PENDING, 0)
-                contentResolver.update(uri, values, null, null)
-                result.success(uri.toString())
-            } else {
-                result.error("SAVE_FAILED", "파일 생성 실패", null)
-            }
+            val file  = java.io.File(downloadsDir(), filename)
+            file.writeBytes(bytes)
+            result.success(file.absolutePath)
         } catch (e: Exception) {
             result.error("SAVE_ERROR", e.message, null)
         }
