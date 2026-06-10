@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme.dart';
 import 'email_detail_screen.dart';
 import 'gmail_compose_screen.dart';
 import 'gmail_service.dart';
@@ -160,14 +159,6 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
             IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-              icon: const Icon(Icons.widgets_outlined),
-              tooltip: '위젯 설정',
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
-            ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: const Icon(Icons.search),
               onPressed: () => setState(() => _searching = true),
             ),
@@ -180,7 +171,14 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                 ref.read(gmailProvider.notifier).loadLabelCounts();
               },
             ),
-            const ThemeToggleButton(),
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              icon: const Icon(Icons.settings),
+              tooltip: '설정',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
+            ),
           ],
         ],
       ),

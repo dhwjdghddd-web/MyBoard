@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme.dart';
 import '../tasks/task_service.dart';
 import 'calendar_service.dart';
 import 'event_detail_sheet.dart';
@@ -52,14 +51,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         title: _MonthNav(cal: cal, ref: ref),
         titleSpacing: 0,
         actions: [
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            icon: const Icon(Icons.widgets_outlined),
-            tooltip: '위젯 설정',
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
-          ),
           TextButton(
             style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 6)),
             onPressed: () => ref.read(calendarProvider.notifier).goToday(),
@@ -80,7 +71,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             onPressed: () => setState(() => _showFilter = !_showFilter),
             tooltip: '캘린더 필터',
           ),
-          const ThemeToggleButton(compact: true),
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: const Icon(Icons.settings),
+            tooltip: '설정',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
+          ),
         ],
       ),
       body: Stack(children: [
@@ -291,9 +289,14 @@ class _MonthNav extends StatelessWidget {
         icon: const Icon(Icons.chevron_left, color: Colors.white),
         onPressed: () => ref.read(calendarProvider.notifier).prevMonth(),
       ),
-      Text(
-        '${cal.year}년 ${cal.month}월',
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+      Flexible(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            '${cal.year}년 ${cal.month}월',
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
       ),
       IconButton(
         padding: EdgeInsets.zero,

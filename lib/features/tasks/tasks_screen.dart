@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
-import '../../core/theme.dart';
 import 'add_task_sheet.dart';
 import 'task_service.dart';
 import '../settings/widget_settings_screen.dart';
@@ -20,17 +19,16 @@ class TasksScreen extends ConsumerWidget {
           IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            icon: const Icon(Icons.widgets_outlined),
-            tooltip: '위젯 설정',
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref.read(taskServiceProvider.notifier).loadTasks(),
           ),
-          const ThemeToggleButton(),
           IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(taskServiceProvider.notifier).loadTasks(),
+            icon: const Icon(Icons.settings),
+            tooltip: '설정',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
           ),
         ],
       ),
