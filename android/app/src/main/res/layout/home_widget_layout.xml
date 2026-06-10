@@ -23,9 +23,8 @@
 
         <!-- 태스크 헤더 -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:minHeight="44dp"
             android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingTop="6dp" android:paddingBottom="6dp">
+            android:padding="4dp">
             <TextView android:id="@+id/task_header_title"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="할 일 목록" android:textSize="14sp" android:textStyle="bold"
@@ -71,17 +70,17 @@
             android:orientation="vertical">
 
             <!-- 월 네비게이션 (넓은 터치 영역으로 스와이프 대체) -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="44dp"
+            <LinearLayout android:layout_width="match_parent" android:layout_height="36dp"
                 android:orientation="horizontal" android:gravity="center_vertical">
                 <TextView android:id="@+id/cal_prev"
-                    android:layout_width="44dp" android:layout_height="44dp"
+                    android:layout_width="44dp" android:layout_height="match_parent"
                     android:text="‹" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_month_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="6월" android:textSize="14sp" android:textStyle="bold"
                     android:textColor="#FFFFFF" android:gravity="center"/>
                 <TextView android:id="@+id/cal_next"
-                    android:layout_width="44dp" android:layout_height="44dp"
+                    android:layout_width="44dp" android:layout_height="match_parent"
                     android:text="›" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_launch_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
@@ -275,9 +274,8 @@
         android:orientation="vertical" android:visibility="gone">
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:minHeight="44dp"
             android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingTop="6dp" android:paddingBottom="6dp">
+            android:padding="4dp">
             <TextView android:id="@+id/gmail_header_title"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="받은편지함" android:textSize="14sp" android:textStyle="bold"
