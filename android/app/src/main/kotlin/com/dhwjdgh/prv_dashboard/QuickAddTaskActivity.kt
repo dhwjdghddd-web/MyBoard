@@ -185,27 +185,21 @@ class QuickAddTaskActivity : AppCompatActivity() {
     }
 
     private fun pushToWidget(title: String, newId: String) {
-        val prefs = getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
-        val edit  = prefs.edit()
-        
-        // 기존 항목 한 칸씩 뒤로
-        for (i in 2 downTo 1) {
-            edit.putString("task_$i",       prefs.getString("task_${i-1}", "")       ?: "")
-            edit.putString("task_${i}_id",  prefs.getString("task_${i-1}_id", "")    ?: "")
-            edit.putString("task_${i}_done",prefs.getString("task_${i-1}_done","false") ?: "false")
+        val prefs    = getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
+        val oldCount = prefs.getString("task_count", "0")?.toIntOrNull() ?: 0
+        val edit     = prefs.edit()
+
+        // 기존 항목 전체를 한 칸씩 뒤로 밀기
+        for (i in oldCount downTo 1) {
+            edit.putString("task_$i",        prefs.getString("task_${i-1}", "")        ?: "")
+            edit.putString("task_${i}_id",   prefs.getString("task_${i-1}_id", "")     ?: "")
+            edit.putString("task_${i}_done", prefs.getString("task_${i-1}_done","false") ?: "false")
         }
+        // 새 태스크를 맨 앞에 삽입
         edit.putString("task_0",       title)
         edit.putString("task_0_id",    newId)
         edit.putString("task_0_done",  "false")
-
-        // 태스크 개수 계산하여 반영
-        var count = 0
-        if (title.isNotEmpty()) count++
-        for (i in 1..2) {
-            val t = prefs.getString("task_$i", "") ?: ""
-            if (t.isNotEmpty()) count++
-        }
-        edit.putString("task_count", count.toString())
+        edit.putString("task_count",   (oldCount + 1).toString())
         edit.apply()
 
         val manager = AppWidgetManager.getInstance(applicationContext)
