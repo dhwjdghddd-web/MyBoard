@@ -8,11 +8,11 @@ import android.widget.RemoteViewsService
 
 class GmailWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return GmailWidgetFactory(applicationContext)
+        return GmailWidgetFactory(applicationContext, intent.getBooleanExtra("is_cover", false))
     }
 }
 
-class GmailWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
+class GmailWidgetFactory(private val context: Context, private val isCover: Boolean = false) : RemoteViewsService.RemoteViewsFactory {
 
     private val PREFS = "HomeWidgetPreferences"
     private var emailsList = mutableListOf<EmailItem>()
@@ -52,6 +52,11 @@ class GmailWidgetFactory(private val context: Context) : RemoteViewsService.Remo
         views.setTextViewText(R.id.gmail_item_subject, item.subject)
 
         views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) Color.WHITE else Color.parseColor("#B0B0C0"))
+        if (isCover) {
+            views.setTextViewTextSize(R.id.gmail_item_sender,  android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+            views.setTextViewTextSize(R.id.gmail_item_time,    android.util.TypedValue.COMPLEX_UNIT_SP, 14f)
+            views.setTextViewTextSize(R.id.gmail_item_subject, android.util.TypedValue.COMPLEX_UNIT_SP, 15f)
+        }
         
         val openIntent = Intent().apply {
             putExtra("gmail_item_action", "open")

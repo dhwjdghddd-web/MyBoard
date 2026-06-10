@@ -368,7 +368,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
             if (hasAny) {
                 views.setViewVisibility(R.id.task_list_view, View.VISIBLE)
                 views.setViewVisibility(R.id.task_empty, View.GONE)
-                val serviceIntent = Intent(context, TaskWidgetService::class.java)
+                val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
+                    putExtra("is_cover", isCover)
+                }
                 views.setRemoteAdapter(R.id.task_list_view, serviceIntent)
                 val template = PendingIntent.getBroadcast(
                     context, 450,
@@ -647,7 +649,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.gmail_empty, View.GONE)
 
                 // Bind ListView to RemoteViewsService
-                val intent = Intent(context, GmailWidgetService::class.java)
+                val intent = Intent(context, GmailWidgetService::class.java).apply {
+                    putExtra("is_cover", isCover)
+                }
                 views.setRemoteAdapter(R.id.gmail_list_view, intent)
 
                 // Broadcast template → HomeWidgetProvider handles open/delete

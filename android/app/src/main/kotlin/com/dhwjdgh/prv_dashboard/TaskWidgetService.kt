@@ -8,11 +8,11 @@ import android.widget.RemoteViewsService
 
 class TaskWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return TaskWidgetFactory(applicationContext)
+        return TaskWidgetFactory(applicationContext, intent.getBooleanExtra("is_cover", false))
     }
 }
 
-class TaskWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
+class TaskWidgetFactory(private val context: Context, private val isCover: Boolean = false) : RemoteViewsService.RemoteViewsFactory {
 
     private val PREFS = "HomeWidgetPreferences"
     private var tasksList = mutableListOf<TaskItem>()
@@ -37,6 +37,10 @@ class TaskWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         views.setTextViewText(R.id.task_item_check, if (item.done) "☑" else "☐")
         views.setTextColor(R.id.task_item_title, if (item.done) Color.parseColor("#606070") else Color.WHITE)
         views.setTextColor(R.id.task_item_check, if (item.done) Color.parseColor("#606070") else Color.parseColor("#4285F4"))
+        if (isCover) {
+            views.setTextViewTextSize(R.id.task_item_title, android.util.TypedValue.COMPLEX_UNIT_SP, 20f)
+            views.setTextViewTextSize(R.id.task_item_check, android.util.TypedValue.COMPLEX_UNIT_SP, 17f)
+        }
 
         val completeIntent = Intent().apply {
             putExtra("task_item_action", "complete")
