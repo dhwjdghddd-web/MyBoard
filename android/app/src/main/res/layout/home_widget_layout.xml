@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="10dp">
+    android:padding="4dp">
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -71,7 +71,8 @@
 
             <!-- 월 네비게이션 (넓은 터치 영역으로 스와이프 대체) -->
             <LinearLayout android:layout_width="match_parent" android:layout_height="36dp"
-                android:orientation="horizontal" android:gravity="center_vertical">
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="4dp" android:paddingEnd="4dp">
                 <TextView android:id="@+id/cal_prev"
                     android:layout_width="44dp" android:layout_height="match_parent"
                     android:text="‹" android:textSize="20sp" android:textColor="#A0A0B0" android:gravity="center"/>
@@ -343,17 +344,17 @@
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="할 일" android:textSize="12sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
-                android:paddingTop="4dp" android:paddingBottom="4dp"/>
+                android:paddingTop="4dp" android:paddingBottom="0dp"/>
             <TextView android:id="@+id/tab_calendar"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="캘린더" android:textSize="12sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
-                android:paddingTop="4dp" android:paddingBottom="4dp"/>
+                android:paddingTop="4dp" android:paddingBottom="0dp"/>
             <TextView android:id="@+id/tab_gmail"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="Gmail" android:textSize="12sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
-                android:paddingTop="4dp" android:paddingBottom="4dp"/>
+                android:paddingTop="4dp" android:paddingBottom="0dp"/>
         </LinearLayout>
 
     </LinearLayout>
