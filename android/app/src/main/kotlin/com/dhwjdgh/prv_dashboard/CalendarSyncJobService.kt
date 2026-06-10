@@ -48,12 +48,15 @@ class CalendarSyncJobService : JobService() {
                 return
             }
             Thread {
+                val success: Boolean
                 try {
-                    executeSyncInternal(context, year, month)
-                    // 동기화 성공 시 타임스탬프 저장
-                    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-                        .putLong("cal_synced_${year}_${month}", System.currentTimeMillis())
-                        .apply()
+                    success = executeSyncInternal(context, year, month)
+                    // API 호출이 실제로 성공했을 때만 타임스탬프 저장
+                    if (success) {
+                        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                            .putLong("cal_synced_${year}_${month}", System.currentTimeMillis())
+                            .apply()
+                    }
                 } finally {
                     isSyncing.set(false)
                 }
@@ -64,23 +67,28 @@ class CalendarSyncJobService : JobService() {
             }.start()
         }
 
-        private fun executeSyncInternal(context: Context, year: Int, month: Int) {
+        private fun executeSyncInternal(context: Context, year: Int, month: Int): Boolean {
             Log.d(TAG, "executeSyncInternal: $year/$month")
             var token = readToken(context)
             if (token.isNullOrEmpty()) token = freshToken(context)
             if (!token.isNullOrEmpty()) {
-                runCatching { syncCalendar(context, token!!, year, month) }
-                    .onSuccess { Log.d(TAG, "syncCalendar success") }
-                    .onFailure { e ->
-                        Log.e(TAG, "syncCalendar failed: $e — retrying with fresh token")
-                        freshToken(context)?.let { t ->
-                            runCatching { syncCalendar(context, t, year, month) }
-                                .onSuccess { Log.d(TAG, "syncCalendar retry success") }
-                                .onFailure { e2 -> Log.e(TAG, "syncCalendar retry failed: $e2") }
-                        }
+                var result = runCatching { syncCalendar(context, token!!, year, month) }
+                    .onSuccess { Log.d(TAG, "syncCalendar success: fetched=$it") }
+                    .getOrNull()
+                if (result == null || !result) {
+                    Log.e(TAG, "syncCalendar failed or no data — retrying with fresh token")
+                    val freshT = freshToken(context)
+                    if (freshT != null) {
+                        result = runCatching { syncCalendar(context, freshT, year, month) }
+                            .onSuccess { Log.d(TAG, "syncCalendar retry success: fetched=$it") }
+                            .onFailure { e2 -> Log.e(TAG, "syncCalendar retry failed: $e2") }
+                            .getOrNull()
                     }
+                }
+                return result == true
             } else {
                 Log.e(TAG, "No token available — sync skipped")
+                return false
             }
         }
 
@@ -97,10 +105,34 @@ class CalendarSyncJobService : JobService() {
             }
         }
 
-        private fun syncCalendar(context: Context, token: String, year: Int, month: Int) {
+        // true = API 호출 성공 (0건 포함), false = 모든 API 호출 실패
+        private fun syncCalendar(context: Context, token: String, year: Int, month: Int): Boolean {
             val calendars = fetchCalendarsCached(token, context)
             val hiddenCalendars = readHiddenCalendars(context)
             Log.d(TAG, "hiddenCalendars: $hiddenCalendars")
+
+            val calList = if (calendars.isEmpty()) listOf(Pair("primary", DEFAULT_COLOR)) else calendars
+            val visibleCals = calList.filter { !hiddenCalendars.contains(it.first) }
+
+            val byDay = mutableMapOf<String, MutableList<EventItem>>()
+            var fetchSucceeded = false
+
+            for ((calId, calColor) in visibleCals) {
+                runCatching {
+                    val events = fetchEvents(token, calId, calColor, year, month)
+                    fetchSucceeded = true  // 이 캘린더는 API 응답 성공
+                    for (ev in events) {
+                        byDay.getOrPut(ev.dayKey) { mutableListOf() }.add(ev)
+                    }
+                }.onFailure { Log.e(TAG, "fetchEvents failed for $calId: $it") }
+            }
+
+            // 모두 숨김 처리된 경우도 성공으로 간주 (쓸 데이터가 없는 게 정상)
+            val succeeded = fetchSucceeded || visibleCals.isEmpty()
+            if (!succeeded) {
+                Log.e(TAG, "syncCalendar: all fetchEvents calls failed, not writing to prefs")
+                return false
+            }
 
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val edit  = prefs.edit()
@@ -116,22 +148,6 @@ class CalendarSyncJobService : JobService() {
                 edit.remove("cal_day_${k}_colors")
             }
 
-            val byDay = mutableMapOf<String, MutableList<EventItem>>()
-
-            val calList = if (calendars.isEmpty()) listOf(Pair("primary", DEFAULT_COLOR)) else calendars
-            for ((calId, calColor) in calList) {
-                if (hiddenCalendars.contains(calId)) {
-                    Log.d(TAG, "skipping hidden calendar: $calId")
-                    continue
-                }
-                runCatching {
-                    val events = fetchEvents(token, calId, calColor, year, month)
-                    for (ev in events) {
-                        byDay.getOrPut(ev.dayKey) { mutableListOf() }.add(ev)
-                    }
-                }
-            }
-
             for ((key, events) in byDay) {
                 events.sortWith(compareBy { it.time })
                 val take = events.take(4)
@@ -142,6 +158,7 @@ class CalendarSyncJobService : JobService() {
             }
             edit.commit()
             Log.d(TAG, "syncCalendar written ${byDay.size} days to prefs")
+            return true
         }
 
         private data class EventItem(val dayKey: String, val title: String, val time: String, val id: String, val color: String)
