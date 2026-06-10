@@ -50,6 +50,10 @@ class CalendarSyncJobService : JobService() {
             Thread {
                 try {
                     executeSyncInternal(context, year, month)
+                    // 동기화 성공 시 타임스탬프 저장
+                    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                        .putLong("cal_synced_${year}_${month}", System.currentTimeMillis())
+                        .apply()
                 } finally {
                     isSyncing.set(false)
                 }
@@ -94,7 +98,7 @@ class CalendarSyncJobService : JobService() {
         }
 
         private fun syncCalendar(context: Context, token: String, year: Int, month: Int) {
-            val calendars = fetchCalendars(token)
+            val calendars = fetchCalendarsCached(token, context)
             val hiddenCalendars = readHiddenCalendars(context)
             Log.d(TAG, "hiddenCalendars: $hiddenCalendars")
 
@@ -141,6 +145,32 @@ class CalendarSyncJobService : JobService() {
         }
 
         private data class EventItem(val dayKey: String, val title: String, val time: String, val id: String, val color: String)
+
+        private fun fetchCalendarsCached(token: String, context: Context): List<Pair<String, String>> {
+            val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val lastFetch = prefs.getLong("cal_list_fetched_at", 0L)
+            val cached = prefs.getString("cal_list_cache", null)
+            // 1시간 이내 캐시 유효
+            if (cached != null && System.currentTimeMillis() - lastFetch < 60 * 60 * 1000L) {
+                val result = mutableListOf<Pair<String, String>>()
+                cached.split("\n").forEach { line ->
+                    val parts = line.split("\t")
+                    if (parts.size == 2) result.add(Pair(parts[0], parts[1]))
+                }
+                if (result.isNotEmpty()) {
+                    Log.d(TAG, "using cached calendar list (${result.size} calendars)")
+                    return result
+                }
+            }
+            val result = fetchCalendars(token)
+            if (result.isNotEmpty()) {
+                prefs.edit()
+                    .putString("cal_list_cache", result.joinToString("\n") { "${it.first}\t${it.second}" })
+                    .putLong("cal_list_fetched_at", System.currentTimeMillis())
+                    .apply()
+            }
+            return result
+        }
 
         private fun fetchCalendars(token: String): List<Pair<String, String>> {
             val url = URL("https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=reader")

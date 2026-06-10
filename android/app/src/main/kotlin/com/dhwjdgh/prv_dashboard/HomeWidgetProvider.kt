@@ -84,9 +84,22 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 m--; if (m < 1) { m = 12; y-- }
                 prefs.edit().putInt("cal_display_year", y).putInt("cal_display_month", m)
                     .putBoolean("cal_show_day_panel", false).apply()
-                redraw(context)
-                val pendingResult = goAsync()
-                CalendarSyncJobService.executeSync(context, y, m) { pendingResult.finish() }
+                partiallySetBtnColor(context, R.id.cal_prev, "#FFA000")
+                val lastSync = prefs.getLong("cal_synced_${y}_${m}", 0L)
+                val isCached = System.currentTimeMillis() - lastSync < 30 * 60 * 1000L
+                if (isCached) {
+                    redraw(context)
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        partiallySetBtnColor(context, R.id.cal_prev, "#A0A0B0")
+                    }, 300)
+                } else {
+                    redraw(context)
+                    val pendingResult = goAsync()
+                    CalendarSyncJobService.executeSync(context, y, m) {
+                        partiallySetBtnColor(context, R.id.cal_prev, "#A0A0B0")
+                        pendingResult.finish()
+                    }
+                }
             }
             ACTION_CAL_NEXT_MONTH -> {
                 var y = prefs.getInt("cal_display_year",  now().get(java.util.Calendar.YEAR))
@@ -94,9 +107,22 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 m++; if (m > 12) { m = 1; y++ }
                 prefs.edit().putInt("cal_display_year", y).putInt("cal_display_month", m)
                     .putBoolean("cal_show_day_panel", false).apply()
-                redraw(context)
-                val pendingResult = goAsync()
-                CalendarSyncJobService.executeSync(context, y, m) { pendingResult.finish() }
+                partiallySetBtnColor(context, R.id.cal_next, "#FFA000")
+                val lastSync = prefs.getLong("cal_synced_${y}_${m}", 0L)
+                val isCached = System.currentTimeMillis() - lastSync < 30 * 60 * 1000L
+                if (isCached) {
+                    redraw(context)
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        partiallySetBtnColor(context, R.id.cal_next, "#A0A0B0")
+                    }, 300)
+                } else {
+                    redraw(context)
+                    val pendingResult = goAsync()
+                    CalendarSyncJobService.executeSync(context, y, m) {
+                        partiallySetBtnColor(context, R.id.cal_next, "#A0A0B0")
+                        pendingResult.finish()
+                    }
+                }
             }
             ACTION_CAL_SELECT_DATE -> {
                 val dateKey = intent.getStringExtra("date_key") ?: return
