@@ -416,6 +416,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
             for (r in 0..5) {
                 views.setViewVisibility(WEEK_ROW_IDS[r], if (r < neededRows) View.VISIBLE else View.GONE)
             }
+            // 행 수에 따라 글씨 크기 자동 조정 (5행 기준, 6행이면 작아지고 4행이면 커짐)
+            val rowFactor = 5f / neededRows
+            val dateSp  = (if (isCover) scaledSp(widgetWidth, widgetHeight, 15f, 21f) else scaledSp(widgetWidth, widgetHeight, 11f, 17f)) * rowFactor
+            val eventSp = (if (isCover) scaledSp(widgetWidth, widgetHeight, 11f, 17f) else scaledSp(widgetWidth, widgetHeight, 8f, 13f)) * rowFactor
 
             for (row in 0..5) {
                 for (col in 0..6) {
@@ -428,10 +432,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
                     } else {
                         val isToday  = dispYear == actualYear && dispMonth == actualMonth && day == actualToday
-                        
+
                         val dateKey = "%04d-%02d-%02d".format(dispYear, dispMonth, day)
                         val compactKey = "%04d%02d%02d".format(dispYear, dispMonth, day)
-                        
+
                         val titlesRaw = prefs.getString("cal_day_${compactKey}_titles", "") ?: ""
                         val colorsRaw = prefs.getString("cal_day_${compactKey}_colors", "") ?: ""
 
@@ -439,19 +443,17 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
 
                         val ssb = SpannableStringBuilder()
-                        
+
                         // 1. 날짜 숫자 추가
                         val dayStr = day.toString()
                         ssb.append(dayStr)
-                        
-                        // 날짜 부분 스타일 지정 (10sp, 볼드여부, 요일별 색상)
+
                         val dayColor = when {
                             isToday  -> Color.parseColor("#4285F4")
                             col == 0 -> Color.parseColor("#FF6B6B")
                             col == 6 -> Color.parseColor("#6B9FFF")
                             else     -> Color.parseColor("#D0D0E0")
                         }
-                        val dateSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 15f, 21f) else scaledSp(widgetWidth, widgetHeight, 11f, 17f)
                         ssb.setSpan(AbsoluteSizeSpan(dateSp.toInt(), true), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         ssb.setSpan(ForegroundColorSpan(dayColor), 0, dayStr.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         if (isToday) {
@@ -464,7 +466,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             ssb.append("\n")
                             val start = ssb.length
                             val title = displayTitles[i]
-                            // 너무 길면 4글자 + .. 처리 (셀 크기가 매우 좁음)
                             val truncatedTitle = if (title.length > 5) title.substring(0, 4) + ".." else title
                             ssb.append(truncatedTitle)
                             val end = ssb.length
@@ -476,7 +477,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                 Color.parseColor("#60D8A0")
                             }
 
-                        val eventSp = if (isCover) scaledSp(widgetWidth, widgetHeight, 11f, 17f) else scaledSp(widgetWidth, widgetHeight, 8f, 13f)
                             ssb.setSpan(AbsoluteSizeSpan(eventSp.toInt(), true), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                             ssb.setSpan(ForegroundColorSpan(eventColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         }
