@@ -70,6 +70,11 @@
                 android:resource="@xml/home_widget_info" />
         </receiver>
 
+        <activity
+            android:name=".WidgetConfigureActivity"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar"
+            android:exported="true" />
+
         <service
             android:name=".TaskWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"

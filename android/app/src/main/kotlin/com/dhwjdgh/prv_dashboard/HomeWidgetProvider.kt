@@ -20,35 +20,11 @@ import android.graphics.Typeface
 class HomeWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        val displayWidthDp = (context.resources.displayMetrics.widthPixels /
-            context.resources.displayMetrics.density).toInt()
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val edit = prefs.edit()
-        for (id in appWidgetIds) {
-            val opts = appWidgetManager.getAppWidgetOptions(id)
-            val ww = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300)
-            val wh = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
-            
-            // 커버 W:438 / 홈대형 W:457 → 415..455 범위로 커버만 포착, 홈대형(457) 제외
-            val isCover = ww in 415..455
-            edit.putBoolean("widget_is_cover_$id", isCover)
-            Log.d("HomeWidget", "onUpdate id=$id displayW=$displayWidthDp widgetW=$ww widgetH=$wh isCover=$isCover")
-        }
-        edit.apply()
         for (id in appWidgetIds) updateWidget(context, appWidgetManager, id)
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: android.os.Bundle) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
-        val displayWidthDp = (context.resources.displayMetrics.widthPixels /
-            context.resources.displayMetrics.density).toInt()
-        val ww = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300)
-        val wh = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
-        
-        val isCover = ww in 415..455
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-            .putBoolean("widget_is_cover_$appWidgetId", isCover).apply()
-        Log.d("HomeWidget", "optionsChanged id=$appWidgetId displayW=$displayWidthDp widgetW=$ww widgetH=$wh isCover=$isCover")
         updateWidget(context, appWidgetManager, appWidgetId)
     }
 
@@ -339,9 +315,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
             
-            val isCoverDirect = widgetWidth in 415..455
-            val isCover = isCoverDirect || prefs.getBoolean("widget_is_cover_$widgetId", false)
-            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight isCoverDirect=$isCoverDirect isCover=$isCover")
+            val isCover = resolveIsCover(context, prefs, widgetId, widgetWidth)
+            val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
+            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover")
             
             when (activeTab) {
                 0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover)
@@ -681,6 +657,27 @@ class HomeWidgetProvider : AppWidgetProvider() {
         }
 
         // 가로(클수록 큰 글씨) × 세로(짧을수록 작은 글씨) 두 제약 중 작은 쪽을 따름
+        // DisplayManager로 폴더블 기기 여부 확인
+        // 폴더블이면 커버/홈 구분 로직 활성화, 단일 디스플레이 기기는 항상 false
+        fun isFoldableDevice(context: Context): Boolean {
+            val dm = context.getSystemService(Context.DISPLAY_SERVICE)
+                as android.hardware.display.DisplayManager
+            return dm.displays.size >= 2
+        }
+
+        // isCover 판정 우선순위:
+        // 1순위: 사용자 수동 설정 ("cover" / "home") via WidgetConfigureActivity
+        // 2순위: 폴더블 기기에서 위젯 치수 휴리스틱 (ww in 415..455)
+        // 비폴더블 기기는 항상 false
+        fun resolveIsCover(context: Context, prefs: android.content.SharedPreferences, widgetId: Int, widgetWidth: Int): Boolean {
+            val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
+            return when (manual) {
+                "cover" -> true
+                "home"  -> false
+                else    -> isFoldableDevice(context) && widgetWidth in 415..455
+            }
+        }
+
         private fun scaledSp(widgetWidth: Int, widgetHeight: Int, spAtMin: Float, spAtMax: Float): Float {
             val tW = ((widgetWidth  - 250).toFloat() / 300f).coerceIn(0f, 1f)
             val tH = ((widgetHeight - 180).toFloat() / 220f).coerceIn(0f, 1f)
