@@ -51,6 +51,40 @@ String decodeBase64Body(String data) {
   }
 }
 
+class Attachment {
+  final String filename;
+  final String mimeType;
+  final String attachmentId;
+  final int size;
+  const Attachment({required this.filename, required this.mimeType, required this.attachmentId, required this.size});
+}
+
+List<Attachment> getAttachments(Map<String, dynamic> payload) {
+  final result = <Attachment>[];
+  _collectAttachments(payload, result);
+  return result;
+}
+
+void _collectAttachments(Map<String, dynamic> part, List<Attachment> out) {
+  final filename = (part['filename'] as String?) ?? '';
+  final body = part['body'] as Map<String, dynamic>?;
+  final attachmentId = body?['attachmentId'] as String?;
+  if (filename.isNotEmpty && attachmentId != null) {
+    out.add(Attachment(
+      filename: filename,
+      mimeType: (part['mimeType'] as String?) ?? 'application/octet-stream',
+      attachmentId: attachmentId,
+      size: (body?['size'] as int?) ?? 0,
+    ));
+  }
+  final parts = part['parts'] as List?;
+  if (parts != null) {
+    for (final p in parts) {
+      _collectAttachments(p as Map<String, dynamic>, out);
+    }
+  }
+}
+
 String? getEmailBody(Map<String, dynamic> payload) {
   final bodyData = (payload['body'] as Map?)?['data'] as String?;
   if (bodyData != null && bodyData.isNotEmpty) return decodeBase64Body(bodyData);

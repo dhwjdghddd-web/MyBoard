@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/api_client.dart';
 import 'gmail_service.dart';
@@ -52,9 +54,13 @@ class EmailDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
+  static const _saveChannel = MethodChannel('widget_channel');
+
   Map<String, dynamic>? _full;
   bool _loading = true;
   String? _error;
+  List<Attachment> _attachments = [];
+  final Set<String> _downloading = {};
   late final WebViewController _webController;
 
   @override
@@ -62,7 +68,17 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
     super.initState();
     _webController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.disabled)
-      ..setBackgroundColor(const Color(0xFFFFFFFF));
+      ..setBackgroundColor(const Color(0xFFFFFFFF))
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (req) {
+          final url = req.url;
+          if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:')) {
+            launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+      ));
 
     _loadFull();
   }
@@ -74,12 +90,46 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         '$_base/messages/${widget.messageId}',
         params: {'format': 'full'},
       );
-      setState(() { _full = data as Map<String, dynamic>; _loading = false; });
-      final body = getEmailBody(_full?['payload'] as Map<String, dynamic>? ?? {}) ??
-          '<p style="padding:16px;color:#999">본문이 없습니다</p>';
+      final full = data as Map<String, dynamic>;
+      final payload = full['payload'] as Map<String, dynamic>? ?? {};
+      final body = getEmailBody(payload) ?? '<p style="padding:16px;color:#999">본문이 없습니다</p>';
+      setState(() {
+        _full = full;
+        _attachments = getAttachments(payload);
+        _loading = false;
+      });
       await _webController.loadHtmlString(_wrapHtml(body));
     } catch (e) {
       setState(() { _error = e.toString(); _loading = false; });
+    }
+  }
+
+  Future<void> _downloadAttachment(Attachment att) async {
+    if (_downloading.contains(att.attachmentId)) return;
+    setState(() => _downloading.add(att.attachmentId));
+    try {
+      final resp = await ref.read(apiClientProvider).get(
+        '$_base/messages/${widget.messageId}/attachments/${att.attachmentId}',
+      );
+      final data = resp['data'] as String;
+      await _saveChannel.invokeMethod('saveAttachment', {
+        'filename': att.filename,
+        'mimeType': att.mimeType,
+        'data': data,
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('"${att.filename}" 다운로드 완료')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('다운로드 실패: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _downloading.remove(att.attachmentId));
     }
   }
 
@@ -209,6 +259,12 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                       ),
                     ),
                   ),
+                  if (_attachments.isNotEmpty)
+                    _AttachmentBar(
+                      attachments: _attachments,
+                      downloading: _downloading,
+                      onDownload: _downloadAttachment,
+                    ),
                   Expanded(child: WebViewWidget(controller: _webController)),
                 ]),
     );
@@ -255,6 +311,109 @@ class _ActionBtn extends StatelessWidget {
         minimumSize: const Size(double.infinity, 0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         side: color != null ? BorderSide(color: color!) : null,
+      ),
+    );
+  }
+}
+
+class _AttachmentBar extends StatelessWidget {
+  const _AttachmentBar({
+    required this.attachments,
+    required this.downloading,
+    required this.onDownload,
+  });
+
+  final List<Attachment> attachments;
+  final Set<String> downloading;
+  final void Function(Attachment) onDownload;
+
+  IconData _iconFor(String mimeType) {
+    if (mimeType.startsWith('image/')) return Icons.image_outlined;
+    if (mimeType.startsWith('video/')) return Icons.video_file_outlined;
+    if (mimeType.startsWith('audio/')) return Icons.audio_file_outlined;
+    if (mimeType == 'application/pdf') return Icons.picture_as_pdf_outlined;
+    if (mimeType.contains('word') || mimeType.contains('document')) return Icons.description_outlined;
+    if (mimeType.contains('sheet') || mimeType.contains('excel')) return Icons.table_chart_outlined;
+    if (mimeType.contains('zip') || mimeType.contains('compressed')) return Icons.folder_zip_outlined;
+    return Icons.attach_file;
+  }
+
+  String _sizeLabel(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final outline = Theme.of(context).colorScheme.outlineVariant;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: surface,
+        border: Border(
+          top: BorderSide(color: outline),
+          bottom: BorderSide(color: outline),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '첨부파일 ${attachments.length}개',
+            style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 6),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: attachments.map((att) {
+                final isLoading = downloading.contains(att.attachmentId);
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: InkWell(
+                    onTap: isLoading ? null : () => onDownload(att),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: outline),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(_iconFor(att.mimeType), size: 18, color: Colors.grey[600]),
+                          const SizedBox(width: 6),
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 130),
+                            child: Text(
+                              att.filename,
+                              style: const TextStyle(fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _sizeLabel(att.size),
+                            style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                          ),
+                          const SizedBox(width: 6),
+                          isLoading
+                              ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                              : Icon(Icons.download_outlined, size: 16, color: Colors.grey[600]),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }
