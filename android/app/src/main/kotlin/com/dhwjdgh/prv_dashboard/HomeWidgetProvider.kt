@@ -339,50 +339,68 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
             val isCover = resolveIsCover(context, prefs, widgetId, widgetWidth)
+            val isTablet = resolveIsTablet(prefs, widgetId, context)
             
-            val layoutId = if (isCover) R.layout.cover_widget_layout else R.layout.home_widget_layout
+            val layoutId = when {
+                isTablet -> R.layout.tablet_widget_layout
+                isCover  -> R.layout.cover_widget_layout
+                else     -> R.layout.home_widget_layout
+            }
             val views     = RemoteViews(context.packageName, layoutId)
-            val activeTab = prefs.getInt("active_widget_tab", 0)
 
-            views.setViewVisibility(R.id.section_tasks,    if (activeTab == 0) View.VISIBLE else View.GONE)
-            views.setViewVisibility(R.id.section_calendar, if (activeTab == 1) View.VISIBLE else View.GONE)
-            views.setViewVisibility(R.id.section_gmail,    if (activeTab == 2) View.VISIBLE else View.GONE)
-
-            val DIM   = Color.parseColor("#A0A0B0")
-
-            views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) Color.WHITE else DIM)
-            views.setTextColor(R.id.tab_calendar, if (activeTab == 1) Color.WHITE else DIM)
-            views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) Color.WHITE else DIM)
-            
-            if (activeTab == 0) {
-                views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_active_bg)
+            if (isTablet) {
+                bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true)
+                bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true)
+                bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true)
             } else {
-                views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_inactive_bg)
-            }
-            if (activeTab == 1) {
-                views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_active_bg)
-            } else {
-                views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_inactive_bg)
-            }
-            if (activeTab == 2) {
-                views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_active_bg)
-            } else {
-                views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_inactive_bg)
-            }
+                val activeTab = prefs.getInt("active_widget_tab", 0)
 
-            views.setOnClickPendingIntent(R.id.tab_tasks,    switchTabIntent(context, 0))
-            views.setOnClickPendingIntent(R.id.tab_calendar, switchTabIntent(context, 1))
-            views.setOnClickPendingIntent(R.id.tab_gmail,    switchTabIntent(context, 2))
+                views.setViewVisibility(R.id.section_tasks,    if (activeTab == 0) View.VISIBLE else View.GONE)
+                views.setViewVisibility(R.id.section_calendar, if (activeTab == 1) View.VISIBLE else View.GONE)
+                views.setViewVisibility(R.id.section_gmail,    if (activeTab == 2) View.VISIBLE else View.GONE)
+
+                val DIM   = Color.parseColor("#A0A0B0")
+
+                views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) Color.WHITE else DIM)
+                views.setTextColor(R.id.tab_calendar, if (activeTab == 1) Color.WHITE else DIM)
+                views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) Color.WHITE else DIM)
+                
+                if (activeTab == 0) {
+                    views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_active_bg)
+                } else {
+                    views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_inactive_bg)
+                }
+                if (activeTab == 1) {
+                    views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_active_bg)
+                } else {
+                    views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_inactive_bg)
+                }
+                if (activeTab == 2) {
+                    views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_active_bg)
+                } else {
+                    views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_inactive_bg)
+                }
+
+                views.setOnClickPendingIntent(R.id.tab_tasks,    switchTabIntent(context, 0))
+                views.setOnClickPendingIntent(R.id.tab_calendar, switchTabIntent(context, 1))
+                views.setOnClickPendingIntent(R.id.tab_gmail,    switchTabIntent(context, 2))
+
+                // 탭 텍스트 크기 동적 조정
+                val tabSp = if (isCover) 16f
+                            else         scaledSp(widgetWidth, widgetHeight, 14f, 16f)
+                views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
+                views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
+                views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
+                
+                when (activeTab) {
+                    0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false)
+                    1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false)
+                    2 -> bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false)
+                }
+            }
 
             val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
-            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover")
-
-            // 탭 텍스트 크기 동적 조정
-            val tabSp = if (isCover) 16f
-                        else         scaledSp(widgetWidth, widgetHeight, 14f, 16f)
-            views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
-            views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
-            views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
+            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover isTablet=$isTablet")
 
             // ⚙ 버튼 → WidgetConfigureActivity 직접 실행 (런처 무관)
             val configIntent = Intent(context, WidgetConfigureActivity::class.java).apply {
@@ -393,14 +411,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_settings_btn, configPi)
 
-            when (activeTab) {
-                0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover)
-                1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover)
-                2 -> bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover)
+            if (isTablet) {
+                manager.notifyAppWidgetViewDataChanged(widgetId, R.id.task_list_view)
+                manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
+            } else {
+                val activeTab = prefs.getInt("active_widget_tab", 0)
+                if (activeTab == 0) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.task_list_view)
+                if (activeTab == 2) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
             }
-
-            if (activeTab == 0) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.task_list_view)
-            if (activeTab == 2) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
 
             manager.updateAppWidget(widgetId, views)
         }
@@ -408,7 +426,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
         // ─────────────────────────────────────────────────────────────────
         //  태스크 섹션
         // ─────────────────────────────────────────────────────────────────
-        private fun bindTasks(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
+        private fun bindTasks(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
             val count = prefs.getString("task_count", "0")?.toIntOrNull() ?: 0
             val hasAny = (0 until count).any { i -> (prefs.getString("task_$i", "") ?: "").isNotEmpty() }
 
@@ -429,9 +447,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
 
             val headerSp = if (isCover) 20f
+                           else if (isTablet) 12f
                            else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.task_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
-            val addSp = if (isCover) 18f else scaledSp(widgetWidth, widgetHeight, 12f, 14f)
+            val addSp = if (isCover) 18f
+                        else if (isTablet) 11f
+                        else scaledSp(widgetWidth, widgetHeight, 12f, 14f)
             views.setTextViewTextSize(R.id.task_add_btn, android.util.TypedValue.COMPLEX_UNIT_SP, addSp)
             views.setOnClickPendingIntent(R.id.task_add_btn, quickAddTaskIntent(context))
 
@@ -446,20 +467,20 @@ class HomeWidgetProvider : AppWidgetProvider() {
         // ─────────────────────────────────────────────────────────────────
         //  캘린더 섹션
         // ─────────────────────────────────────────────────────────────────
-        private fun bindCalendar(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
+        private fun bindCalendar(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
             val showDayPanel = prefs.getBoolean("cal_show_day_panel", false)
 
             views.setViewVisibility(R.id.cal_grid_panel, if (!showDayPanel) View.VISIBLE else View.GONE)
             views.setViewVisibility(R.id.cal_day_panel,  if (showDayPanel)  View.VISIBLE else View.GONE)
 
             if (showDayPanel) {
-                bindCalendarDayPanel(context, views, prefs, widgetWidth, widgetHeight, isCover)
+                bindCalendarDayPanel(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet)
             } else {
-                bindCalendarGrid(context, views, prefs, widgetWidth, widgetHeight, isCover)
+                bindCalendarGrid(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet)
             }
         }
 
-        private fun bindCalendarGrid(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
+        private fun bindCalendarGrid(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
             val allPrefs    = prefs.all
             val actual      = now()
             val actualYear  = actual.get(java.util.Calendar.YEAR)
@@ -479,6 +500,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val monthNames = arrayOf("","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
             views.setTextViewText(R.id.cal_month_label, "${dispYear}년 ${monthNames[dispMonth]}")
             val monthLabelSp = if (isCover) 20f
+                               else if (isTablet) 12f
                                else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.cal_month_label, android.util.TypedValue.COMPLEX_UNIT_SP, monthLabelSp)
 
@@ -528,7 +550,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
             // Calculate font sizes dynamically
             val rawDateSp = 8.5f + ((rowHeightDp - 10) * 0.15f)
-            val dateSp = rawDateSp.coerceIn(8.5f, 14.0f)
+            var dateSp = rawDateSp.coerceIn(8.5f, 14.0f)
+            if (isTablet) {
+                dateSp = dateSp.coerceAtMost(11.0f)
+            }
 
             // Calculate remaining vertical space for event chips to prevent clipping
             // wrap_content Date view takes about dateSp * 1.2 in dp
@@ -539,7 +564,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val maxEventSp = ((remainingHeightDp / 2f) * 1.1f).coerceAtLeast(7.0f)
             
             val rawEventSp = 7.5f + ((rowHeightDp - 10) * 0.15f)
-            val eventSp = rawEventSp.coerceIn(7.5f, 13.0f).coerceAtMost(maxEventSp)
+            var eventSp = rawEventSp.coerceIn(7.5f, 13.0f).coerceAtMost(maxEventSp)
+            if (isTablet) {
+                eventSp = eventSp.coerceAtMost(10.0f)
+            }
 
             for (row in 0..5) {
                 for (col in 0..6) {
@@ -659,7 +687,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun bindCalendarDayPanel(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
+        private fun bindCalendarDayPanel(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
             val dateKey = prefs.getString("cal_selected_date", "") ?: ""
 
             // 날짜 레이블 (MM/DD 요일 형식)
@@ -675,6 +703,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             } else ""
             views.setTextViewText(R.id.cal_day_label, label)
             val dayLabelSp = if (isCover) 16f
+                             else if (isTablet) 11f
                              else         scaledSp(widgetWidth, widgetHeight, 11f, 14f)
             views.setTextViewTextSize(R.id.cal_day_label, android.util.TypedValue.COMPLEX_UNIT_SP, dayLabelSp)
 
@@ -736,8 +765,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             views.setViewVisibility(R.id.cal_day_empty, if (visible == 0) View.VISIBLE else View.GONE)
             dayRows.forEach { r ->
-                views.setTextViewTextSize(r.title, android.util.TypedValue.COMPLEX_UNIT_SP, if (isCover) 18f else scaledSp(widgetWidth, widgetHeight, 12f, 15f))
-                views.setTextViewTextSize(r.time,  android.util.TypedValue.COMPLEX_UNIT_SP, if (isCover) 15f else scaledSp(widgetWidth, widgetHeight, 10f, 12f))
+                val titleSp = if (isCover) 18f else if (isTablet) 12f else scaledSp(widgetWidth, widgetHeight, 12f, 15f)
+                val timeSp = if (isCover) 15f else if (isTablet) 10f else scaledSp(widgetWidth, widgetHeight, 10f, 12f)
+                views.setTextViewTextSize(r.title, android.util.TypedValue.COMPLEX_UNIT_SP, titleSp)
+                views.setTextViewTextSize(r.time,  android.util.TypedValue.COMPLEX_UNIT_SP, timeSp)
             }
 
             val backIntent = PendingIntent.getBroadcast(
@@ -752,7 +783,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
         // ─────────────────────────────────────────────────────────────────
         //  Gmail 섹션
         // ─────────────────────────────────────────────────────────────────
-        private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
+        private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
             val count = try {
                 prefs.getInt("gmail_count", 0)
             } catch (e: ClassCastException) {
@@ -792,6 +823,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
 
             val headerSp = if (isCover) 20f
+                           else if (isTablet) 12f
                            else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.gmail_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
 
@@ -806,9 +838,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
             ))
             // compose 버튼 → 앱의 Gmail 작성 화면
             views.setOnClickPendingIntent(R.id.gmail_compose_btn, openAppWithActionIntent(context, "compose_email"))
-            // 하단 스와이프 존: 탭 이동
-            views.setOnClickPendingIntent(R.id.swipe_prev_gmail, switchTabIntent(context, 1))
-            views.setOnClickPendingIntent(R.id.swipe_next_gmail, switchTabIntent(context, 0))
+            if (!isTablet) {
+                // 하단 스와이프 존: 탭 이동
+                views.setOnClickPendingIntent(R.id.swipe_prev_gmail, switchTabIntent(context, 1))
+                views.setOnClickPendingIntent(R.id.swipe_next_gmail, switchTabIntent(context, 0))
+            }
         }
 
         // 가로(클수록 큰 글씨) × 세로(짧을수록 작은 글씨) 두 제약 중 작은 쪽을 따름
@@ -820,16 +854,31 @@ class HomeWidgetProvider : AppWidgetProvider() {
             return dm.displays.size >= 2
         }
 
+        fun isTablet(context: Context): Boolean {
+            return context.resources.configuration.smallestScreenWidthDp >= 600
+        }
+
+        fun resolveIsTablet(prefs: android.content.SharedPreferences, widgetId: Int, context: Context): Boolean {
+            val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
+            return when (manual) {
+                "tablet" -> true
+                "cover"  -> false
+                "home"   -> false
+                else     -> isTablet(context)
+            }
+        }
+
         // isCover 판정 우선순위:
-        // 1순위: 사용자 수동 설정 ("cover" / "home") via WidgetConfigureActivity
+        // 1순위: 사용자 수동 설정 ("cover" / "home" / "tablet") via WidgetConfigureActivity
         // 2순위: 폴더블 기기에서 위젯 치수 휴리스틱 (ww in 415..455)
         // 비폴더블 기기는 항상 false
         fun resolveIsCover(context: Context, prefs: android.content.SharedPreferences, widgetId: Int, widgetWidth: Int): Boolean {
             val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
             return when (manual) {
-                "cover" -> true
-                "home"  -> false
-                else    -> isFoldableDevice(context) && widgetWidth in 415..455
+                "cover"  -> true
+                "home"   -> false
+                "tablet" -> false
+                else     -> isFoldableDevice(context) && widgetWidth in 415..455
             }
         }
 
@@ -845,8 +894,13 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val color = android.graphics.Color.parseColor(colorHex)
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             for (id in ids) {
+                val isTablet = resolveIsTablet(prefs, id, context)
                 val isCover = resolveIsCover(context, prefs, id, 300)
-                val layoutId = if (isCover) R.layout.cover_widget_layout else R.layout.home_widget_layout
+                val layoutId = when {
+                    isTablet -> R.layout.tablet_widget_layout
+                    isCover  -> R.layout.cover_widget_layout
+                    else     -> R.layout.home_widget_layout
+                }
                 val v = RemoteViews(context.packageName, layoutId)
                 v.setInt(viewId, "setColorFilter", color)
                 mgr.partiallyUpdateAppWidget(id, v)

@@ -35,14 +35,16 @@ class WidgetConfigureActivity : AppCompatActivity() {
 
         val hint = findViewById<TextView>(R.id.configure_hint)
         hint.text = when {
-            existing == "cover" -> "현재 설정: 커버화면 위젯"
-            existing == "home"  -> "현재 설정: 홈화면 위젯"
+            existing == "cover"  -> "현재 설정: 커버화면 위젯"
+            existing == "home"   -> "현재 설정: 홈화면 위젯"
+            existing == "tablet" -> "현재 설정: 태블릿 위젯"
             HomeWidgetProvider.isFoldableDevice(this) -> "폴더블 기기 감지됨 — 화면 자동 감지 작동 중"
             else -> "화면 자동 감지 작동 중"
         }
 
         val btnCover = findViewById<Button>(R.id.btn_cover)
         val btnHome = findViewById<Button>(R.id.btn_home)
+        val btnTablet = findViewById<Button>(R.id.btn_tablet)
         val btnAuto = findViewById<Button>(R.id.btn_auto)
 
         when (existing) {
@@ -54,15 +56,20 @@ class WidgetConfigureActivity : AppCompatActivity() {
                 btnHome.setBackgroundResource(R.drawable.btn_dialog_accent)
                 btnHome.setTextColor(android.graphics.Color.parseColor("#82B1FF"))
             }
+            "tablet" -> {
+                btnTablet.setBackgroundResource(R.drawable.btn_dialog_accent)
+                btnTablet.setTextColor(android.graphics.Color.parseColor("#82B1FF"))
+            }
             else -> {
                 btnAuto.setBackgroundResource(R.drawable.btn_dialog_accent)
                 btnAuto.setTextColor(android.graphics.Color.parseColor("#82B1FF"))
             }
         }
 
-        btnCover.setOnClickListener { saveAndFinish("cover") }
-        btnHome.setOnClickListener  { saveAndFinish("home")  }
-        btnAuto.setOnClickListener  { saveAndFinish("auto")  }
+        btnCover.setOnClickListener  { saveAndFinish("cover")  }
+        btnHome.setOnClickListener   { saveAndFinish("home")   }
+        btnTablet.setOnClickListener { saveAndFinish("tablet") }
+        btnAuto.setOnClickListener   { saveAndFinish("auto")   }
     }
 
     private fun saveAndFinish(choice: String) {

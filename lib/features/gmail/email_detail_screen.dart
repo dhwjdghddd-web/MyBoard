@@ -133,6 +133,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       'findExistingDownload', att.filename,
     );
     if (existingUri != null && mounted) {
+      final messenger = ScaffoldMessenger.of(context);
       final redownload = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
@@ -152,7 +153,6 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       );
       if (redownload == null) return; // 취소
       if (redownload == false) {
-        final messenger = ScaffoldMessenger.of(context);
         await _openFile(existingUri, att.mimeType, messenger);
         return;
       }

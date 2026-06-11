@@ -93,8 +93,9 @@ class MainActivity : FlutterActivity() {
             val height = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
             val manual = prefs.getString("widget_cover_manual_$id", "auto") ?: "auto"
             val isCover = HomeWidgetProvider.resolveIsCover(this, prefs, id, width)
+            val isTablet = HomeWidgetProvider.resolveIsTablet(prefs, id, this)
             mapOf("id" to id, "width" to width, "height" to height,
-                  "manual" to manual, "isCover" to isCover)
+                  "manual" to manual, "isCover" to isCover, "isTablet" to isTablet)
         }
     }
 

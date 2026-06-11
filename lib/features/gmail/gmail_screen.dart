@@ -125,7 +125,7 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                 style: TextStyle(color: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white),
                 decoration: InputDecoration(
                   hintText: '메일 검색…',
-                  hintStyle: TextStyle(color: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withOpacity(0.7)),
+                  hintStyle: TextStyle(color: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withValues(alpha: 0.7)),
                   border: InputBorder.none,
                 ),
                 onSubmitted: (_) => _search(),

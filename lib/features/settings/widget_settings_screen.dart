@@ -85,7 +85,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
               subtitle: Text(isDark ? '다크 모드' : '라이트 모드'),
               trailing: Switch(
                 value: isDark,
-                activeColor: accentColor,
+                activeThumbColor: accentColor,
                 onChanged: (_) => ref.read(themeModeProvider.notifier).toggle(),
               ),
             ),
@@ -129,6 +129,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                   height: w['height'] as int,
                   manual: w['manual'] as String,
                   isCover: w['isCover'] as bool,
+                  isTablet: w['isTablet'] as bool? ?? false,
                   isDark: isDark,
                   onChanged: (setting) => _setSetting(w['id'] as int, setting),
                 )),
@@ -144,6 +145,7 @@ class _WidgetCard extends StatelessWidget {
   final int height;
   final String manual;
   final bool isCover;
+  final bool isTablet;
   final bool isDark;
   final void Function(String) onChanged;
 
@@ -153,6 +155,7 @@ class _WidgetCard extends StatelessWidget {
     required this.height,
     required this.manual,
     required this.isCover,
+    required this.isTablet,
     required this.isDark,
     required this.onChanged,
   });
@@ -179,9 +182,9 @@ class _WidgetCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  isCover ? Icons.phone_android : Icons.home,
+                  isCover ? Icons.phone_android : (isTablet ? Icons.tablet : Icons.home),
                   size: 18,
-                  color: isCover ? accentColor : secondaryTextColor,
+                  color: isCover ? accentColor : (isTablet ? Colors.teal : secondaryTextColor),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -192,15 +195,19 @@ class _WidgetCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: isCover ? accentColor.withOpacity(0.15) : secondaryTextColor.withOpacity(0.15),
+                    color: isCover
+                        ? accentColor.withValues(alpha: 0.15)
+                        : (isTablet
+                            ? Colors.teal.withValues(alpha: 0.15)
+                            : secondaryTextColor.withValues(alpha: 0.15)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    isCover ? '커버화면' : '홈화면',
+                    isCover ? '커버화면' : (isTablet ? '태블릿' : '홈화면'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isCover ? accentColor : secondaryTextColor,
+                      color: isCover ? accentColor : (isTablet ? Colors.teal : secondaryTextColor),
                     ),
                   ),
                 ),
@@ -216,14 +223,15 @@ class _WidgetCard extends StatelessWidget {
               width: double.infinity,
               child: SegmentedButton<String>(
                 segments: const [
-                  ButtonSegment(value: 'cover', label: Text('커버화면'), icon: Icon(Icons.phone_android, size: 14)),
-                  ButtonSegment(value: 'home',  label: Text('홈화면'),   icon: Icon(Icons.home, size: 14)),
+                  ButtonSegment(value: 'cover', label: Text('커버'), icon: Icon(Icons.phone_android, size: 14)),
+                  ButtonSegment(value: 'home',  label: Text('홈'),   icon: Icon(Icons.home, size: 14)),
+                  ButtonSegment(value: 'tablet', label: Text('태블릿'), icon: Icon(Icons.tablet, size: 14)),
                   ButtonSegment(value: 'auto',  label: Text('자동'),     icon: Icon(Icons.auto_fix_high, size: 14)),
                 ],
                 selected: {manual},
                 onSelectionChanged: (s) => onChanged(s.first),
                 style: SegmentedButton.styleFrom(
-                  selectedBackgroundColor: accentColor.withOpacity(0.15),
+                  selectedBackgroundColor: accentColor.withValues(alpha: 0.15),
                   selectedForegroundColor: accentColor,
                   side: BorderSide(color: theme.colorScheme.outlineVariant),
                   textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),

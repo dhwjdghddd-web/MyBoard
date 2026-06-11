@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="6dp">
+    android:padding="4dp">
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -75,7 +75,7 @@
             android:orientation="vertical">
 
             <!-- 월 네비게이션 -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="36dp"
+            <LinearLayout android:layout_width="match_parent" android:layout_height="30dp"
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingStart="4dp" android:paddingEnd="4dp">
                 <ImageView android:id="@+id/cal_prev"
@@ -108,19 +108,19 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="1dp">
                 <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="일" android:textSize="13sp" android:textColor="#FF8A80" android:gravity="center"/>
+                    android:text="일" android:textSize="11sp" android:textColor="#FF8A80" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="월" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="월" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="화" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="화" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="수" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="수" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="목" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="목" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="금" android:textSize="13sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="금" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="토" android:textSize="13sp" android:textColor="#82B1FF" android:gravity="center"/>
+                    android:text="토" android:textSize="11sp" android:textColor="#82B1FF" android:gravity="center"/>
             </LinearLayout>
 
             <!-- 주 0 -->
@@ -1439,7 +1439,7 @@
     <!-- ══════════════ 하단 캡슐형 세그먼트 탭 ══════════════ -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="36dp"
         android:orientation="horizontal"
         android:layout_marginTop="2dp"
         android:gravity="center_vertical">
@@ -1456,18 +1456,18 @@
 
             <TextView android:id="@+id/tab_tasks"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="할 일" android:textSize="16sp" android:textStyle="bold"
+                android:text="할 일" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#FFFFFF" android:gravity="center"
                 android:background="@drawable/tab_active_bg" />
 
             <TextView android:id="@+id/tab_calendar"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="캘린더" android:textSize="16sp" android:textStyle="bold"
+                android:text="캘린더" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#A0A0B0" android:gravity="center" />
 
             <TextView android:id="@+id/tab_gmail"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="Gmail" android:textSize="16sp" android:textStyle="bold"
+                android:text="Gmail" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#A0A0B0" android:gravity="center" />
         </LinearLayout>
 

@@ -49,6 +49,17 @@
         android:layout_marginBottom="12dp"/>
 
     <Button
+        android:id="@+id/btn_tablet"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="태블릿 위젯으로 설정"
+        android:textSize="14sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/btn_dialog_default"
+        android:backgroundTint="@null"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
         android:id="@+id/btn_auto"
         android:layout_width="match_parent"
         android:layout_height="50dp"

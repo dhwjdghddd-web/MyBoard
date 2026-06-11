@@ -3,125 +3,109 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="6dp">
+    android:padding="12dp">
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <!-- 콘텐츠 영역 (3개 섹션 공유) -->
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <!-- ══════════════ 태스크 섹션 ══════════════ -->
-    <LinearLayout android:id="@+id/section_tasks"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:orientation="vertical" android:visibility="visible">
+        <!-- 상단 대시보드 헤더 바 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="6dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="MyBoard 대시보드"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:paddingStart="4dp" />
 
-        <!-- 태스크 헤더 -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:padding="3dp">
-            <TextView android:id="@+id/task_header_title"
-                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="할 일 목록" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#FFFFFF"/>
-            <ImageView android:id="@+id/task_launch_btn"
+            <!-- 원형 설정 버튼 -->
+            <ImageView android:id="@+id/widget_settings_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            <ImageView android:id="@+id/task_refresh_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                android:src="@drawable/ic_settings" android:tint="#A0A0B0"
+                android:padding="4dp" android:layout_marginEnd="4dp"
+                android:background="@drawable/tab_active_bg"
+                android:focusable="true"/>
         </LinearLayout>
 
-        <ListView android:id="@+id/task_list_view"
+        <!-- 메인 분할 콘텐츠 영역 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:divider="@null"
-            android:scrollbars="none"
-            android:visibility="gone"/>
+            android:orientation="horizontal">
 
-        <TextView android:id="@+id/task_empty"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="태스크 없음" android:textSize="12sp" android:textColor="#A0A0B0"
-            android:gravity="center" android:paddingTop="12dp" android:visibility="gone"/>
+            <!-- 좌측: 캘린더 섹션 (가중치 6) -->
+            <LinearLayout android:id="@+id/section_calendar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="6"
+                android:orientation="vertical"
+                android:visibility="visible">
+                
+                <!-- ── 월 그리드 패널 ── -->
+                <LinearLayout android:id="@+id/cal_grid_panel"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
-        <TextView android:id="@+id/task_add_btn"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="＋  할 일 추가" android:textSize="12sp" android:textColor="#82B1FF"
-            android:gravity="center"
-            android:paddingTop="10dp" android:paddingBottom="10dp"
-            android:layout_marginTop="10dp" android:layout_marginBottom="6dp"
-            android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-            android:background="@drawable/task_add_btn_bg"
-            android:clickable="true"
-            android:focusable="true"/>
-    </LinearLayout>
+                    <!-- 월 네비게이션 -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="32dp"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingStart="4dp" android:paddingEnd="4dp">
+                        <ImageView android:id="@+id/cal_prev"
+                            android:layout_width="32dp" android:layout_height="match_parent"
+                            android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <TextView android:id="@+id/cal_month_label"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="6월" android:textSize="14sp" android:textStyle="bold"
+                            android:textColor="#FFFFFF" android:gravity="center"/>
+                        <ImageView android:id="@+id/cal_next"
+                            android:layout_width="32dp" android:layout_height="match_parent"
+                            android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <ImageView android:id="@+id/cal_launch_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <ImageView android:id="@+id/cal_refresh_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <ImageView android:id="@+id/cal_add_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                    </LinearLayout>
 
-    <!-- ══════════════ 캘린더 섹션 ══════════════ -->
-    <LinearLayout android:id="@+id/section_calendar"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:orientation="vertical" android:visibility="gone">
-
-        <!-- ── 월 그리드 패널 ── -->
-        <LinearLayout android:id="@+id/cal_grid_panel"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:orientation="vertical">
-
-            <!-- 월 네비게이션 -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="32dp"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingStart="4dp" android:paddingEnd="4dp">
-                <ImageView android:id="@+id/cal_prev"
-                    android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-                <TextView android:id="@+id/cal_month_label"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="6월" android:textSize="14sp" android:textStyle="bold"
-                    android:textColor="#FFFFFF" android:gravity="center"/>
-                <ImageView android:id="@+id/cal_next"
-                    android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-                <ImageView android:id="@+id/cal_launch_btn"
-                    android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-                <ImageView android:id="@+id/cal_refresh_btn"
-                    android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-                <ImageView android:id="@+id/cal_add_btn"
-                    android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            </LinearLayout>
-
-            <!-- 요일 헤더 -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="1dp">
-                <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="일" android:textSize="11sp" android:textColor="#FF8A80" android:gravity="center"/>
-                <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="월" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="화" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="수" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="목" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="금" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
-                <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="토" android:textSize="11sp" android:textColor="#82B1FF" android:gravity="center"/>
-            </LinearLayout>
+                    <!-- 요일 헤더 -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="1dp">
+                        <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="일" android:textSize="11sp" android:textColor="#FF8A80" android:gravity="center"/>
+                        <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="월" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                        <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="화" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                        <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="수" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                        <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="목" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                        <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="금" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                        <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="토" android:textSize="11sp" android:textColor="#82B1FF" android:gravity="center"/>
+                    </LinearLayout>
 
             <!-- 주 0 -->
             <LinearLayout android:id="@+id/cal_week_0"
@@ -1287,199 +1271,219 @@
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
+                </LinearLayout>
+
+                <!-- ── 일 상세 패널 (날짜 탭 시 표시) ── -->
+                <LinearLayout android:id="@+id/cal_day_panel"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical" android:visibility="gone">
+
+                    <!-- 헤더: 뒤로 + 날짜 레이블 + 일정추가 -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingBottom="6dp">
+                        <ImageView android:id="@+id/cal_back_btn"
+                            android:layout_width="32dp" android:layout_height="32dp"
+                            android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <TextView android:id="@+id/cal_day_label"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="" android:textSize="13sp" android:textStyle="bold"
+                            android:textColor="#FFFFFF" android:paddingStart="4dp"/>
+                        <ImageView android:id="@+id/cal_day_add_btn"
+                            android:layout_width="32dp" android:layout_height="32dp"
+                            android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 0 -->
+                    <LinearLayout android:id="@+id/cal_day_row_0"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_0" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_0"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_0"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 1 -->
+                    <LinearLayout android:id="@+id/cal_day_row_1"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_1" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#0F9D58" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_1"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_1"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 2 -->
+                    <LinearLayout android:id="@+id/cal_day_row_2"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_2" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#FBBC04" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_2"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_2"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 3 -->
+                    <LinearLayout android:id="@+id/cal_day_row_3"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_3" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#EA4335" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_3"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_3"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <TextView android:id="@+id/cal_day_empty"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="이 날 일정이 없어요" android:textSize="12sp" android:textColor="#A0A0B0"
+                        android:gravity="center" android:paddingTop="16dp" android:visibility="gone"/>
+                    <!-- 빈 공간: 오른쪽 스와이프 → 월 달력으로 이동 -->
+                    <FrameLayout android:id="@+id/cal_day_swipe_back"
+                        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 중앙 구분선 (여백) -->
+            <View
+                android:layout_width="12dp"
+                android:layout_height="match_parent"/>
+
+            <!-- 우측: 태스크(상) 및 Gmail(하) 세로 배치 (가중치 4) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:orientation="vertical">
+
+                <!-- 태스크 섹션 (상단) -->
+                <LinearLayout android:id="@+id/section_tasks"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <!-- 태스크 헤더 -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:padding="3dp">
+                        <TextView android:id="@+id/task_header_title"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="할 일 목록" android:textSize="14sp" android:textStyle="bold"
+                            android:textColor="#FFFFFF"/>
+                        <ImageView android:id="@+id/task_launch_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <ImageView android:id="@+id/task_refresh_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                    </LinearLayout>
+
+                    <ListView android:id="@+id/task_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:divider="@null"
+                        android:scrollbars="none"
+                        android:visibility="gone"/>
+
+                    <TextView android:id="@+id/task_empty"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="태스크 없음" android:textSize="12sp" android:textColor="#A0A0B0"
+                        android:gravity="center" android:paddingTop="12dp" android:visibility="gone"/>
+
+                    <TextView android:id="@+id/task_add_btn"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="＋  할 일 추가" android:textSize="12sp" android:textColor="#82B1FF"
+                        android:gravity="center"
+                        android:paddingTop="10dp" android:paddingBottom="10dp"
+                        android:layout_marginTop="10dp" android:layout_marginBottom="6dp"
+                        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                        android:background="@drawable/task_add_btn_bg"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </LinearLayout>
+
+                <!-- 섹션 구분 여백 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"/>
+
+                <!-- Gmail 섹션 (하단) -->
+                <LinearLayout android:id="@+id/section_gmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:padding="3dp">
+                        <TextView android:id="@+id/gmail_header_title"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="받은편지함" android:textSize="14sp" android:textStyle="bold"
+                            android:textColor="#FFFFFF"/>
+                        <ImageView android:id="@+id/gmail_launch_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <ImageView android:id="@+id/gmail_refresh_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                        <ImageView android:id="@+id/gmail_compose_btn"
+                            android:layout_width="28dp" android:layout_height="28dp"
+                            android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
+                    </LinearLayout>
+
+                    <!-- Gmail 리스트뷰 -->
+                    <ListView android:id="@+id/gmail_list_view"
+                        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+                        android:divider="#20FFFFFF" android:dividerHeight="1dp"
+                        android:scrollbars="none"
+                        android:visibility="gone" />
+
+                    <TextView android:id="@+id/gmail_empty"
+                        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+                        android:text="새 메일 없음" android:textSize="12sp" android:textColor="#A0A0B0"
+                        android:gravity="center" android:visibility="gone"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- ── 일 상세 패널 (날짜 탭 시 표시) ── -->
-        <LinearLayout android:id="@+id/cal_day_panel"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:orientation="vertical" android:visibility="gone">
-
-            <!-- 헤더: 뒤로 + 날짜 레이블 + 일정추가 -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingBottom="6dp">
-                <ImageView android:id="@+id/cal_back_btn"
-                    android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-                <TextView android:id="@+id/cal_day_label"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="" android:textSize="13sp" android:textStyle="bold"
-                    android:textColor="#FFFFFF" android:paddingStart="4dp"/>
-                <ImageView android:id="@+id/cal_day_add_btn"
-                    android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
-                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            </LinearLayout>
-
-            <!-- 일정 행 0 -->
-            <LinearLayout android:id="@+id/cal_day_row_0"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:id="@+id/cal_day_color_0" android:layout_width="4dp" android:layout_height="match_parent"
-                    android:background="#4285F4" android:layout_marginEnd="8dp"/>
-                <TextView android:id="@+id/cal_day_time_0"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
-                <TextView android:id="@+id/cal_day_title_0"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
-                    android:paddingStart="6dp"/>
-            </LinearLayout>
-
-            <!-- 일정 행 1 -->
-            <LinearLayout android:id="@+id/cal_day_row_1"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:id="@+id/cal_day_color_1" android:layout_width="4dp" android:layout_height="match_parent"
-                    android:background="#0F9D58" android:layout_marginEnd="8dp"/>
-                <TextView android:id="@+id/cal_day_time_1"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
-                <TextView android:id="@+id/cal_day_title_1"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
-                    android:paddingStart="6dp"/>
-            </LinearLayout>
-
-            <!-- 일정 행 2 -->
-            <LinearLayout android:id="@+id/cal_day_row_2"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:id="@+id/cal_day_color_2" android:layout_width="4dp" android:layout_height="match_parent"
-                    android:background="#FBBC04" android:layout_marginEnd="8dp"/>
-                <TextView android:id="@+id/cal_day_time_2"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
-                <TextView android:id="@+id/cal_day_title_2"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
-                    android:paddingStart="6dp"/>
-            </LinearLayout>
-
-            <!-- 일정 행 3 -->
-            <LinearLayout android:id="@+id/cal_day_row_3"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
-                <FrameLayout android:id="@+id/cal_day_color_3" android:layout_width="4dp" android:layout_height="match_parent"
-                    android:background="#EA4335" android:layout_marginEnd="8dp"/>
-                <TextView android:id="@+id/cal_day_time_3"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
-                <TextView android:id="@+id/cal_day_title_3"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
-                    android:paddingStart="6dp"/>
-            </LinearLayout>
-
-            <TextView android:id="@+id/cal_day_empty"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="이 날 일정이 없어요" android:textSize="12sp" android:textColor="#A0A0B0"
-                android:gravity="center" android:paddingTop="16dp" android:visibility="gone"/>
-            <!-- 빈 공간: 오른쪽 스와이프 → 월 달력으로 이동 -->
-            <FrameLayout android:id="@+id/cal_day_swipe_back"
-                android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
-        </LinearLayout>
     </LinearLayout>
-
-    <!-- ══════════════ Gmail 섹션 ══════════════ -->
-    <LinearLayout android:id="@+id/section_gmail"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:orientation="vertical" android:visibility="gone">
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:padding="3dp">
-            <TextView android:id="@+id/gmail_header_title"
-                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="받은편지함" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#FFFFFF"/>
-            <ImageView android:id="@+id/gmail_launch_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            <ImageView android:id="@+id/gmail_refresh_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            <ImageView android:id="@+id/gmail_compose_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-        </LinearLayout>
-
-        <!-- Gmail 리스트뷰 -->
-        <ListView android:id="@+id/gmail_list_view"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:divider="#20FFFFFF" android:dividerHeight="1dp"
-            android:scrollbars="none"
-            android:visibility="gone" />
-
-        <TextView android:id="@+id/gmail_empty"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:text="새 메일 없음" android:textSize="12sp" android:textColor="#A0A0B0"
-            android:gravity="center" android:visibility="gone"/>
-
-        <!-- 하단 스와이프 존: 좌우로 탭 이동 -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="12dp"
-            android:orientation="horizontal">
-            <FrameLayout android:id="@+id/swipe_prev_gmail"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
-            <FrameLayout android:id="@+id/swipe_next_gmail"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    </FrameLayout><!-- 콘텐츠 FrameLayout 종료 -->
-
-    <!-- ══════════════ 하단 캡슐형 세그먼트 탭 ══════════════ -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="2dp"
-        android:gravity="center_vertical">
-        
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:background="@drawable/tab_pill_bg"
-            android:layout_marginStart="8dp"
-            android:padding="2dp"
-            android:gravity="center_vertical">
-
-            <TextView android:id="@+id/tab_tasks"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="할 일" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#FFFFFF" android:gravity="center"
-                android:background="@drawable/tab_active_bg" />
-
-            <TextView android:id="@+id/tab_calendar"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="캘린더" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#A0A0B0" android:gravity="center" />
-
-            <TextView android:id="@+id/tab_gmail"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="Gmail" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#A0A0B0" android:gravity="center" />
-        </LinearLayout>
-
-        <!-- 원형 설정 버튼 단 1개만 배치 -->
-        <ImageView android:id="@+id/widget_settings_btn"
-            android:layout_width="36dp" android:layout_height="36dp"
-            android:src="@drawable/ic_settings" android:tint="#A0A0B0"
-            android:padding="6dp" android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
-            android:background="@drawable/tab_active_bg"/>
-            
-    </LinearLayout>
-
-</LinearLayout>
 
 </FrameLayout>

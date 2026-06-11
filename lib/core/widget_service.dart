@@ -115,7 +115,7 @@ class WidgetService {
         }).join('|');
         final ids = take.map((e) => e.id).join('|');
         final colors = take.map((e) {
-          final hex = e.color.value.toRadixString(16).padLeft(8, '0');
+          final hex = e.color.toARGB32().toRadixString(16).padLeft(8, '0');
           return '#$hex';
         }).join('|');
         await HomeWidget.saveWidgetData<String>('cal_day_${key}_titles', titles);
