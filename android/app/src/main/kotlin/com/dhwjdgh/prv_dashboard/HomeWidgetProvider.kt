@@ -568,9 +568,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
                         val titlesRaw = (allPrefs["cal_day_${compactKey}_titles"] as? String) ?: ""
                         val colorsRaw = (allPrefs["cal_day_${compactKey}_colors"] as? String) ?: ""
+                        val timesRaw = (allPrefs["cal_day_${compactKey}_times"] as? String) ?: ""
 
                         val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
                         val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
+                        val times = if (timesRaw.isEmpty()) emptyList() else timesRaw.split("|")
 
                         // 1. 날짜 설정
                         views.setTextViewText(cellId, day.toString())
@@ -597,19 +599,28 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             if (titles.isNotEmpty()) {
                                 views.setViewVisibility(ev1Id, View.VISIBLE)
                                 val title = titles[0]
-                                val ssb = SpannableStringBuilder(title)
-                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                views.setTextViewText(ev1Id, ssb)
-                                views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
-                                
                                 val colorStr = colors.getOrNull(0)
                                 val eventColor = try {
                                     if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
                                 } catch (e: Exception) {
                                     Color.parseColor("#ff4285f4")
                                 }
-                                views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
-                                views.setTextColor(ev1Id, getContrastColor(eventColor))
+                                val time = times.getOrNull(0) ?: ""
+                                val isAllDay = time == "종일"
+
+                                val displayText = if (!isAllDay && time.isNotEmpty()) "$time $title" else title
+                                val ssb = SpannableStringBuilder(displayText)
+                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                views.setTextViewText(ev1Id, ssb)
+                                views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
+
+                                if (isAllDay) {
+                                    views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
+                                    views.setTextColor(ev1Id, getContrastColor(eventColor))
+                                } else {
+                                    views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(Color.TRANSPARENT))
+                                    views.setTextColor(ev1Id, eventColor)
+                                }
                             } else {
                                 views.setViewVisibility(ev1Id, View.GONE)
                             }
@@ -619,19 +630,28 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             if (titles.size > 1) {
                                 views.setViewVisibility(ev2Id, View.VISIBLE)
                                 val title = titles[1]
-                                val ssb = SpannableStringBuilder(title)
-                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                views.setTextViewText(ev2Id, ssb)
-                                views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
-                                
                                 val colorStr = colors.getOrNull(1)
                                 val eventColor = try {
                                     if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
                                 } catch (e: Exception) {
                                     Color.parseColor("#ff4285f4")
                                 }
-                                views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
-                                views.setTextColor(ev2Id, getContrastColor(eventColor))
+                                val time = times.getOrNull(1) ?: ""
+                                val isAllDay = time == "종일"
+
+                                val displayText = if (!isAllDay && time.isNotEmpty()) "$time $title" else title
+                                val ssb = SpannableStringBuilder(displayText)
+                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                views.setTextViewText(ev2Id, ssb)
+                                views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
+
+                                if (isAllDay) {
+                                    views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
+                                    views.setTextColor(ev2Id, getContrastColor(eventColor))
+                                } else {
+                                    views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(Color.TRANSPARENT))
+                                    views.setTextColor(ev2Id, eventColor)
+                                }
                             } else if (titles.size == 1) {
                                 views.setViewVisibility(ev2Id, View.INVISIBLE)
                             } else {

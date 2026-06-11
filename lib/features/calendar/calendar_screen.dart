@@ -487,17 +487,46 @@ class _DayCell extends StatelessWidget {
                 Expanded(child: Text(item.title, style: const TextStyle(fontSize: 9.5, color: Color(0xFF1A73E8)), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
             )
-          else
+          else if (item.isAllDay)
             Container(
               width: double.infinity,
               margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(color: item.color.withOpacity(0.85), borderRadius: BorderRadius.circular(6)),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+              decoration: BoxDecoration(
+                color: item.color,
+                borderRadius: BorderRadius.circular(3),
+              ),
               child: Text(
                 item.title,
-                style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 9.5,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      (item.startDt != null)
+                          ? '${item.startDt!.toLocal().hour.toString().padLeft(2, '0')}:${item.startDt!.toLocal().minute.toString().padLeft(2, '0')} ${item.title}'
+                          : item.title,
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        color: item.color,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
         if (extra > 0)
