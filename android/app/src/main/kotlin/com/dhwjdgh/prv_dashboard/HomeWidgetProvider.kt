@@ -289,6 +289,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val PREFS = "HomeWidgetPreferences"
+
+        private fun getContrastColor(color: Int): Int {
+            val red = Color.red(color)
+            val green = Color.green(color)
+            val blue = Color.blue(color)
+            val lum = 0.299 * red + 0.587 * green + 0.114 * blue
+            return if (lum > 180) Color.BLACK else Color.WHITE
+        }
         const val ACTION_COMPLETE_TASK   = "com.dhwjdgh.prv_dashboard.COMPLETE_TASK"
         const val ACTION_DELETE_TASK     = "com.dhwjdgh.prv_dashboard.DELETE_TASK"
         const val ACTION_TASK_ITEM       = "com.dhwjdgh.prv_dashboard.TASK_ITEM"
@@ -596,11 +604,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             
                             val colorStr = colors.getOrNull(0)
                             val eventColor = try {
-                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#60D8A0")
+                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
                             } catch (e: Exception) {
-                                Color.parseColor("#60D8A0")
+                                Color.parseColor("#ff4285f4")
                             }
-                            views.setTextColor(ev1Id, eventColor)
+                            views.setInt(ev1Id, "setBackgroundColor", eventColor)
+                            views.setTextColor(ev1Id, getContrastColor(eventColor))
                         } else if (ev1Id != 0) {
                             views.setViewVisibility(ev1Id, View.GONE)
                         }
@@ -616,11 +625,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             
                             val colorStr = colors.getOrNull(1)
                             val eventColor = try {
-                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#60D8A0")
+                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
                             } catch (e: Exception) {
-                                Color.parseColor("#60D8A0")
+                                Color.parseColor("#ff4285f4")
                             }
-                            views.setTextColor(ev2Id, eventColor)
+                            views.setInt(ev2Id, "setBackgroundColor", eventColor)
+                            views.setTextColor(ev2Id, getContrastColor(eventColor))
                         } else if (ev2Id != 0) {
                             views.setViewVisibility(ev2Id, View.GONE)
                         }

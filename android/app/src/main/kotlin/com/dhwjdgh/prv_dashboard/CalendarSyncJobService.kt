@@ -168,7 +168,13 @@ class CalendarSyncJobService : JobService() {
             }
 
             for ((key, events) in byDay) {
-                events.sortWith(compareBy { it.time })
+                events.sortWith(Comparator { a, b ->
+                    val aAllDay = a.time == "종일"
+                    val bAllDay = b.time == "종일"
+                    if (aAllDay && !bAllDay) return@Comparator -1
+                    if (!aAllDay && bAllDay) return@Comparator 1
+                    a.time.compareTo(b.time)
+                })
                 val take = events.take(4)
                 edit.putString("cal_day_${key}_titles", take.joinToString("|") { it.title })
                 edit.putString("cal_day_${key}_times",  take.joinToString("|") { it.time })

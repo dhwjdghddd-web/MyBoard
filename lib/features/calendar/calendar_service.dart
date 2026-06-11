@@ -264,8 +264,8 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       }
 
       events.sort((a, b) {
-        final ak = a.isAllDay ? '${a.dateKey}T00:00' : (a.startDt?.toIso8601String() ?? '');
-        final bk = b.isAllDay ? '${b.dateKey}T00:00' : (b.startDt?.toIso8601String() ?? '');
+        final ak = a.isAllDay ? '${a.dateKey}T00:00' : (a.startDt?.toLocal().toIso8601String() ?? '');
+        final bk = b.isAllDay ? '${b.dateKey}T00:00' : (b.startDt?.toLocal().toIso8601String() ?? '');
         return ak.compareTo(bk);
       });
 

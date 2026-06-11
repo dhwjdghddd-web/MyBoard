@@ -94,9 +94,18 @@ class WidgetService {
       }
       for (final entry in byDay.entries) {
         final key = entry.key;
-        final evList = entry.value.take(4).toList();
-        final titles = evList.map((e) => e.summary).join('|');
-        final times  = evList.map((e) {
+        final evList = entry.value;
+        evList.sort((a, b) {
+          if (a.isAllDay && !b.isAllDay) return -1;
+          if (!a.isAllDay && b.isAllDay) return 1;
+          if (a.startDt != null && b.startDt != null) {
+            return a.startDt!.toLocal().compareTo(b.startDt!.toLocal());
+          }
+          return 0;
+        });
+        final take = evList.take(4).toList();
+        final titles = take.map((e) => e.summary).join('|');
+        final times  = take.map((e) {
           if (e.isAllDay) return '종일';
           if (e.startDt != null) {
             final d = e.startDt!.toLocal();
@@ -104,8 +113,8 @@ class WidgetService {
           }
           return '';
         }).join('|');
-        final ids = evList.map((e) => e.id).join('|');
-        final colors = evList.map((e) {
+        final ids = take.map((e) => e.id).join('|');
+        final colors = take.map((e) {
           final hex = e.color.value.toRadixString(16).padLeft(8, '0');
           return '#$hex';
         }).join('|');

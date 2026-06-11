@@ -191,7 +191,7 @@ class _MonthItem {
         : (e.startDt != null
             ? '${e.startDt!.toLocal().hour.toString().padLeft(2,'0')}:${e.startDt!.toLocal().minute.toString().padLeft(2,'0')}'
             : '');
-    final sk = e.isAllDay ? '${e.dateKey}T00:00' : (e.startDt?.toIso8601String() ?? e.dateKey);
+    final sk = e.isAllDay ? '${e.dateKey}T00:00' : (e.startDt?.toLocal().toIso8601String() ?? e.dateKey);
     return _MonthItem(
       dateKey: e.dateKey,
       sortKey: sk,
@@ -432,9 +432,19 @@ class _DayCell extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     final allItems = [
-      ...events.map((e) => (title: e.summary, color: e.color, isTask: false, isAllDay: e.isAllDay)),
-      ...tasks.map((t) => (title: t.title, color: const Color(0xFF1A73E8), isTask: true, isAllDay: false)),
+      ...events.map((e) => (title: e.summary, color: e.color, isTask: false, isAllDay: e.isAllDay, startDt: e.startDt)),
+      ...tasks.map((t) => (title: t.title, color: const Color(0xFF1A73E8), isTask: true, isAllDay: false, startDt: t.due)),
     ];
+    allItems.sort((a, b) {
+      if (a.isAllDay && !b.isAllDay) return -1;
+      if (!a.isAllDay && b.isAllDay) return 1;
+      if (!a.isTask && b.isTask) return -1;
+      if (a.isTask && !b.isTask) return 1;
+      if (a.startDt != null && b.startDt != null) {
+        return a.startDt!.toLocal().compareTo(b.startDt!.toLocal());
+      }
+      return 0;
+    });
     final visible = allItems.take(2).toList();
     final extra = allItems.length - visible.length;
 
