@@ -15,7 +15,6 @@ import 'features/gmail/gmail_screen.dart';
 import 'features/gmail/gmail_service.dart';
 import 'features/gmail/gmail_compose_screen.dart';
 import 'features/gmail/email_detail_screen.dart';
-import 'features/settings/widget_settings_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});

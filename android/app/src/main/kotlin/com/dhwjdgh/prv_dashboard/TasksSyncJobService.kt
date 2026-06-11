@@ -15,6 +15,7 @@ import java.net.URL
 import java.net.ProtocolException
 
 class TasksSyncJobService : JobService() {
+    private var jobThread: Thread? = null
 
     override fun onStartJob(params: JobParameters?): Boolean {
         val action = params?.extras?.getString("action", "sync") ?: "sync"
@@ -22,29 +23,34 @@ class TasksSyncJobService : JobService() {
         val isCompleted = params?.extras?.getBoolean("is_completed", true) ?: true
         val ctx = applicationContext
 
-        Thread {
-            when (action) {
-                "complete" -> {
-                    if (taskId.isNotEmpty()) executeCompleteInternal(ctx, taskId, isCompleted)
+        jobThread = Thread {
+            try {
+                when (action) {
+                    "complete" -> {
+                        if (taskId.isNotEmpty()) executeCompleteInternal(ctx, taskId, isCompleted)
+                    }
+                    "delete" -> {
+                        if (taskId.isNotEmpty()) executeDeleteInternal(ctx, taskId)
+                    }
+                    else -> {
+                        executeSyncInternal(ctx)
+                    }
                 }
-                "delete" -> {
-                    if (taskId.isNotEmpty()) executeDeleteInternal(ctx, taskId)
-                }
-                else -> {
-                    executeSyncInternal(ctx)
-                }
+                // 위젯 갱신
+                val mgr = AppWidgetManager.getInstance(ctx)
+                val ids = mgr.getAppWidgetIds(ComponentName(ctx, HomeWidgetProvider::class.java))
+                for (id in ids) HomeWidgetProvider.updateWidget(ctx, mgr, id)
+            } finally {
+                jobFinished(params, false)
             }
-            // 위젯 갱신
-            val mgr = AppWidgetManager.getInstance(ctx)
-            val ids = mgr.getAppWidgetIds(ComponentName(ctx, HomeWidgetProvider::class.java))
-            for (id in ids) HomeWidgetProvider.updateWidget(ctx, mgr, id)
-            
-            jobFinished(params, false)
-        }.start()
+        }.apply { start() }
         return true
     }
 
-    override fun onStopJob(params: JobParameters?): Boolean = true
+    override fun onStopJob(params: JobParameters?): Boolean {
+        jobThread?.interrupt()
+        return true
+    }
 
     companion object {
         const val PREFS = "HomeWidgetPreferences"

@@ -16,27 +16,34 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class GmailSyncJobService : JobService() {
+    private var jobThread: Thread? = null
 
     override fun onStartJob(params: JobParameters?): Boolean {
         val action  = params?.extras?.getString("action", "sync") ?: "sync"
         val emailId = params?.extras?.getString("email_id", "") ?: ""
         val ctx = applicationContext
 
-        Thread {
-            if (action == "trash" && emailId.isNotEmpty()) {
-                executeTrashInternal(ctx, emailId)
-            } else {
-                executeSyncInternal(ctx)
-                val mgr = AppWidgetManager.getInstance(ctx)
-                val ids = mgr.getAppWidgetIds(ComponentName(ctx, HomeWidgetProvider::class.java))
-                for (id in ids) HomeWidgetProvider.updateWidget(ctx, mgr, id)
+        jobThread = Thread {
+            try {
+                if (action == "trash" && emailId.isNotEmpty()) {
+                    executeTrashInternal(ctx, emailId)
+                } else {
+                    executeSyncInternal(ctx)
+                    val mgr = AppWidgetManager.getInstance(ctx)
+                    val ids = mgr.getAppWidgetIds(ComponentName(ctx, HomeWidgetProvider::class.java))
+                    for (id in ids) HomeWidgetProvider.updateWidget(ctx, mgr, id)
+                }
+            } finally {
+                jobFinished(params, false)
             }
-            jobFinished(params, false)
-        }.start()
+        }.apply { start() }
         return true
     }
 
-    override fun onStopJob(params: JobParameters?): Boolean = true
+    override fun onStopJob(params: JobParameters?): Boolean {
+        jobThread?.interrupt()
+        return true
+    }
 
     companion object {
         const val PREFS = "HomeWidgetPreferences"

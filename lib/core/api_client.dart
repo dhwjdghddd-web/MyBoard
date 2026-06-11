@@ -38,18 +38,24 @@ class ApiClient {
         onError: (err, handler) async {
           if (err.response?.statusCode == 401 && !_isRefreshing) {
             _isRefreshing = true;
+            String? newToken;
             try {
-              // google_sign_in은 .authentication 재호출로 토큰 자동 갱신
-              final newToken = await getToken();
+              newToken = await getToken();
+            } catch (_) {
+              // ignore
+            } finally {
               _isRefreshing = false;
-              if (newToken != null) {
+            }
+
+            if (newToken != null) {
+              try {
                 err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
                 final response = await _dio.fetch(err.requestOptions);
                 handler.resolve(response);
                 return;
+              } catch (_) {
+                // ignore
               }
-            } catch (_) {
-              _isRefreshing = false;
             }
             // 갱신 실패 → 로그아웃 유도
             onAuthError();

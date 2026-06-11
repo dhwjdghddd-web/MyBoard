@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import '../features/tasks/task_service.dart';
 import '../features/calendar/calendar_service.dart';
@@ -7,7 +8,9 @@ class WidgetService {
   static Future<void> saveTaskListId(String listId) async {
     try {
       await HomeWidget.saveWidgetData<String>('task_list_id', listId);
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.saveTaskListId error: $e\n$st');
+    }
   }
 
   static Future<void> updateTasks(List<Task> tasks) async {
@@ -30,7 +33,9 @@ class WidgetService {
         await HomeWidget.saveWidgetData<String>('task_${i}_done', 'false');
       }
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.updateTasks error: $e\n$st');
+    }
   }
 
   static Future<void> updateCalendar(List<CalendarEvent> events) async {
@@ -111,7 +116,9 @@ class WidgetService {
       }
 
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.updateCalendar error: $e\n$st');
+    }
   }
 
   static Future<void> updateGmail(List<GmailMessage> messages) async {
@@ -152,7 +159,9 @@ class WidgetService {
         }
       }
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.updateGmail error: $e\n$st');
+    }
   }
 
   static Future<List<String>> getPendingCompletions() async {
@@ -160,7 +169,8 @@ class WidgetService {
       final raw = await HomeWidget.getWidgetData<String>('pending_completions', defaultValue: '');
       if (raw == null || raw.isEmpty) return [];
       return raw.split(',').where((s) => s.isNotEmpty).toList();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('WidgetService.getPendingCompletions error: $e\n$st');
       return [];
     }
   }
@@ -168,7 +178,9 @@ class WidgetService {
   static Future<void> clearPendingCompletions() async {
     try {
       await HomeWidget.saveWidgetData<String>('pending_completions', '');
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.clearPendingCompletions error: $e\n$st');
+    }
   }
 
   static Future<List<String>> getPendingDeletions() async {
@@ -176,7 +188,8 @@ class WidgetService {
       final raw = await HomeWidget.getWidgetData<String>('pending_deletions', defaultValue: '');
       if (raw == null || raw.isEmpty) return [];
       return raw.split(',').where((s) => s.isNotEmpty).toList();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('WidgetService.getPendingDeletions error: $e\n$st');
       return [];
     }
   }
@@ -184,7 +197,9 @@ class WidgetService {
   static Future<void> clearPendingDeletions() async {
     try {
       await HomeWidget.saveWidgetData<String>('pending_deletions', '');
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.clearPendingDeletions error: $e\n$st');
+    }
   }
 
   static Future<List<String>> getPendingNewTasks() async {
@@ -192,7 +207,8 @@ class WidgetService {
       final raw = await HomeWidget.getWidgetData<String>('pending_new_tasks', defaultValue: '');
       if (raw == null || raw.isEmpty) return [];
       return raw.split('\n').where((s) => s.isNotEmpty).toList();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('WidgetService.getPendingNewTasks error: $e\n$st');
       return [];
     }
   }
@@ -200,6 +216,8 @@ class WidgetService {
   static Future<void> clearPendingNewTasks() async {
     try {
       await HomeWidget.saveWidgetData<String>('pending_new_tasks', '');
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('WidgetService.clearPendingNewTasks error: $e\n$st');
+    }
   }
 }

@@ -360,12 +360,18 @@ class _CalendarGrid extends ConsumerWidget {
     final startOffset = firstDay.weekday % 7;
     final totalCells = startOffset + lastDay.day;
     final rows = (totalCells / 7).ceil();
+    final double textScale = MediaQuery.maybeTextScalerOf(context)?.scale(1.0) ?? 
+                             (MediaQuery.maybeOf(context)?.textScaleFactor) ?? 1.0;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cellWidth = screenWidth / 7;
+    final minCellHeight = 28.0 + (38.0 * textScale);
+    final childAspectRatio = (cellWidth / minCellHeight).clamp(0.45, 0.85);
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7, childAspectRatio: 0.75,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7, childAspectRatio: childAspectRatio,
       ),
       itemCount: rows * 7,
       itemBuilder: (context, i) {

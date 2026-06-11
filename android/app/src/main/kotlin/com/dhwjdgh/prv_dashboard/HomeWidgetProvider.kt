@@ -452,12 +452,21 @@ class HomeWidgetProvider : AppWidgetProvider() {
         }
 
         private fun bindCalendarGrid(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false) {
+            val allPrefs    = prefs.all
             val actual      = now()
             val actualYear  = actual.get(java.util.Calendar.YEAR)
             val actualMonth = actual.get(java.util.Calendar.MONTH) + 1
             val actualToday = actual.get(java.util.Calendar.DAY_OF_MONTH)
-            val dispYear    = prefs.getInt("cal_display_year",  actualYear)
-            val dispMonth   = prefs.getInt("cal_display_month", actualMonth)
+            val dispYear    = when (val y = allPrefs["cal_display_year"]) {
+                is Int -> y
+                is String -> y.toIntOrNull() ?: actualYear
+                else -> actualYear
+            }
+            val dispMonth   = when (val m = allPrefs["cal_display_month"]) {
+                is Int -> m
+                is String -> m.toIntOrNull() ?: actualMonth
+                else -> actualMonth
+            }
 
             val monthNames = arrayOf("","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
             views.setTextViewText(R.id.cal_month_label, "${dispYear}년 ${monthNames[dispMonth]}")
@@ -549,8 +558,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         val dateKey = "%04d-%02d-%02d".format(dispYear, dispMonth, day)
                         val compactKey = "%04d%02d%02d".format(dispYear, dispMonth, day)
 
-                        val titlesRaw = prefs.getString("cal_day_${compactKey}_titles", "") ?: ""
-                        val colorsRaw = prefs.getString("cal_day_${compactKey}_colors", "") ?: ""
+                        val titlesRaw = (allPrefs["cal_day_${compactKey}_titles"] as? String) ?: ""
+                        val colorsRaw = (allPrefs["cal_day_${compactKey}_colors"] as? String) ?: ""
 
                         val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
                         val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")

@@ -16,17 +16,36 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 
 class CalendarSyncJobService : JobService() {
+    private var jobThread: Thread? = null
 
     override fun onStartJob(params: JobParameters?): Boolean {
         val year  = params?.extras?.getInt("year",  0) ?: 0
         val month = params?.extras?.getInt("month", 0) ?: 0
         if (year == 0 || month == 0) { jobFinished(params, false); return false }
 
-        executeSync(applicationContext, year, month) { jobFinished(params, false) }
+        val ctx = applicationContext
+        jobThread = Thread {
+            try {
+                val success = executeSyncInternal(ctx, year, month)
+                if (success) {
+                    ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                        .putLong("cal_synced_${year}_${month}", System.currentTimeMillis())
+                        .apply()
+                }
+                val mgr = AppWidgetManager.getInstance(ctx)
+                val ids = mgr.getAppWidgetIds(ComponentName(ctx, HomeWidgetProvider::class.java))
+                for (id in ids) HomeWidgetProvider.updateWidget(ctx, mgr, id)
+            } finally {
+                jobFinished(params, false)
+            }
+        }.apply { start() }
         return true
     }
 
-    override fun onStopJob(params: JobParameters?): Boolean = true
+    override fun onStopJob(params: JobParameters?): Boolean {
+        jobThread?.interrupt()
+        return true
+    }
 
     companion object {
         private const val PREFS = "HomeWidgetPreferences"
