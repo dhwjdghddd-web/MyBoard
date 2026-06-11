@@ -8,9 +8,7 @@
     android:paddingBottom="8dp"
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
-    android:background="@drawable/widget_list_item_ripple"
-    android:clickable="true"
-    android:focusable="true">
+    android:background="@drawable/widget_list_item_ripple">
 
     <!-- 첫 번째 줄: 보낸 사람 + 시간 -->
     <LinearLayout

@@ -501,10 +501,47 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(WEEK_ROW_IDS[r], if (r < neededRows) View.VISIBLE else View.GONE)
             }
             Log.d("HomeWidget", "bindCalendarGrid isCover=$isCover w=$widgetWidth h=$widgetHeight neededRows=$neededRows")
-            // 행 수에 따라 글씨 크기 자동 조정
-            val rowFactor = 5f / neededRows
-            val eventSp = if (isCover) (14.5f * rowFactor) else (12.5f * rowFactor)
-            val dateSp = if (isCover) (13.5f * rowFactor) else (scaledSp(widgetWidth, widgetHeight, 11f, 13f) * rowFactor)
+            // 행 수와 위젯 높이에 따라 반응형으로 글씨 크기 및 표시 개수 조절
+            val safeWidgetHeight = maxOf(widgetHeight, 150)
+            val gridHeightDp = safeWidgetHeight - if (isCover) 85 else 105
+            val rowHeightDp = (gridHeightDp.toFloat() / neededRows.toFloat()).toInt()
+
+            val dateSp: Float
+            val eventSp: Float
+            val showEv1: Boolean
+            val showEv2: Boolean
+
+            if (rowHeightDp < 14) {
+                dateSp = 9.5f
+                eventSp = 8.5f
+                showEv1 = true
+                showEv2 = false
+            } else if (rowHeightDp < 19) {
+                dateSp = 10.5f
+                eventSp = 9.5f
+                showEv1 = true
+                showEv2 = false
+            } else if (rowHeightDp < 24) {
+                dateSp = 11.5f
+                eventSp = 10.5f
+                showEv1 = true
+                showEv2 = true
+            } else if (rowHeightDp < 30) {
+                dateSp = 12.5f
+                eventSp = 11.5f
+                showEv1 = true
+                showEv2 = true
+            } else if (rowHeightDp < 38) {
+                dateSp = 13.5f
+                eventSp = 12.5f
+                showEv1 = true
+                showEv2 = true
+            } else {
+                dateSp = 14.5f
+                eventSp = 13.5f
+                showEv1 = true
+                showEv2 = true
+            }
 
             for (row in 0..5) {
                 for (col in 0..6) {
@@ -558,11 +595,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         }
 
                         // 2. 일정 바인딩 (최대 2개)
-                        val displayTitles = titles.take(2)
-                        
-                        if (displayTitles.size > 0 && ev1Id != 0) {
+                        if (showEv1 && titles.isNotEmpty() && ev1Id != 0) {
                             views.setViewVisibility(ev1Id, View.VISIBLE)
-                            val title = displayTitles[0]
+                            val title = titles[0]
                             
                             val ssb = SpannableStringBuilder(title)
                             ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -580,9 +615,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             views.setViewVisibility(ev1Id, View.GONE)
                         }
 
-                        if (displayTitles.size > 1 && ev2Id != 0) {
+                        if (showEv2 && titles.size > 1 && ev2Id != 0) {
                             views.setViewVisibility(ev2Id, View.VISIBLE)
-                            val title = displayTitles[1]
+                            val title = titles[1]
                             
                             val ssb = SpannableStringBuilder(title)
                             ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
