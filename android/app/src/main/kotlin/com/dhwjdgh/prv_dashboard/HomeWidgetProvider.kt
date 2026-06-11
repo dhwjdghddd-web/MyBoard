@@ -503,19 +503,26 @@ class HomeWidgetProvider : AppWidgetProvider() {
             Log.d("HomeWidget", "bindCalendarGrid isCover=$isCover w=$widgetWidth h=$widgetHeight neededRows=$neededRows")
             // 행 수와 위젯 높이에 따라 반응형으로 글씨 크기 및 표시 개수 조절
             val safeWidgetHeight = maxOf(widgetHeight, 100)
-            val gridHeightDp = safeWidgetHeight - if (isCover) 70 else 90
+            val gridHeightDp = safeWidgetHeight - if (isCover) 88 else 100
             val rowHeightDp = (gridHeightDp.toFloat() / neededRows.toFloat()).toInt()
 
             val showEv1 = true
             val showEv2 = true
 
-            // Calculate font sizes dynamically using a linear mapping formula
-            val rawEventSp = 8f + ((rowHeightDp - 10) * 0.16f)
-            val rawDateSp = 9f + ((rowHeightDp - 10) * 0.16f)
+            // Calculate font sizes dynamically
+            val rawDateSp = 8.5f + ((rowHeightDp - 10) * 0.15f)
+            val dateSp = rawDateSp.coerceIn(8.5f, 14.0f)
 
-            // Constrain the font sizes between reasonable bounds
-            val eventSp = rawEventSp.coerceIn(8.0f, 13.5f)
-            val dateSp = rawDateSp.coerceIn(9.0f, 14.5f)
+            // Calculate remaining vertical space for event chips to prevent clipping
+            // wrap_content Date view takes about dateSp * 1.2 in dp
+            val dateHeightDp = dateSp * 1.20f
+            val remainingHeightDp = maxOf(rowHeightDp - dateHeightDp, 0f)
+            
+            // Event chips divide the remaining height equally (2 events)
+            val maxEventSp = ((remainingHeightDp / 2f) * 1.1f).coerceAtLeast(7.0f)
+            
+            val rawEventSp = 7.5f + ((rowHeightDp - 10) * 0.15f)
+            val eventSp = rawEventSp.coerceIn(7.5f, 13.0f).coerceAtMost(maxEventSp)
 
             for (row in 0..5) {
                 for (col in 0..6) {
