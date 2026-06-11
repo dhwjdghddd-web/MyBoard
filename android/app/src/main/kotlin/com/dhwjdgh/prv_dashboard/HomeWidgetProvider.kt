@@ -502,47 +502,20 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             Log.d("HomeWidget", "bindCalendarGrid isCover=$isCover w=$widgetWidth h=$widgetHeight neededRows=$neededRows")
             // 행 수와 위젯 높이에 따라 반응형으로 글씨 크기 및 표시 개수 조절
-            val minHeight = if (isCover) 160 else 220
-            val safeWidgetHeight = maxOf(widgetHeight, minHeight)
-            val gridHeightDp = safeWidgetHeight - if (isCover) 80 else 100
+            val safeWidgetHeight = maxOf(widgetHeight, 100)
+            val gridHeightDp = safeWidgetHeight - if (isCover) 70 else 90
             val rowHeightDp = (gridHeightDp.toFloat() / neededRows.toFloat()).toInt()
 
-            val dateSp: Float
-            val eventSp: Float
-            val showEv1: Boolean
-            val showEv2: Boolean
+            val showEv1 = true
+            val showEv2 = true
 
-            if (rowHeightDp < 11) {
-                dateSp = 9.5f
-                eventSp = 8.5f
-                showEv1 = true
-                showEv2 = false
-            } else if (rowHeightDp < 16) {
-                dateSp = 10.0f
-                eventSp = 9.0f
-                showEv1 = true
-                showEv2 = true
-            } else if (rowHeightDp < 22) {
-                dateSp = 11.0f
-                eventSp = 10.0f
-                showEv1 = true
-                showEv2 = true
-            } else if (rowHeightDp < 29) {
-                dateSp = 12.0f
-                eventSp = 11.0f
-                showEv1 = true
-                showEv2 = true
-            } else if (rowHeightDp < 36) {
-                dateSp = 13.0f
-                eventSp = 12.0f
-                showEv1 = true
-                showEv2 = true
-            } else {
-                dateSp = 14.5f
-                eventSp = 13.5f
-                showEv1 = true
-                showEv2 = true
-            }
+            // Calculate font sizes dynamically using a linear mapping formula
+            val rawEventSp = 8f + ((rowHeightDp - 10) * 0.16f)
+            val rawDateSp = 9f + ((rowHeightDp - 10) * 0.16f)
+
+            // Constrain the font sizes between reasonable bounds
+            val eventSp = rawEventSp.coerceIn(8.0f, 13.5f)
+            val dateSp = rawDateSp.coerceIn(9.0f, 14.5f)
 
             for (row in 0..5) {
                 for (col in 0..6) {

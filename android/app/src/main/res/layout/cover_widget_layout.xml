@@ -141,12 +141,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c00_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_01"
@@ -163,12 +167,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c01_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_02"
@@ -185,12 +193,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c02_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_03"
@@ -207,12 +219,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c03_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_04"
@@ -229,12 +245,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c04_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_05"
@@ -251,12 +271,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c05_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_06"
@@ -273,12 +297,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c06_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
@@ -300,12 +328,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c10_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_11"
@@ -322,12 +354,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c11_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_12"
@@ -344,12 +380,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c12_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_13"
@@ -366,12 +406,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c13_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_14"
@@ -388,12 +432,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c14_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_15"
@@ -410,12 +458,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c15_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_16"
@@ -432,12 +484,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c16_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
@@ -459,12 +515,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c20_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_21"
@@ -481,12 +541,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c21_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_22"
@@ -503,12 +567,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c22_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_23"
@@ -525,12 +593,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c23_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_24"
@@ -547,12 +619,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c24_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_25"
@@ -569,12 +645,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c25_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_26"
@@ -591,12 +671,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c26_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
@@ -618,12 +702,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c30_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_31"
@@ -640,12 +728,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c31_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_32"
@@ -662,12 +754,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c32_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_33"
@@ -684,12 +780,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c33_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_34"
@@ -706,12 +806,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c34_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_35"
@@ -728,12 +832,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c35_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_36"
@@ -750,12 +858,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c36_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
@@ -777,12 +889,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c40_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_41"
@@ -799,12 +915,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c41_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_42"
@@ -821,12 +941,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c42_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_43"
@@ -843,12 +967,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c43_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_44"
@@ -865,12 +993,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c44_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_45"
@@ -887,12 +1019,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c45_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_46"
@@ -909,12 +1045,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c46_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
@@ -936,12 +1076,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c50_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_51"
@@ -958,12 +1102,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c51_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_52"
@@ -980,12 +1128,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c52_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_53"
@@ -1002,12 +1154,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c53_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_54"
@@ -1024,12 +1180,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c54_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_55"
@@ -1046,12 +1206,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c55_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/cell_56"
@@ -1068,12 +1232,16 @@
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                     <TextView android:id="@+id/c56_ev2"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center_vertical" android:textSize="12sp"
                         android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
                         android:layout_marginTop="0.5dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+                        android:paddingTop="0.5dp" android:paddingBottom="0.5dp"
+                        android:includeFontPadding="false"
                         android:background="@drawable/event_chip_bg" android:visibility="gone"/>
                 </LinearLayout>
             </LinearLayout>
