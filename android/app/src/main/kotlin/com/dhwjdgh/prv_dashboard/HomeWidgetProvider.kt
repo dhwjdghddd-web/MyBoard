@@ -232,12 +232,19 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         }
                     }
                     else -> {
-                        context.startActivity(
-                            Intent(context, MainActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                putExtra("tab", 0)
-                            }
+                        val activityIntent = Intent(context, MainActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            putExtra("tab", 0)
+                        }
+                        val pendingIntent = PendingIntent.getActivity(
+                            context, 451, activityIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                         )
+                        try {
+                            pendingIntent.send()
+                        } catch (e: Exception) {
+                            context.startActivity(activityIntent)
+                        }
                     }
                 }
             }
@@ -260,13 +267,20 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     }
                     else -> {
                         val emailId = intent.getStringExtra("email_id") ?: ""
-                        context.startActivity(
-                            Intent(context, MainActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                putExtra("tab", 2)
-                                if (emailId.isNotEmpty()) putExtra("email_id", emailId)
-                            }
+                        val activityIntent = Intent(context, MainActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            putExtra("tab", 2)
+                            if (emailId.isNotEmpty()) putExtra("email_id", emailId)
+                        }
+                        val pendingIntent = PendingIntent.getActivity(
+                            context, 351, activityIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                         )
+                        try {
+                            pendingIntent.send()
+                        } catch (e: Exception) {
+                            context.startActivity(activityIntent)
+                        }
                     }
                 }
             }
@@ -714,9 +728,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setRemoteAdapter(R.id.gmail_list_view, Intent(context, gmailSvcClass))
 
                 // Broadcast template → HomeWidgetProvider handles open/delete
-                val template = PendingIntent.getBroadcast(
+                // Activity template → opens MainActivity directly in the foreground
+                val template = PendingIntent.getActivity(
                     context, 350,
-                    Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_GMAIL_ITEM },
+                    Intent(context, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    },
                     PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 views.setPendingIntentTemplate(R.id.gmail_list_view, template)
