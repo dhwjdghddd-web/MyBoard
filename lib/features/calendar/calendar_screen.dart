@@ -52,9 +52,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         titleSpacing: 0,
         actions: [
           TextButton(
-            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 6)),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              foregroundColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
+            ),
             onPressed: () => ref.read(calendarProvider.notifier).goToday(),
-            child: const Text('오늘', style: TextStyle(color: Colors.white)),
+            child: const Text('오늘'),
           ),
           IconButton(
             padding: EdgeInsets.zero,
@@ -461,20 +464,25 @@ class _DayCell extends StatelessWidget {
         for (final item in visible)
           if (item.isTask)
             Padding(
-              padding: const EdgeInsets.fromLTRB(2, 1, 2, 0),
+              padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
               child: Row(children: [
                 Container(width: 5, height: 5, decoration: const BoxDecoration(color: Color(0xFF1A73E8), shape: BoxShape.circle)),
-                const SizedBox(width: 2),
-                Expanded(child: Text(item.title, style: const TextStyle(fontSize: 8, color: Color(0xFF1A73E8)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                const SizedBox(width: 3),
+                Expanded(child: Text(item.title, style: const TextStyle(fontSize: 9.5, color: Color(0xFF1A73E8)), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
             )
           else
             Container(
               width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(2, 1, 2, 0),
-              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-              decoration: BoxDecoration(color: item.color, borderRadius: BorderRadius.circular(2)),
-              child: Text(item.title, style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
+              margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(color: item.color.withOpacity(0.85), borderRadius: BorderRadius.circular(4)),
+              child: Text(
+                item.title,
+                style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
         if (extra > 0)
           Padding(

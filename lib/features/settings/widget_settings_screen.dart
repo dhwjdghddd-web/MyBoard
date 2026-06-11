@@ -43,18 +43,18 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mode = ref.watch(themeModeProvider);
-    final isDark = mode == ThemeMode.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
-    final themeBg = isDark ? const Color(0xFF151524) : null;
-    final themeSurface = isDark ? const Color(0xFF1E1E30) : null;
-    final accentColor = const Color(0xFF82B1FF);
-    final secondaryTextColor = isDark ? const Color(0xFF9090A8) : Colors.grey;
+    final themeBg = theme.scaffoldBackgroundColor;
+    final themeSurface = theme.cardColor;
+    final accentColor = theme.colorScheme.primary;
+    final secondaryTextColor = theme.colorScheme.onSurfaceVariant;
 
     return Scaffold(
       backgroundColor: themeBg,
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF151524) : null,
+        backgroundColor: themeBg,
         title: const Text('설정'),
         actions: [
           IconButton(
@@ -73,7 +73,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
             color: themeSurface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: isDark ? const BorderSide(color: Color(0xFF2E2E44), width: 1) : BorderSide.none,
+              side: BorderSide(color: theme.colorScheme.outlineVariant.withAlpha(120), width: 1),
             ),
             margin: const EdgeInsets.only(bottom: 16),
             child: ListTile(
@@ -159,15 +159,16 @@ class _WidgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeSurface = isDark ? const Color(0xFF1E1E30) : null;
-    final accentColor = const Color(0xFF82B1FF);
-    final secondaryTextColor = isDark ? const Color(0xFF9090A8) : Colors.grey;
+    final theme = Theme.of(context);
+    final themeSurface = theme.cardColor;
+    final accentColor = theme.colorScheme.primary;
+    final secondaryTextColor = theme.colorScheme.onSurfaceVariant;
 
     return Card(
       color: themeSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: isDark ? const BorderSide(color: Color(0xFF2E2E44), width: 1) : BorderSide.none,
+        side: BorderSide(color: theme.colorScheme.outlineVariant.withAlpha(120), width: 1),
       ),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -222,9 +223,9 @@ class _WidgetCard extends StatelessWidget {
                 selected: {manual},
                 onSelectionChanged: (s) => onChanged(s.first),
                 style: SegmentedButton.styleFrom(
-                  selectedBackgroundColor: isDark ? accentColor.withOpacity(0.15) : null,
-                  selectedForegroundColor: isDark ? accentColor : null,
-                  side: isDark ? const BorderSide(color: Color(0xFF2E2E44)) : null,
+                  selectedBackgroundColor: accentColor.withOpacity(0.15),
+                  selectedForegroundColor: accentColor,
+                  side: BorderSide(color: theme.colorScheme.outlineVariant),
                   textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),

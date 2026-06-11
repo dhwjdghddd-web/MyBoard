@@ -4,23 +4,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/api_client.dart';
+import '../../core/theme.dart';
 import 'gmail_service.dart';
 
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
-String _wrapHtml(String body) => '''
+String _wrapHtml(String body, bool isDark) {
+  final bg = isDark ? '#151524' : '#ffffff';
+  final text = isDark ? '#E0E0FF' : '#202124';
+  final link = isDark ? '#82B1FF' : '#1a73e8';
+  final imgOpacity = isDark ? '0.85' : '1.0';
+  final colorScheme = isDark ? 'only dark' : 'only light';
+
+  return '''
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="only light">
+  <meta name="color-scheme" content="$colorScheme">
   <style>
-    :root { color-scheme: only light; }
+    :root { color-scheme: $colorScheme; }
     html, body {
       margin: 0; padding: 0;
-      background: #ffffff !important;
-      color: #202124 !important;
+      background: $bg !important;
+      color: $text !important;
     }
     body {
       padding: 14px;
@@ -30,14 +38,15 @@ String _wrapHtml(String body) => '''
       word-break: break-word;
     }
     * { max-width: 100%; box-sizing: border-box; }
-    img { max-width: 100%; height: auto; }
-    a { color: #1a73e8; }
+    img { max-width: 100%; height: auto; opacity: $imgOpacity; }
+    a { color: $link; }
     pre { white-space: pre-wrap; font-family: inherit; }
   </style>
 </head>
 <body>$body</body>
 </html>
 ''';
+}
 
 class EmailDetailScreen extends ConsumerStatefulWidget {
   const EmailDetailScreen({
@@ -68,7 +77,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
     super.initState();
     _webController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.disabled)
-      ..setBackgroundColor(const Color(0xFFFFFFFF))
+      ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (req) {
           final url = req.url;
@@ -93,12 +102,13 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       final full = data as Map<String, dynamic>;
       final payload = full['payload'] as Map<String, dynamic>? ?? {};
       final body = getEmailBody(payload) ?? '<p style="padding:16px;color:#999">본문이 없습니다</p>';
+      final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
       setState(() {
         _full = full;
         _attachments = getAttachments(payload);
         _loading = false;
       });
-      await _webController.loadHtmlString(_wrapHtml(body));
+      await _webController.loadHtmlString(_wrapHtml(body, isDark));
     } catch (e) {
       setState(() { _error = e.toString(); _loading = false; });
     }
@@ -333,7 +343,7 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.only(top: 2),
       child: RichText(
         text: TextSpan(
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
           children: [
             TextSpan(text: '$label: ', style: const TextStyle(fontWeight: FontWeight.w600)),
             TextSpan(text: value),
@@ -361,7 +371,7 @@ class _ActionBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         minimumSize: const Size(double.infinity, 0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        side: color != null ? BorderSide(color: color!) : null,
+        side: BorderSide(color: color ?? Theme.of(context).colorScheme.outline),
       ),
     );
   }

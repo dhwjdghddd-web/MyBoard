@@ -122,10 +122,10 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
             ? TextField(
                 controller: _searchCtrl,
                 autofocus: true,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
+                style: TextStyle(color: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white),
+                decoration: InputDecoration(
                   hintText: '메일 검색…',
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(color: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withOpacity(0.7)),
                   border: InputBorder.none,
                 ),
                 onSubmitted: (_) => _search(),
@@ -152,9 +152,12 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
           ] else ...[
             if (gmail.isInTrash)
               TextButton(
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 6)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  foregroundColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
+                ),
                 onPressed: _confirmEmptyTrash,
-                child: const Text('비우기', style: TextStyle(color: Colors.white)),
+                child: const Text('비우기'),
               ),
             IconButton(
               padding: EdgeInsets.zero,
@@ -187,8 +190,8 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
             MaterialPageRoute(builder: (_) => const GmailComposeScreen())),
         icon: const Icon(Icons.edit_outlined),
         label: const Text('작성'),
-        backgroundColor: const Color(0xFF4285F4),
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
       ),
       body: Column(children: [
         // 라벨 선택 스트립

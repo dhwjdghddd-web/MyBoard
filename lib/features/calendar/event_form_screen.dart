@@ -173,9 +173,12 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
         actions: [
           TextButton(
             onPressed: _saving ? null : _save,
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
+            ),
             child: _saving
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('저장', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                : const Text('저장', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -381,6 +384,10 @@ class _ColorChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeBorderColor = isDark ? Colors.white : Colors.black87;
+    final activeCheckColor = isDefault ? activeBorderColor : Colors.white;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -389,12 +396,12 @@ class _ColorChip extends StatelessWidget {
           color: isDefault ? Colors.transparent : color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: selected ? Colors.black87 : (isDefault ? Colors.grey : color),
+            color: selected ? activeBorderColor : (isDefault ? Colors.grey : color),
             width: selected ? 3 : (isDefault ? 2 : 0),
           ),
         ),
         child: selected
-            ? Icon(Icons.check, size: 14, color: isDefault ? Colors.black87 : Colors.white)
+            ? Icon(Icons.check, size: 14, color: activeCheckColor)
             : null,
       ),
     );

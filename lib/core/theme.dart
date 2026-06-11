@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const kPrimaryLight = Color(0xFF1A73E8);
-const kPrimaryDark = Color(0xFF8AB4F8);
+const kPrimaryDark = Color(0xFF82B1FF);
 const kBgLight = Color(0xFFF0F2F5);
-const kBgDark = Color(0xFF121212);
+const kBgDark = Color(0xFF151524);
 const kSurfaceLight = Colors.white;
-const kSurfaceDark = Color(0xFF1E1E1E);
+const kSurfaceDark = Color(0xFF1E1E30);
 
 class AppTheme {
   static ThemeData get light => ThemeData(
@@ -46,7 +46,7 @@ class AppTheme {
         ),
         scaffoldBackgroundColor: kBgDark,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1E1E1E),
+          backgroundColor: Color(0xFF151524),
           foregroundColor: Colors.white,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle(
