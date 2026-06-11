@@ -492,7 +492,7 @@ class _DayCell extends StatelessWidget {
               width: double.infinity,
               margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(color: item.color.withOpacity(0.85), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(color: item.color.withOpacity(0.85), borderRadius: BorderRadius.circular(6)),
               child: Text(
                 item.title,
                 style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),

@@ -593,46 +593,50 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         }
 
                         // 2. 일정 바인딩 (최대 2개)
-                        if (showEv1 && titles.isNotEmpty() && ev1Id != 0) {
-                            views.setViewVisibility(ev1Id, View.VISIBLE)
-                            val title = titles[0]
-                            
-                            val ssb = SpannableStringBuilder(title)
-                            ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            views.setTextViewText(ev1Id, ssb)
-                            views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
-                            
-                            val colorStr = colors.getOrNull(0)
-                            val eventColor = try {
-                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
-                            } catch (e: Exception) {
-                                Color.parseColor("#ff4285f4")
+                        if (ev1Id != 0) {
+                            if (titles.isNotEmpty()) {
+                                views.setViewVisibility(ev1Id, View.VISIBLE)
+                                val title = titles[0]
+                                val ssb = SpannableStringBuilder(title)
+                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                views.setTextViewText(ev1Id, ssb)
+                                views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
+                                
+                                val colorStr = colors.getOrNull(0)
+                                val eventColor = try {
+                                    if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
+                                } catch (e: Exception) {
+                                    Color.parseColor("#ff4285f4")
+                                }
+                                views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
+                                views.setTextColor(ev1Id, getContrastColor(eventColor))
+                            } else {
+                                views.setViewVisibility(ev1Id, View.GONE)
                             }
-                            views.setInt(ev1Id, "setBackgroundColor", eventColor)
-                            views.setTextColor(ev1Id, getContrastColor(eventColor))
-                        } else if (ev1Id != 0) {
-                            views.setViewVisibility(ev1Id, View.GONE)
                         }
 
-                        if (showEv2 && titles.size > 1 && ev2Id != 0) {
-                            views.setViewVisibility(ev2Id, View.VISIBLE)
-                            val title = titles[1]
-                            
-                            val ssb = SpannableStringBuilder(title)
-                            ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            views.setTextViewText(ev2Id, ssb)
-                            views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
-                            
-                            val colorStr = colors.getOrNull(1)
-                            val eventColor = try {
-                                if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
-                            } catch (e: Exception) {
-                                Color.parseColor("#ff4285f4")
+                        if (ev2Id != 0) {
+                            if (titles.size > 1) {
+                                views.setViewVisibility(ev2Id, View.VISIBLE)
+                                val title = titles[1]
+                                val ssb = SpannableStringBuilder(title)
+                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                views.setTextViewText(ev2Id, ssb)
+                                views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
+                                
+                                val colorStr = colors.getOrNull(1)
+                                val eventColor = try {
+                                    if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
+                                } catch (e: Exception) {
+                                    Color.parseColor("#ff4285f4")
+                                }
+                                views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
+                                views.setTextColor(ev2Id, getContrastColor(eventColor))
+                            } else if (titles.size == 1) {
+                                views.setViewVisibility(ev2Id, View.INVISIBLE)
+                            } else {
+                                views.setViewVisibility(ev2Id, View.GONE)
                             }
-                            views.setInt(ev2Id, "setBackgroundColor", eventColor)
-                            views.setTextColor(ev2Id, getContrastColor(eventColor))
-                        } else if (ev2Id != 0) {
-                            views.setViewVisibility(ev2Id, View.GONE)
                         }
 
                         // 날짜 탭 → 위젯 내 일정 패널로 전환 (앱 열지 않음)
