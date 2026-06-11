@@ -1371,7 +1371,7 @@
             </LinearLayout>
 
             <!-- 중앙 구분선 (여백) -->
-            <View
+            <FrameLayout
                 android:layout_width="12dp"
                 android:layout_height="match_parent"/>
 
@@ -1434,7 +1434,7 @@
                 </LinearLayout>
 
                 <!-- 섹션 구분 여백 -->
-                <View
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="12dp"/>
 
