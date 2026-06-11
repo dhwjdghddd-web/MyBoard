@@ -335,17 +335,17 @@ class HomeWidgetProvider : AppWidgetProvider() {
             if (activeTab == 0) {
                 views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_active_bg)
             } else {
-                views.setInt(R.id.tab_tasks, "setBackgroundColor", Color.TRANSPARENT)
+                views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_inactive_bg)
             }
             if (activeTab == 1) {
                 views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_active_bg)
             } else {
-                views.setInt(R.id.tab_calendar, "setBackgroundColor", Color.TRANSPARENT)
+                views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_inactive_bg)
             }
             if (activeTab == 2) {
                 views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_active_bg)
             } else {
-                views.setInt(R.id.tab_gmail, "setBackgroundColor", Color.TRANSPARENT)
+                views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_inactive_bg)
             }
 
             views.setOnClickPendingIntent(R.id.tab_tasks,    switchTabIntent(context, 0))
@@ -537,9 +537,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
                         if (parentId != 0) {
                             if (isToday) {
-                                views.setInt(parentId, "setBackgroundResource", R.drawable.today_cell_bg)
+                                views.setInt(parentId, "setBackgroundResource", R.drawable.today_cell_ripple)
                             } else {
-                                views.setInt(parentId, "setBackgroundColor", Color.TRANSPARENT)
+                                views.setInt(parentId, "setBackgroundResource", R.drawable.widget_cell_ripple)
                             }
                         }
 
@@ -549,9 +549,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         if (displayTitles.size > 0 && ev1Id != 0) {
                             views.setViewVisibility(ev1Id, View.VISIBLE)
                             val title = displayTitles[0]
-                            val truncatedTitle = if (title.length > 5) title.substring(0, 5) + ".." else title
                             
-                            val ssb = SpannableStringBuilder(truncatedTitle)
+                            val ssb = SpannableStringBuilder(title)
                             ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                             views.setTextViewText(ev1Id, ssb)
                             views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
@@ -570,9 +569,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         if (displayTitles.size > 1 && ev2Id != 0) {
                             views.setViewVisibility(ev2Id, View.VISIBLE)
                             val title = displayTitles[1]
-                            val truncatedTitle = if (title.length > 5) title.substring(0, 5) + ".." else title
                             
-                            val ssb = SpannableStringBuilder(truncatedTitle)
+                            val ssb = SpannableStringBuilder(title)
                             ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                             views.setTextViewText(ev2Id, ssb)
                             views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)

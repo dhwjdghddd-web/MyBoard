@@ -31,10 +31,12 @@
                 android:textColor="#FFFFFF"/>
             <ImageView android:id="@+id/task_launch_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"/>
+                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             <ImageView android:id="@+id/task_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"/>
+                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
         </LinearLayout>
 
         <ListView android:id="@+id/task_list_view"
@@ -47,15 +49,19 @@
 
         <TextView android:id="@+id/task_empty"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="태스크 없음" android:textSize="11sp" android:textColor="#606070"
-            android:gravity="center" android:paddingTop="6dp" android:visibility="gone"/>
+            android:text="태스크 없음" android:textSize="15sp" android:textColor="#A0A0B0"
+            android:gravity="center" android:paddingTop="12dp" android:visibility="gone"/>
 
         <TextView android:id="@+id/task_add_btn"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="＋  할 일 추가" android:textSize="11sp" android:textColor="#82B1FF"
             android:gravity="center"
-            android:paddingTop="6dp" android:paddingBottom="6dp"
-            android:layout_marginTop="4dp" android:layout_marginBottom="2dp"/>
+            android:paddingTop="8dp" android:paddingBottom="8dp"
+            android:layout_marginTop="6dp" android:layout_marginBottom="4dp"
+            android:layout_marginStart="12dp" android:layout_marginEnd="12dp"
+            android:background="@drawable/task_add_btn_bg"
+            android:clickable="true"
+            android:focusable="true"/>
     </LinearLayout>
 
     <!-- ══════════════ 캘린더 섹션 ══════════════ -->
@@ -74,23 +80,28 @@
                 android:paddingStart="4dp" android:paddingEnd="4dp">
                 <ImageView android:id="@+id/cal_prev"
                     android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp"/>
+                    android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <TextView android:id="@+id/cal_month_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="6월" android:textSize="13sp" android:textStyle="bold"
                     android:textColor="#FFFFFF" android:gravity="center"/>
                 <ImageView android:id="@+id/cal_next"
                     android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp"/>
+                    android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <ImageView android:id="@+id/cal_launch_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"/>
+                    android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <ImageView android:id="@+id/cal_refresh_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"/>
+                    android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <ImageView android:id="@+id/cal_add_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"/>
+                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             </LinearLayout>
 
             <!-- 요일 헤더 -->
@@ -119,7 +130,8 @@
                 <LinearLayout android:id="@+id/cell_00"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c00"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -140,7 +152,8 @@
                 <LinearLayout android:id="@+id/cell_01"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c01"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -161,7 +174,8 @@
                 <LinearLayout android:id="@+id/cell_02"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c02"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -182,7 +196,8 @@
                 <LinearLayout android:id="@+id/cell_03"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c03"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -203,7 +218,8 @@
                 <LinearLayout android:id="@+id/cell_04"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c04"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -224,7 +240,8 @@
                 <LinearLayout android:id="@+id/cell_05"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c05"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -245,7 +262,8 @@
                 <LinearLayout android:id="@+id/cell_06"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c06"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -271,7 +289,8 @@
                 <LinearLayout android:id="@+id/cell_10"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c10"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -292,7 +311,8 @@
                 <LinearLayout android:id="@+id/cell_11"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c11"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -313,7 +333,8 @@
                 <LinearLayout android:id="@+id/cell_12"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c12"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -334,7 +355,8 @@
                 <LinearLayout android:id="@+id/cell_13"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c13"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -355,7 +377,8 @@
                 <LinearLayout android:id="@+id/cell_14"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c14"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -376,7 +399,8 @@
                 <LinearLayout android:id="@+id/cell_15"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c15"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -397,7 +421,8 @@
                 <LinearLayout android:id="@+id/cell_16"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c16"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -423,7 +448,8 @@
                 <LinearLayout android:id="@+id/cell_20"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c20"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -444,7 +470,8 @@
                 <LinearLayout android:id="@+id/cell_21"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c21"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -465,7 +492,8 @@
                 <LinearLayout android:id="@+id/cell_22"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c22"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -486,7 +514,8 @@
                 <LinearLayout android:id="@+id/cell_23"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c23"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -507,7 +536,8 @@
                 <LinearLayout android:id="@+id/cell_24"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c24"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -528,7 +558,8 @@
                 <LinearLayout android:id="@+id/cell_25"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c25"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -549,7 +580,8 @@
                 <LinearLayout android:id="@+id/cell_26"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c26"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -575,7 +607,8 @@
                 <LinearLayout android:id="@+id/cell_30"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c30"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -596,7 +629,8 @@
                 <LinearLayout android:id="@+id/cell_31"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c31"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -617,7 +651,8 @@
                 <LinearLayout android:id="@+id/cell_32"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c32"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -638,7 +673,8 @@
                 <LinearLayout android:id="@+id/cell_33"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c33"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -659,7 +695,8 @@
                 <LinearLayout android:id="@+id/cell_34"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c34"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -680,7 +717,8 @@
                 <LinearLayout android:id="@+id/cell_35"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c35"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -701,7 +739,8 @@
                 <LinearLayout android:id="@+id/cell_36"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c36"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -727,7 +766,8 @@
                 <LinearLayout android:id="@+id/cell_40"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c40"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -748,7 +788,8 @@
                 <LinearLayout android:id="@+id/cell_41"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c41"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -769,7 +810,8 @@
                 <LinearLayout android:id="@+id/cell_42"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c42"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -790,7 +832,8 @@
                 <LinearLayout android:id="@+id/cell_43"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c43"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -811,7 +854,8 @@
                 <LinearLayout android:id="@+id/cell_44"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c44"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -832,7 +876,8 @@
                 <LinearLayout android:id="@+id/cell_45"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c45"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -853,7 +898,8 @@
                 <LinearLayout android:id="@+id/cell_46"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c46"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -879,7 +925,8 @@
                 <LinearLayout android:id="@+id/cell_50"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c50"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -900,7 +947,8 @@
                 <LinearLayout android:id="@+id/cell_51"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c51"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -921,7 +969,8 @@
                 <LinearLayout android:id="@+id/cell_52"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c52"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -942,7 +991,8 @@
                 <LinearLayout android:id="@+id/cell_53"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c53"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -963,7 +1013,8 @@
                 <LinearLayout android:id="@+id/cell_54"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c54"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -984,7 +1035,8 @@
                 <LinearLayout android:id="@+id/cell_55"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c55"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -1005,7 +1057,8 @@
                 <LinearLayout android:id="@+id/cell_56"
                     android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                     android:orientation="vertical" android:gravity="top|center_horizontal"
-                    android:padding="0.5dp">
+                    android:padding="0.5dp"
+                    android:background="@drawable/widget_cell_ripple">
                     <TextView android:id="@+id/c56"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
@@ -1037,14 +1090,16 @@
                 android:paddingBottom="6dp">
                 <ImageView android:id="@+id/cal_back_btn"
                     android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp"/>
+                    android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <TextView android:id="@+id/cal_day_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="" android:textSize="13sp" android:textStyle="bold"
                     android:textColor="#FFFFFF" android:paddingStart="4dp"/>
                 <ImageView android:id="@+id/cal_day_add_btn"
                     android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"/>
+                    android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
+                    android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             </LinearLayout>
 
             <!-- 일정 행 0 -->
@@ -1113,8 +1168,8 @@
 
             <TextView android:id="@+id/cal_day_empty"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="이 날 일정이 없어요" android:textSize="11sp" android:textColor="#606070"
-                android:gravity="center" android:paddingTop="12dp" android:visibility="gone"/>
+                android:text="이 날 일정이 없어요" android:textSize="15sp" android:textColor="#A0A0B0"
+                android:gravity="center" android:paddingTop="16dp" android:visibility="gone"/>
             <!-- 빈 공간: 오른쪽 스와이프 → 월 달력으로 이동 -->
             <FrameLayout android:id="@+id/cal_day_swipe_back"
                 android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
@@ -1135,13 +1190,16 @@
                 android:textColor="#FFFFFF"/>
             <ImageView android:id="@+id/gmail_launch_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"/>
+                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             <ImageView android:id="@+id/gmail_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"/>
+                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             <ImageView android:id="@+id/gmail_compose_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp"/>
+                android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp"
+                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
         </LinearLayout>
 
         <!-- Gmail 리스트뷰 -->
@@ -1153,7 +1211,7 @@
 
         <TextView android:id="@+id/gmail_empty"
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:text="새 메일 없음" android:textSize="11sp" android:textColor="#606070"
+            android:text="새 메일 없음" android:textSize="15sp" android:textColor="#A0A0B0"
             android:gravity="center" android:visibility="gone"/>
 
         <!-- 하단 스와이프 존: 좌우로 탭 이동 -->
