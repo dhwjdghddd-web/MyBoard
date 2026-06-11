@@ -502,8 +502,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             Log.d("HomeWidget", "bindCalendarGrid isCover=$isCover w=$widgetWidth h=$widgetHeight neededRows=$neededRows")
             // 행 수와 위젯 높이에 따라 반응형으로 글씨 크기 및 표시 개수 조절
-            val safeWidgetHeight = maxOf(widgetHeight, 150)
-            val gridHeightDp = safeWidgetHeight - if (isCover) 85 else 105
+            val minHeight = if (isCover) 160 else 220
+            val safeWidgetHeight = maxOf(widgetHeight, minHeight)
+            val gridHeightDp = safeWidgetHeight - if (isCover) 80 else 100
             val rowHeightDp = (gridHeightDp.toFloat() / neededRows.toFloat()).toInt()
 
             val dateSp: Float
@@ -511,29 +512,29 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val showEv1: Boolean
             val showEv2: Boolean
 
-            if (rowHeightDp < 14) {
+            if (rowHeightDp < 11) {
                 dateSp = 9.5f
                 eventSp = 8.5f
                 showEv1 = true
                 showEv2 = false
-            } else if (rowHeightDp < 19) {
-                dateSp = 10.5f
-                eventSp = 9.5f
-                showEv1 = true
-                showEv2 = false
-            } else if (rowHeightDp < 24) {
-                dateSp = 11.5f
-                eventSp = 10.5f
+            } else if (rowHeightDp < 16) {
+                dateSp = 10.0f
+                eventSp = 9.0f
                 showEv1 = true
                 showEv2 = true
-            } else if (rowHeightDp < 30) {
-                dateSp = 12.5f
-                eventSp = 11.5f
+            } else if (rowHeightDp < 22) {
+                dateSp = 11.0f
+                eventSp = 10.0f
                 showEv1 = true
                 showEv2 = true
-            } else if (rowHeightDp < 38) {
-                dateSp = 13.5f
-                eventSp = 12.5f
+            } else if (rowHeightDp < 29) {
+                dateSp = 12.0f
+                eventSp = 11.0f
+                showEv1 = true
+                showEv2 = true
+            } else if (rowHeightDp < 36) {
+                dateSp = 13.0f
+                eventSp = 12.0f
                 showEv1 = true
                 showEv2 = true
             } else {
