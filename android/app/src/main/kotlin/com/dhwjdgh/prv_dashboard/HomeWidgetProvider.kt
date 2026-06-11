@@ -605,22 +605,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                 } catch (e: Exception) {
                                     Color.parseColor("#ff4285f4")
                                 }
-                                val time = times.getOrNull(0) ?: ""
-                                val isAllDay = time == "종일"
 
-                                val displayText = if (!isAllDay && time.isNotEmpty()) "$time $title" else title
-                                val ssb = SpannableStringBuilder(displayText)
+                                val ssb = SpannableStringBuilder(title)
                                 ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 views.setTextViewText(ev1Id, ssb)
                                 views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
 
-                                if (isAllDay) {
-                                    views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
-                                    views.setTextColor(ev1Id, getContrastColor(eventColor))
-                                } else {
-                                    views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(Color.TRANSPARENT))
-                                    views.setTextColor(ev1Id, eventColor)
-                                }
+                                views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
+                                views.setTextColor(ev1Id, getContrastColor(eventColor))
                             } else {
                                 views.setViewVisibility(ev1Id, View.GONE)
                             }
@@ -636,22 +628,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                 } catch (e: Exception) {
                                     Color.parseColor("#ff4285f4")
                                 }
-                                val time = times.getOrNull(1) ?: ""
-                                val isAllDay = time == "종일"
 
-                                val displayText = if (!isAllDay && time.isNotEmpty()) "$time $title" else title
-                                val ssb = SpannableStringBuilder(displayText)
+                                val ssb = SpannableStringBuilder(title)
                                 ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 views.setTextViewText(ev2Id, ssb)
                                 views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
 
-                                if (isAllDay) {
-                                    views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
-                                    views.setTextColor(ev2Id, getContrastColor(eventColor))
-                                } else {
-                                    views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(Color.TRANSPARENT))
-                                    views.setTextColor(ev2Id, eventColor)
-                                }
+                                views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
+                                views.setTextColor(ev2Id, getContrastColor(eventColor))
                             } else if (titles.size == 1) {
                                 views.setViewVisibility(ev2Id, View.INVISIBLE)
                             } else {
