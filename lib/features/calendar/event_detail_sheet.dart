@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'calendar_service.dart';
 import 'event_form_screen.dart';
+import '../tasks/task_service.dart';
 
 class EventDetailSheet extends ConsumerWidget {
   const EventDetailSheet({
     super.key,
     required this.dateKey,
     required this.events,
+    required this.tasks,
   });
 
   final String dateKey;
   final List<CalendarEvent> events;
+  final List<Task> tasks;
 
   String _dateLabel() {
     final parts = dateKey.split('-');
@@ -71,9 +74,9 @@ class EventDetailSheet extends ConsumerWidget {
               ),
             ),
             const Divider(height: 1),
-            // 이벤트 목록
+            // 이벤트/태스크 목록
             Expanded(
-              child: events.isEmpty
+              child: (events.isEmpty && tasks.isEmpty)
                   ? Center(
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Icon(Icons.event_available, size: 48, color: Colors.grey[300]),
@@ -83,32 +86,40 @@ class EventDetailSheet extends ConsumerWidget {
                     )
                   : ListView.builder(
                       controller: ctrl,
-                      itemCount: events.length,
-                      itemBuilder: (_, i) => _EventCard(
-                        event: events[i],
-                        onEdit: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EventFormScreen(
-                                initialDateKey: dateKey,
-                                event: events[i],
-                              ),
-                            ),
+                      itemCount: events.length + tasks.length,
+                      itemBuilder: (_, i) {
+                        if (i < events.length) {
+                          final event = events[i];
+                          return _EventCard(
+                            event: event,
+                            onEdit: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EventFormScreen(
+                                    initialDateKey: dateKey,
+                                    event: event,
+                                  ),
+                                ),
+                              );
+                            },
+                            onDelete: () async {
+                              Navigator.pop(context);
+                              await ref.read(calendarProvider.notifier).deleteEvent(
+                                    event.calendarId, event.id);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('일정이 삭제되었습니다')),
+                                );
+                              }
+                            },
                           );
-                        },
-                        onDelete: () async {
-                          Navigator.pop(context);
-                          await ref.read(calendarProvider.notifier).deleteEvent(
-                                events[i].calendarId, events[i].id);
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('일정이 삭제되었습니다')),
-                            );
-                          }
-                        },
-                      ),
+                        } else {
+                          final task = tasks[i - events.length];
+                          return _TaskCard(task: task);
+                        }
+                      },
                     ),
             ),
           ],
@@ -204,5 +215,99 @@ class _EventCard extends StatelessWidget {
     if (dt == null) return '';
     final l = dt.toLocal();
     return '${l.hour.toString().padLeft(2,'0')}:${l.minute.toString().padLeft(2,'0')}';
+  }
+}
+
+class _TaskCard extends ConsumerWidget {
+  const _TaskCard({required this.task});
+  final Task task;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A73E8).withAlpha(30),
+        border: const Border(left: BorderSide(color: Color(0xFF1A73E8), width: 4)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  task.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color: const Color(0xFF1A73E8),
+                ),
+                onPressed: () {
+                  ref.read(taskServiceProvider.notifier).toggleComplete(task);
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  task.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                    color: task.isCompleted ? Colors.grey : null,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Text('할 일', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Spacer(),
+              IconButton(
+                icon: Icon(Icons.delete, size: 14, color: Colors.red[400]),
+                onPressed: () => _confirmDelete(context, ref),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+          if (task.notes?.isNotEmpty == true)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(task.notes!, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('할 일 삭제'),
+        content: Text('"${task.title}"을 삭제할까요?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await ref.read(taskServiceProvider.notifier).deleteTask(task.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('할 일이 삭제되었습니다')),
+        );
+      }
+    }
   }
 }
