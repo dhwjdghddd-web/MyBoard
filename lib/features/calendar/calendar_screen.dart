@@ -598,48 +598,58 @@ class _DayCell extends StatelessWidget {
             ),
           ),
         ),
-        for (final item in visible)
-          if (item.isTask)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(text: '● ', style: TextStyle(color: Color(0xFF1A73E8), fontWeight: FontWeight.bold)),
-                    TextSpan(text: item.title),
-                  ],
-                ),
-                style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            )
-          else
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: Text(
-                item.title,
-                style: const TextStyle(
-                  fontSize: 9.5,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+        Expanded(
+          child: ClipRect(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final item in visible)
+                  if (item.isTask)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            const TextSpan(text: '● ', style: TextStyle(color: Color(0xFF1A73E8), fontWeight: FontWeight.bold)),
+                            TextSpan(text: item.title),
+                          ],
+                        ),
+                        style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  else
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: item.color,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                if (extra > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 3),
+                    child: Text('+$extra', style: TextStyle(fontSize: 8, color: scheme.onSurfaceVariant)),
+                  ),
+              ],
             ),
-        if (extra > 0)
-          Padding(
-            padding: const EdgeInsets.only(left: 3),
-            child: Text('+$extra', style: TextStyle(fontSize: 8, color: scheme.onSurfaceVariant)),
           ),
+        ),
       ]),
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,7 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 
 class ApiClient {
   late final Dio _dio;
-  bool _isRefreshing = false;
+  Completer<String?>? _refreshCompleter;
 
   ApiClient({
     required Future<String?> Function() getToken,
@@ -36,15 +37,28 @@ class ApiClient {
           handler.next(options);
         },
         onError: (err, handler) async {
-          if (err.response?.statusCode == 401 && !_isRefreshing) {
-            _isRefreshing = true;
+          if (err.response?.statusCode == 401) {
             String? newToken;
-            try {
-              newToken = await getToken();
-            } catch (e) {
-              debugPrint('토큰 갱신 요청 실패: $e');
-            } finally {
-              _isRefreshing = false;
+            if (_refreshCompleter != null) {
+              // 다른 요청이 이미 토큰 갱신 중 — 완료될 때까지 대기
+              try {
+                newToken = await _refreshCompleter!.future;
+              } catch (_) {
+                newToken = null;
+              }
+            } else {
+              // 첫 번째 401 — 토큰 갱신 시작
+              _refreshCompleter = Completer<String?>();
+              try {
+                newToken = await getToken();
+                _refreshCompleter!.complete(newToken);
+              } catch (e) {
+                debugPrint('토큰 갱신 요청 실패: $e');
+                _refreshCompleter!.completeError(e);
+                newToken = null;
+              } finally {
+                _refreshCompleter = null;
+              }
             }
 
             if (newToken != null) {
