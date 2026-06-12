@@ -909,7 +909,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
 
             data class DayRow(val row: Int, val time: Int, val title: Int, val colorBar: Int)
-            val maxRowsCount = if (isTablet) 12 else 4
+            val maxRowsCount = if (isTablet) 12 else 8
             val dayRows = mutableListOf<DayRow>()
             for (i in 0 until maxRowsCount) {
                 val rowId = context.resources.getIdentifier("cal_day_row_$i", "id", context.packageName)
