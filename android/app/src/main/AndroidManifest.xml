@@ -74,7 +74,7 @@
             android:theme="@style/Theme.AppCompat.Dialog.Alert"
             android:taskAffinity=""
             android:excludeFromRecents="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <service
             android:name=".TaskWidgetService"

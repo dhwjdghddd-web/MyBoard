@@ -98,7 +98,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
 
       final tab = await _channel.invokeMethod<int>('getInitialTab') ?? -1;
       if (tab >= 0 && mounted) setState(() => _index = tab);
-    } catch (_) {}
+    } catch (e) { debugPrint('초기 인텐트 처리 실패: $e'); }
   }
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {

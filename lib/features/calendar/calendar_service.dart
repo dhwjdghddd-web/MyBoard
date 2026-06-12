@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -238,7 +239,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       }).toList();
 
       state = state.copyWith(eventColorMap: eventMap, calendars: calendars);
-    } catch (_) {}
+    } catch (e) { debugPrint('캘린더 색상 로드 실패: $e'); }
   }
 
   Future<void> loadEvents() async {
@@ -269,7 +270,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
               calColor: cal.color, eventColorMap: state.eventColorMap,
             ));
           }
-        } catch (_) {}
+        } catch (e) { debugPrint('캘린더 이벤트 로드 실패 (${cal.id}): $e'); }
       }
 
       events.sort((a, b) {

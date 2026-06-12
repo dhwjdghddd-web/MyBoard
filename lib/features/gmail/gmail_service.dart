@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
 import '../../core/widget_service.dart';
@@ -24,7 +25,8 @@ DateTime? parseEmailDate(String raw) {
     final t = parts[3].split(':');
     if (month == null) return null;
     return DateTime(year, month, day, int.tryParse(t[0]) ?? 0, int.tryParse(t.length > 1 ? t[1] : '0') ?? 0);
-  } catch (_) {
+  } catch (e) {
+    debugPrint('Gmail 날짜 파싱 실패: $e');
     return DateTime.tryParse(raw);
   }
 }
@@ -46,7 +48,8 @@ String decodeBase64Body(String data) {
     final normalized = base64Url.normalize(data);
     final bytes = base64Url.decode(normalized);
     return utf8.decode(bytes, allowMalformed: true);
-  } catch (_) {
+  } catch (e) {
+    debugPrint('Base64 디코딩 실패: $e');
     return '';
   }
 }
@@ -330,7 +333,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
       try {
         final data = await _api.get('$_base/labels/$lbl');
         counts[lbl] = (data['messagesUnread'] as int?) ?? 0;
-      } catch (_) {}
+      } catch (e) { debugPrint('라벨 카운트 로드 실패 ($lbl): $e'); }
     }
     state = state.copyWith(labelCounts: counts);
   }
@@ -360,7 +363,8 @@ class GmailNotifier extends StateNotifier<GmailState> {
     try {
       await _api.post('$_base/messages/$id/trash');
       await loadLabelCounts();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('메시지 삭제 실패: $e');
       state = state.copyWith(messages: prev);
       if (state.label == 'INBOX') {
         WidgetService.updateGmail(prev);
@@ -374,7 +378,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
       await _api.post('$_base/messages/$id/modify',
           body: {'removeLabelIds': ['UNREAD']});
       await loadLabelCounts();
-    } catch (_) {}
+    } catch (e) { debugPrint('읽음 처리 실패: $e'); }
   }
 
   Future<void> markSpam(String id) async {
@@ -383,7 +387,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
           body: {'addLabelIds': ['SPAM'], 'removeLabelIds': ['INBOX']});
       await loadMessages();
       await loadLabelCounts();
-    } catch (_) {}
+    } catch (e) { debugPrint('스팸 처리 실패: $e'); }
   }
 
   Future<void> unmarkSpam(String id) async {
@@ -392,7 +396,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
           body: {'removeLabelIds': ['SPAM'], 'addLabelIds': ['INBOX']});
       await loadMessages();
       await loadLabelCounts();
-    } catch (_) {}
+    } catch (e) { debugPrint('스팸 해제 실패: $e'); }
   }
 
   Future<void> toggleStar(String id, bool isStarred) async {
@@ -402,7 +406,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
     _updateLabels(id, add: isStarred ? [] : ['STARRED'], remove: isStarred ? ['STARRED'] : []);
     try {
       await _api.post('$_base/messages/$id/modify', body: body);
-    } catch (_) {}
+    } catch (e) { debugPrint('스타 토글 실패: $e'); }
   }
 
   Future<void> batchDelete(List<String> ids) async {
@@ -435,7 +439,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
         selectedIds: {},
       );
       await loadLabelCounts();
-    } catch (_) {}
+    } catch (e) { debugPrint('일괄 읽음 처리 실패: $e'); }
   }
 
   Future<void> emptyTrash() async {

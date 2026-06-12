@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -44,8 +45,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
       final auth = await user.authentication;
       if (auth.accessToken != null) {
         await _storage.write(key: 'access_token', value: auth.accessToken!);
+        // 토큰 캐시 시간 기록 (Google 토큰은 보통 1시간 유효)
+        await _storage.write(
+          key: 'access_token_cached_at',
+          value: DateTime.now().millisecondsSinceEpoch.toString(),
+        );
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('토큰 캐시 실패: $e');
+    }
   }
 
   Future<void> signIn() async {
@@ -59,6 +67,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'access_token_cached_at');
     state = const AsyncValue.data(null);
   }
 
@@ -68,7 +77,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
     try {
       final auth = await user.authentication;
       return auth.accessToken;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('토큰 갱신 실패: $e');
       return null;
     }
   }

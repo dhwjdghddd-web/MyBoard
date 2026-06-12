@@ -62,7 +62,8 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
     final ids = ref.read(gmailProvider).selectedIds.toList();
     try {
       await ref.read(gmailProvider.notifier).batchDelete(ids);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('일괄 삭제 실패: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('이미 휴지통에 있습니다. 30일 후 자동 삭제됩니다.'),
@@ -89,7 +90,8 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
     if (ok != true || !mounted) return;
     try {
       await ref.read(gmailProvider.notifier).emptyTrash();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('휴지통 비우기 실패: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('휴지통 비우기는 추가 권한이 필요합니다. Gmail 앱을 이용해주세요.'),

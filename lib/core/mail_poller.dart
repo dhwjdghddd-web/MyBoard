@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'api_client.dart';
 import 'notification_service.dart';
 
@@ -40,8 +41,8 @@ class MailPoller {
         await onNewMail?.call();
       }
       _lastUnread = unread;
-    } catch (_) {
-      // 네트워크 오류나 401(토큰 만료)는 무시
+    } catch (e) {
+      debugPrint('메일 폴링 실패: $e');
     }
   }
 
@@ -71,7 +72,9 @@ class MailPoller {
           from = match?.group(1)?.trim() ?? raw;
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('발신자 정보 조회 실패: $e');
+    }
 
     await NotificationService.showMailNotification(newCount: newCount, from: from);
   }

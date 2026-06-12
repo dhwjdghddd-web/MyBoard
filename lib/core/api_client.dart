@@ -41,8 +41,8 @@ class ApiClient {
             String? newToken;
             try {
               newToken = await getToken();
-            } catch (_) {
-              // ignore
+            } catch (e) {
+              debugPrint('토큰 갱신 요청 실패: $e');
             } finally {
               _isRefreshing = false;
             }
@@ -53,11 +53,12 @@ class ApiClient {
                 final response = await _dio.fetch(err.requestOptions);
                 handler.resolve(response);
                 return;
-              } catch (_) {
-                // ignore
+              } catch (e) {
+                debugPrint('재시도 요청 실패: $e');
               }
             }
             // 갱신 실패 → 로그아웃 유도
+            debugPrint('인증 토큰 갱신 실패 — 자동 로그아웃');
             onAuthError();
           }
           handler.next(err);

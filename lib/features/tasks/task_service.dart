@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
 import '../../core/widget_service.dart';
@@ -90,7 +91,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
           try {
             final task = sorted.firstWhere((t) => t.id == taskId && !t.isCompleted);
             await toggleComplete(task);
-          } catch (_) {}
+          } catch (e) { debugPrint('위젯 완료 동기화 실패: $e'); }
         }
       }
     } catch (e, st) {
@@ -133,7 +134,8 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     try {
       await _api.patch('$_base/lists/$_listId/tasks/${task.id}', body: body);
       WidgetService.updateTasks(state.value ?? []);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('태스크 상태 변경 실패: $e');
       state = AsyncValue.data(_sorted(current)); // 실패 시 원복
     }
   }
@@ -148,7 +150,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
         try {
           final task = current.firstWhere((t) => t.id == taskId && !t.isCompleted);
           await toggleComplete(task);
-        } catch (_) {}
+        } catch (e) { debugPrint('태스크 완료 동기화 실패: $e'); }
       }
     }
 
@@ -157,7 +159,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     if (deletions.isNotEmpty) {
       await WidgetService.clearPendingDeletions();
       for (final taskId in deletions) {
-        try { await deleteTask(taskId); } catch (_) {}
+        try { await deleteTask(taskId); } catch (e) { debugPrint('태스크 삭제 실패: $e'); }
       }
     }
 
@@ -166,7 +168,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     if (newTasks.isNotEmpty) {
       await WidgetService.clearPendingNewTasks();
       for (final title in newTasks) {
-        try { await addTask(title); } catch (_) {}
+        try { await addTask(title); } catch (e) { debugPrint('태스크 추가 실패: $e'); }
       }
     }
 
@@ -182,7 +184,8 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     try {
       await _api.delete('$_base/lists/$_listId/tasks/$taskId');
       WidgetService.updateTasks(state.value ?? []);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('태스크 삭제 API 실패: $e');
       state = AsyncValue.data(current); // 실패 시 원복
     }
   }

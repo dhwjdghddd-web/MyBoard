@@ -31,7 +31,8 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
         _widgets = raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         _loading = false;
       });
-    } catch (_) {
+    } catch (e) {
+      debugPrint('위젯 설정 로드 실패: $e');
       setState(() => _loading = false);
     }
   }
@@ -40,14 +41,14 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
     try {
       await _channel.invokeMethod('setWidgetConfig', {'id': id, 'setting': setting});
       await _loadConfigs();
-    } catch (_) {}
+    } catch (e) { debugPrint('위젯 설정 변경 실패: $e'); }
   }
 
   Future<void> _setTheme(int id, String theme) async {
     try {
       await _channel.invokeMethod('setWidgetTheme', {'id': id, 'theme': theme});
       await _loadConfigs();
-    } catch (_) {}
+    } catch (e) { debugPrint('위젯 테마 변경 실패: $e'); }
   }
 
   void _showPrivacyPolicy(BuildContext context, bool isDark) {
