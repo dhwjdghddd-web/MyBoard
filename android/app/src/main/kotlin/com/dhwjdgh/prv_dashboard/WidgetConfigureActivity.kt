@@ -13,6 +13,7 @@ class WidgetConfigureActivity : AppCompatActivity() {
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        supportRequestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
 
         widgetId = intent.extras?.getInt(
@@ -29,6 +30,7 @@ class WidgetConfigureActivity : AppCompatActivity() {
         // 유저가 뒤로가면 위젯 추가 취소
         setResult(RESULT_CANCELED, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
         setContentView(R.layout.widget_configure_layout)
+        window.setBackgroundDrawableResource(android.R.color.transparent)
 
         val prefs = getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val existing = prefs.getString("widget_cover_manual_$widgetId", "auto") ?: "auto"
