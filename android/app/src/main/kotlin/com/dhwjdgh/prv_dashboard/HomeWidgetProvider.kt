@@ -349,8 +349,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             val views     = RemoteViews(context.packageName, layoutId)
 
-            // 최외각 FrameLayout 배경 설정
-            views.setInt(R.id.widget_root, "setBackgroundResource", if (isDark) R.drawable.widget_background else R.drawable.widget_background_light)
+            // 최외각 LinearLayout 배경 설정
+            views.setInt(R.id.widget_container, "setBackgroundResource", if (isDark) R.drawable.widget_background else R.drawable.widget_background_light)
 
             // 설정 톱니바퀴 아이콘 틴트 컬러 오버라이드
             val cogColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
