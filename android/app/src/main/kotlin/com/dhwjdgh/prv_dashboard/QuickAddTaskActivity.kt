@@ -88,7 +88,7 @@ class QuickAddTaskActivity : AppCompatActivity() {
 
             if (result.code == 401 && gAccount != null && gAccount.account != null) {
                 try {
-                    com.google.android.gms.auth.GoogleAuthUtil.invalidateToken(this, token)
+                    TokenManager.invalidateToken(this, token)
                 } catch (_: Exception) {}
 
                 token = fetchFreshToken(gAccount.account!!)
@@ -111,14 +111,11 @@ class QuickAddTaskActivity : AppCompatActivity() {
 
     private fun fetchFreshToken(account: android.accounts.Account): String? {
         return try {
-            val scopesStr = "oauth2:https://www.googleapis.com/auth/tasks"
-            val freshToken = com.google.android.gms.auth.GoogleAuthUtil.getToken(
-                this,
-                account,
-                scopesStr
+            val freshToken = TokenManager.fetchFreshToken(
+                this, "oauth2:https://www.googleapis.com/auth/tasks"
             )
             if (!freshToken.isNullOrEmpty()) {
-                writeToken(freshToken)
+                TokenManager.writeCachedToken(this, freshToken)
             }
             freshToken
         } catch (e: Exception) {
@@ -159,29 +156,11 @@ class QuickAddTaskActivity : AppCompatActivity() {
     }
 
     private fun writeToken(newToken: String) {
-        try {
-            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-            EncryptedSharedPreferences.create(
-                "FlutterSecureStorage",
-                masterKeyAlias,
-                this,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            ).edit().putString("VGtWcmJHbHVaMjl1_access_token", newToken).apply()
-        } catch (_: Exception) {}
+        TokenManager.writeCachedToken(this, newToken)
     }
 
     private fun readToken(): String? {
-        return try {
-            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-            EncryptedSharedPreferences.create(
-                "FlutterSecureStorage",
-                masterKeyAlias,
-                this,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            ).getString("VGtWcmJHbHVaMjl1_access_token", null)
-        } catch (_: Exception) { null }
+        return TokenManager.readCachedToken(this)
     }
 
     private fun pushToWidget(title: String, newId: String) {

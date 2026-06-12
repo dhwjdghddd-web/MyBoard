@@ -6,9 +6,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.util.Log
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -202,43 +199,45 @@ class TasksSyncJobService : JobService() {
         }
 
         private fun doRequest(token: String, url: URL, method: String, body: String? = null): String? {
-            val conn = url.openConnection() as HttpURLConnection
-            
-            if (method == "PATCH") {
-                try {
-                    conn.requestMethod = "PATCH"
-                } catch (e: ProtocolException) {
-                    conn.requestMethod = "POST"
-                    conn.setRequestProperty("X-HTTP-Method-Override", "PATCH")
+            var conn: HttpURLConnection? = null
+            return try {
+                conn = url.openConnection() as HttpURLConnection
+                
+                if (method == "PATCH") {
+                    try {
+                        conn.requestMethod = "PATCH"
+                    } catch (e: ProtocolException) {
+                        conn.requestMethod = "POST"
+                        conn.setRequestProperty("X-HTTP-Method-Override", "PATCH")
+                    }
+                } else {
+                    conn.requestMethod = method
                 }
-            } else {
-                conn.requestMethod = method
-            }
 
-            conn.setRequestProperty("Authorization", "Bearer $token")
-            conn.connectTimeout = 15_000
-            conn.readTimeout    = 15_000
+                conn.setRequestProperty("Authorization", "Bearer $token")
+                conn.connectTimeout = 15_000
+                conn.readTimeout    = 15_000
 
-            if (body != null) {
-                conn.setRequestProperty("Content-Type", "application/json; utf-8")
-                conn.doOutput = true
-                conn.outputStream.use { os ->
-                    val input = body.toByteArray(charset("utf-8"))
-                    os.write(input, 0, input.size)
+                if (body != null) {
+                    conn.setRequestProperty("Content-Type", "application/json; utf-8")
+                    conn.doOutput = true
+                    conn.outputStream.use { os ->
+                        val input = body.toByteArray(charset("utf-8"))
+                        os.write(input, 0, input.size)
+                    }
+                } else if (method == "PATCH" || method == "POST") {
+                    conn.setRequestProperty("Content-Length", "0")
                 }
-            } else if (method == "PATCH" || method == "POST") {
-                conn.setRequestProperty("Content-Length", "0")
-            }
 
-            val code = conn.responseCode
-            return if (code in 200..299) {
-                val res = conn.inputStream.bufferedReader().use { it.readText() }
-                conn.disconnect()
-                res
-            } else {
-                conn.disconnect()
-                if (code == 401) throw Exception("HTTP 401")
-                null
+                val code = conn.responseCode
+                if (code in 200..299) {
+                    conn.inputStream.bufferedReader().use { it.readText() }
+                } else {
+                    if (code == 401) throw Exception("HTTP 401")
+                    null
+                }
+            } finally {
+                conn?.disconnect()
             }
         }
 
@@ -247,21 +246,12 @@ class TasksSyncJobService : JobService() {
             return prefs.getString("task_list_id", null)
         }
 
-        private fun readToken(context: Context): String? = runCatching {
-            val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-            EncryptedSharedPreferences.create(
-                "FlutterSecureStorage", alias, context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            ).getString("VGtWcmJHbHVaMjl1_access_token", null)
-        }.getOrNull()
+        private fun readToken(context: Context): String? = TokenManager.readCachedToken(context)
 
-        private fun freshToken(context: Context): String? = runCatching {
-            val acct = GoogleSignIn.getLastSignedInAccount(context) ?: return null
-            val scope = "oauth2:https://www.googleapis.com/auth/tasks"
-            com.google.android.gms.auth.GoogleAuthUtil.getToken(context, acct.account!!, scope)
-        }.getOrNull()
+        private fun freshToken(context: Context): String? =
+            TokenManager.fetchFreshToken(context, "oauth2:https://www.googleapis.com/auth/tasks")
     }
 
     private data class TaskItem(val id: String, val title: String, val isCompleted: Boolean, val due: String?)
 }
+

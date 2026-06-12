@@ -6,9 +6,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.util.Log
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -274,17 +271,21 @@ class CalendarSyncJobService : JobService() {
         }
 
         private fun doGet(token: String, url: URL): String? {
-            val conn = url.openConnection() as HttpURLConnection
-            conn.setRequestProperty("Authorization", "Bearer $token")
-            conn.connectTimeout = 15_000
-            conn.readTimeout    = 15_000
-            val code = conn.responseCode
-            return if (code in 200..299) {
-                conn.inputStream.bufferedReader().use { it.readText() }.also { conn.disconnect() }
-            } else {
-                conn.disconnect()
-                if (code == 401) throw Exception("HTTP 401")
-                null
+            var conn: HttpURLConnection? = null
+            return try {
+                conn = url.openConnection() as HttpURLConnection
+                conn.setRequestProperty("Authorization", "Bearer $token")
+                conn.connectTimeout = 15_000
+                conn.readTimeout    = 15_000
+                val code = conn.responseCode
+                if (code in 200..299) {
+                    conn.inputStream.bufferedReader().use { it.readText() }
+                } else {
+                    if (code == 401) throw Exception("HTTP 401")
+                    null
+                }
+            } finally {
+                conn?.disconnect()
             }
         }
 
@@ -293,19 +294,10 @@ class CalendarSyncJobService : JobService() {
             return "#ff$h"
         }
 
-        private fun readToken(context: Context): String? = runCatching {
-            val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-            EncryptedSharedPreferences.create(
-                "FlutterSecureStorage", alias, context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            ).getString("VGtWcmJHbHVaMjl1_access_token", null)
-        }.getOrNull()
+        private fun readToken(context: Context): String? = TokenManager.readCachedToken(context)
 
-        private fun freshToken(context: Context): String? = runCatching {
-            val acct = GoogleSignIn.getLastSignedInAccount(context) ?: return null
-            val scope = "oauth2:https://www.googleapis.com/auth/calendar.readonly"
-            com.google.android.gms.auth.GoogleAuthUtil.getToken(context, acct.account!!, scope)
-        }.getOrNull()
+        private fun freshToken(context: Context): String? =
+            TokenManager.fetchFreshToken(context, "oauth2:https://www.googleapis.com/auth/calendar.readonly")
     }
 }
+

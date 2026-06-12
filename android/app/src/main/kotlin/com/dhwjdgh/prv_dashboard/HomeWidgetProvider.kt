@@ -1182,16 +1182,5 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-
-        private fun openEmailIntent(context: Context, emailId: String, index: Int): PendingIntent =
-            PendingIntent.getActivity(
-                context, 300 + index,
-                Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    putExtra("tab", 2)
-                    if (emailId.isNotEmpty()) putExtra("email_id", emailId)
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
     }
 }
