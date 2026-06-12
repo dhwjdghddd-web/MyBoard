@@ -82,10 +82,6 @@ class WidgetService {
         String? dayKey;
         if (e.startDt != null) {
           final d = e.startDt!.toLocal();
-          dayKey = '%04d%02d%02d'.replaceAllMapped(
-            RegExp(r'%0(\d)d'),
-            (m) => m[0]!,
-          );
           dayKey = '${d.year.toString().padLeft(4,'0')}${d.month.toString().padLeft(2,'0')}${d.day.toString().padLeft(2,'0')}';
         } else if (e.startDate != null && e.startDate!.length >= 10) {
           dayKey = e.startDate!.replaceAll('-', '').substring(0, 8);

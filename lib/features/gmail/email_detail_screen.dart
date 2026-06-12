@@ -9,6 +9,25 @@ import 'gmail_service.dart';
 
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
+String _sanitizeHtml(String html) {
+  // 위험한 태그 제거: script, iframe, object, embed, form, applet, base
+  var sanitized = html;
+  sanitized = sanitized.replaceAll(RegExp(r'<script[^>]*>[\s\S]*?</script>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<script[^>]*/>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<iframe[^>]*>[\s\S]*?</iframe>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<iframe[^>]*/>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<object[^>]*>[\s\S]*?</object>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<embed[^>]*/?>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<form[^>]*>[\s\S]*?</form>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<applet[^>]*>[\s\S]*?</applet>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<base[^>]*/?>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<link[^>]*rel=["\']?stylesheet[^>]*/?>', caseSensitive: false), '');
+  // 인라인 이벤트 핸들러 제거 (on으로 시작하는 속성)
+  sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*["\'][^"\']*["\']', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*\S+', caseSensitive: false), '');
+  return sanitized;
+}
+
 String _wrapHtml(String body, bool isDark) {
   final bg = isDark ? '#151524' : '#ffffff';
   final text = isDark ? '#E0E0FF' : '#202124';
@@ -43,7 +62,7 @@ String _wrapHtml(String body, bool isDark) {
     pre { white-space: pre-wrap; font-family: inherit; }
   </style>
 </head>
-<body>$body</body>
+<body>${_sanitizeHtml(body)}</body>
 </html>
 ''';
 }

@@ -52,3 +52,17 @@ google-services.json
 *.keystore
 *.jks
 key.properties
+
+# Internal development artifacts (NEVER commit)
+PROMPT.md
+START.md
+PLAYSTORE_READINESS_REPORT.md
+index.html
+
+# Flutter generated
+.metadata
+.flutter-plugins
+
+# Environment files
+.env*
+*.env

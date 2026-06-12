@@ -73,8 +73,3 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
     }
   }
 }
-
-// 어디서든 쉽게 토큰을 가져오는 글로벌 헬퍼
-Future<String?> getStoredToken() async {
-  return _storage.read(key: 'access_token');
-}

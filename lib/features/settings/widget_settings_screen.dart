@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/auth_service.dart';
 import '../../core/theme.dart';
 
 class WidgetSettingsScreen extends ConsumerStatefulWidget {
@@ -46,6 +48,61 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
       await _channel.invokeMethod('setWidgetTheme', {'id': id, 'theme': theme});
       await _loadConfigs();
     } catch (_) {}
+  }
+
+  void _showPrivacyPolicy(BuildContext context, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('개인정보 처리방침'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text('마이보드 개인정보 처리방침', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              SizedBox(height: 12),
+              Text('최종 수정일: 2026년 6월 12일', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              SizedBox(height: 16),
+              Text('1. 수집하는 정보', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('본 앱은 Google 계정을 통해 다음 정보에 접근합니다:\n'
+                   '• Google Tasks: 할 일 목록 조회 및 관리\n'
+                   '• Google Calendar: 일정 조회 및 관리\n'
+                   '• Gmail: 이메일 조회, 전송, 삭제\n\n'
+                   '이 정보는 기기에서만 처리되며, 외부 서버로 전송되지 않습니다.'),
+              SizedBox(height: 12),
+              Text('2. 데이터 저장', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('• 인증 토큰: 기기의 암호화된 저장소(EncryptedSharedPreferences)에 저장\n'
+                   '• 위젯 데이터: 기기의 SharedPreferences에 캐시\n'
+                   '• 모든 데이터는 기기에만 저장되며 외부로 전송되지 않습니다.'),
+              SizedBox(height: 12),
+              Text('3. 데이터 삭제', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('로그아웃 시 저장된 인증 토큰이 삭제됩니다. '
+                   '앱을 삭제하면 모든 로컬 데이터가 완전히 제거됩니다.'),
+              SizedBox(height: 12),
+              Text('4. 제3자 제공', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('본 앱은 사용자 데이터를 제3자에게 제공하거나 판매하지 않습니다. '
+                   'Google API를 통한 통신 외에 외부 서버와의 데이터 교환은 없습니다.'),
+              SizedBox(height: 12),
+              Text('5. Google API 정책 준수', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('본 앱의 Google 사용자 데이터 사용 및 전송은 '
+                   'Google API Services User Data Policy(제한적 사용 요건 포함)를 준수합니다.'),
+              SizedBox(height: 12),
+              Text('6. 문의', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('개인정보 관련 문의: dhwjdghddd@gmail.com'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('닫기')),
+        ],
+      ),
+    );
   }
 
   @override
@@ -148,6 +205,70 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                   onChanged: (setting) => _setSetting(w['id'] as int, setting),
                   onThemeChanged: (theme) => _setTheme(w['id'] as int, theme),
                 )),
+          const SizedBox(height: 24),
+          // 앱 정보 & 법적 고지
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8, left: 4),
+            child: Text(
+              '앱 정보',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: isDark ? accentColor : Colors.grey[700],
+              ),
+            ),
+          ),
+          Card(
+            color: themeSurface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: theme.colorScheme.outlineVariant.withAlpha(120), width: 1),
+            ),
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.privacy_tip_outlined, color: isDark ? accentColor : null),
+                  title: const Text('개인정보 처리방침'),
+                  trailing: const Icon(Icons.open_in_new, size: 18),
+                  onTap: () => _showPrivacyPolicy(context, isDark),
+                ),
+                Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withAlpha(80)),
+                ListTile(
+                  leading: Icon(Icons.description_outlined, color: isDark ? accentColor : null),
+                  title: const Text('오픈소스 라이선스'),
+                  trailing: const Icon(Icons.chevron_right, size: 18),
+                  onTap: () => showLicensePage(
+                    context: context,
+                    applicationName: '마이보드',
+                    applicationVersion: '1.0.0',
+                  ),
+                ),
+                Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withAlpha(80)),
+                ListTile(
+                  leading: Icon(Icons.logout, color: Colors.redAccent),
+                  title: const Text('로그아웃'),
+                  onTap: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('로그아웃'),
+                        content: const Text('로그아웃하면 저장된 인증 정보가 삭제됩니다. 계속할까요?'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('로그아웃')),
+                        ],
+                      ),
+                    );
+                    if (confirmed == true && context.mounted) {
+                      ref.read(authServiceProvider.notifier).signOut();
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

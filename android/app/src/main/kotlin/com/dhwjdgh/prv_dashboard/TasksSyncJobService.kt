@@ -258,9 +258,7 @@ class TasksSyncJobService : JobService() {
 
         private fun freshToken(context: Context): String? = runCatching {
             val acct = GoogleSignIn.getLastSignedInAccount(context) ?: return null
-            val scope = "oauth2:https://www.googleapis.com/auth/calendar.readonly " +
-                        "https://www.googleapis.com/auth/tasks " +
-                        "https://www.googleapis.com/auth/gmail.modify"
+            val scope = "oauth2:https://www.googleapis.com/auth/tasks"
             com.google.android.gms.auth.GoogleAuthUtil.getToken(context, acct.account!!, scope)
         }.getOrNull()
     }
