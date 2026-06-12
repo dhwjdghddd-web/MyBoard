@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light Mode Widget Colors -->
+    <color name="widget_background">#F2F0F2F5</color>
+    <color name="widget_text_primary">#1C1C1E</color>
+    <color name="widget_text_secondary">#707080</color>
+    <color name="widget_divider">#1F000000</color>
+    <color name="widget_ripple">#20000000</color>
+    <color name="widget_tab_pill_bg">#15000000</color>
+    <color name="widget_tab_active_bg">#25000000</color>
+    <color name="widget_settings_btn_bg">#25000000</color>
+</resources>

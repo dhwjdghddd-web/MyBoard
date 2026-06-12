@@ -1,5 +1,6 @@
 package com.dhwjdgh.prv_dashboard
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -8,15 +9,15 @@ import android.widget.RemoteViewsService
 
 class TaskWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
-        TaskWidgetFactory(applicationContext, isCover = false)
+        TaskWidgetFactory(applicationContext, isCover = false, intent = intent)
 }
 
 class TaskWidgetServiceCover : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
-        TaskWidgetFactory(applicationContext, isCover = true)
+        TaskWidgetFactory(applicationContext, isCover = true, intent = intent)
 }
 
-class TaskWidgetFactory(private val context: Context, private val isCover: Boolean = false) : RemoteViewsService.RemoteViewsFactory {
+class TaskWidgetFactory(private val context: Context, private val isCover: Boolean = false, private val intent: Intent) : RemoteViewsService.RemoteViewsFactory {
 
     private val PREFS = "HomeWidgetPreferences"
     private var tasksList = mutableListOf<TaskItem>()
@@ -32,6 +33,25 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
     override fun getItemId(position: Int): Long = position.toLong()
     override fun hasStableIds(): Boolean = true
 
+    private val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+
+    private fun resolveIsDark(): Boolean {
+        if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            val nightModeFlags = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        }
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val theme = prefs.getString("widget_theme_$widgetId", "system") ?: "system"
+        return when (theme) {
+            "dark"  -> true
+            "light" -> false
+            else    -> {
+                val nightModeFlags = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            }
+        }
+    }
+
     override fun getViewAt(position: Int): RemoteViews {
         val layoutId = if (isCover) R.layout.cover_task_item_layout else R.layout.task_item_layout
         val views = RemoteViews(context.packageName, layoutId)
@@ -40,8 +60,14 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         val item = tasksList[position]
         views.setTextViewText(R.id.task_item_title, item.title)
         views.setTextViewText(R.id.task_item_check, if (item.done) "☑" else "☐")
-        views.setTextColor(R.id.task_item_title, if (item.done) Color.parseColor("#606070") else Color.WHITE)
-        views.setTextColor(R.id.task_item_check, if (item.done) Color.parseColor("#606070") else Color.parseColor("#4285F4"))
+
+        val isDark = resolveIsDark()
+        val activeTextColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+        val doneTextColor = if (isDark) Color.parseColor("#606070") else Color.parseColor("#A0A0B0")
+        val checkColor = if (isDark) Color.parseColor("#4285F4") else Color.parseColor("#1A73E8")
+
+        views.setTextColor(R.id.task_item_title, if (item.done) doneTextColor else activeTextColor)
+        views.setTextColor(R.id.task_item_check, if (item.done) doneTextColor else checkColor)
 
         val completeIntent = Intent().apply {
             putExtra("task_item_action", "complete")

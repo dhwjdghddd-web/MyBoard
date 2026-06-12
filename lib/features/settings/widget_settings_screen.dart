@@ -41,6 +41,13 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
     } catch (_) {}
   }
 
+  Future<void> _setTheme(int id, String theme) async {
+    try {
+      await _channel.invokeMethod('setWidgetTheme', {'id': id, 'theme': theme});
+      await _loadConfigs();
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -128,10 +135,12 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                   width: w['width'] as int,
                   height: w['height'] as int,
                   manual: w['manual'] as String,
+                  widgetTheme: w['theme'] as String? ?? 'system',
                   isCover: w['isCover'] as bool,
                   isTablet: w['isTablet'] as bool? ?? false,
                   isDark: isDark,
                   onChanged: (setting) => _setSetting(w['id'] as int, setting),
+                  onThemeChanged: (theme) => _setTheme(w['id'] as int, theme),
                 )),
         ],
       ),
@@ -144,20 +153,24 @@ class _WidgetCard extends StatelessWidget {
   final int width;
   final int height;
   final String manual;
+  final String widgetTheme;
   final bool isCover;
   final bool isTablet;
   final bool isDark;
   final void Function(String) onChanged;
+  final void Function(String) onThemeChanged;
 
   const _WidgetCard({
     required this.widgetId,
     required this.width,
     required this.height,
     required this.manual,
+    required this.widgetTheme,
     required this.isCover,
     required this.isTablet,
     required this.isDark,
     required this.onChanged,
+    required this.onThemeChanged,
   });
 
   @override
@@ -230,6 +243,34 @@ class _WidgetCard extends StatelessWidget {
                 ],
                 selected: {manual},
                 onSelectionChanged: (s) => onChanged(s.first),
+                style: SegmentedButton.styleFrom(
+                  selectedBackgroundColor: accentColor.withValues(alpha: 0.15),
+                  selectedForegroundColor: accentColor,
+                  side: BorderSide(color: theme.colorScheme.outlineVariant),
+                  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '위젯 테마 설정',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? accentColor : Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'system', label: Text('시스템'), icon: Icon(Icons.settings_suggest, size: 14)),
+                  ButtonSegment(value: 'light',  label: Text('라이트'), icon: Icon(Icons.light_mode, size: 14)),
+                  ButtonSegment(value: 'dark',   label: Text('다크'),   icon: Icon(Icons.dark_mode, size: 14)),
+                ],
+                selected: {widgetTheme},
+                onSelectionChanged: (s) => onThemeChanged(s.first),
                 style: SegmentedButton.styleFrom(
                   selectedBackgroundColor: accentColor.withValues(alpha: 0.15),
                   selectedForegroundColor: accentColor,

@@ -1,5 +1,6 @@
 package com.dhwjdgh.prv_dashboard
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -8,15 +9,15 @@ import android.widget.RemoteViewsService
 
 class GmailWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
-        GmailWidgetFactory(applicationContext, isCover = false)
+        GmailWidgetFactory(applicationContext, isCover = false, intent = intent)
 }
 
 class GmailWidgetServiceCover : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
-        GmailWidgetFactory(applicationContext, isCover = true)
+        GmailWidgetFactory(applicationContext, isCover = true, intent = intent)
 }
 
-class GmailWidgetFactory(private val context: Context, private val isCover: Boolean = false) : RemoteViewsService.RemoteViewsFactory {
+class GmailWidgetFactory(private val context: Context, private val isCover: Boolean = false, private val intent: Intent) : RemoteViewsService.RemoteViewsFactory {
 
     private val PREFS = "HomeWidgetPreferences"
     private var emailsList = mutableListOf<EmailItem>()
@@ -45,6 +46,25 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
         return emailsList.size
     }
 
+    private val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+
+    private fun resolveIsDark(): Boolean {
+        if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            val nightModeFlags = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        }
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val theme = prefs.getString("widget_theme_$widgetId", "system") ?: "system"
+        return when (theme) {
+            "dark"  -> true
+            "light" -> false
+            else    -> {
+                val nightModeFlags = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            }
+        }
+    }
+
     override fun getViewAt(position: Int): RemoteViews {
         val layoutId = if (isCover) R.layout.cover_gmail_item_layout else R.layout.gmail_item_layout
         val views = RemoteViews(context.packageName, layoutId)
@@ -57,12 +77,16 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
         views.setTextViewText(R.id.gmail_item_subject, item.subject.ifEmpty { "(제목 없음)" })
         views.setTextViewText(R.id.gmail_item_time, item.time)
 
-        val unreadColor = Color.WHITE
-        val readSenderColor = Color.parseColor("#B0B0C0")
-        val readSubjectColor = Color.parseColor("#707080")
+        val isDark = resolveIsDark()
+        val unreadSender = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+        val unreadSubject = if (isDark) Color.parseColor("#E0E0FF") else Color.parseColor("#1A73E8")
+        val readSender = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+        val readSubject = if (isDark) Color.parseColor("#707080") else Color.parseColor("#9090A0")
+        val timeColor = if (isDark) Color.parseColor("#707080") else Color.parseColor("#9090A0")
 
-        views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) unreadColor else readSenderColor)
-        views.setTextColor(R.id.gmail_item_subject, if (item.isUnread) Color.parseColor("#E0E0FF") else readSubjectColor)
+        views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) unreadSender else readSender)
+        views.setTextColor(R.id.gmail_item_subject, if (item.isUnread) unreadSubject else readSubject)
+        views.setTextColor(R.id.gmail_item_time, timeColor)
         
         val openIntent = Intent().apply {
             putExtra("gmail_item_action", "open")

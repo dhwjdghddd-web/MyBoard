@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
@@ -28,14 +29,14 @@
             <TextView android:id="@+id/task_header_title"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="할 일 목록" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#FFFFFF"/>
+                android:textColor="@color/widget_text_primary"/>
             <ImageView android:id="@+id/task_launch_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                android:src="@drawable/ic_launch" android:tint="@color/widget_text_secondary" android:padding="4dp"
                 android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             <ImageView android:id="@+id/task_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                android:src="@drawable/ic_refresh" android:tint="@color/widget_text_secondary" android:padding="4dp"
                 android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
         </LinearLayout>
 
@@ -49,7 +50,7 @@
 
         <TextView android:id="@+id/task_empty"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="태스크 없음" android:textSize="12sp" android:textColor="#A0A0B0"
+            android:text="태스크 없음" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
             android:gravity="center" android:paddingTop="12dp" android:visibility="gone"/>
 
         <TextView android:id="@+id/task_add_btn"
@@ -80,23 +81,23 @@
                 android:paddingStart="4dp" android:paddingEnd="4dp">
                 <ImageView android:id="@+id/cal_prev"
                     android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_left" android:tint="#A0A0B0" android:padding="4dp"
+                    android:src="@drawable/ic_chevron_left" android:tint="@color/widget_text_secondary" android:padding="4dp"
                     android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <TextView android:id="@+id/cal_month_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="6월" android:textSize="14sp" android:textStyle="bold"
-                    android:textColor="#FFFFFF" android:gravity="center"/>
+                    android:textColor="@color/widget_text_primary" android:gravity="center"/>
                 <ImageView android:id="@+id/cal_next"
                     android:layout_width="32dp" android:layout_height="match_parent"
-                    android:src="@drawable/ic_chevron_right" android:tint="#A0A0B0" android:padding="4dp"
+                    android:src="@drawable/ic_chevron_right" android:tint="@color/widget_text_secondary" android:padding="4dp"
                     android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <ImageView android:id="@+id/cal_launch_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                    android:src="@drawable/ic_launch" android:tint="@color/widget_text_secondary" android:padding="4dp"
                     android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <ImageView android:id="@+id/cal_refresh_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
-                    android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                    android:src="@drawable/ic_refresh" android:tint="@color/widget_text_secondary" android:padding="4dp"
                     android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <ImageView android:id="@+id/cal_add_btn"
                     android:layout_width="28dp" android:layout_height="28dp"
@@ -110,15 +111,15 @@
                 <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="일" android:textSize="11sp" android:textColor="#FF8A80" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="월" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="월" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="화" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="화" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="수" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="수" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="목" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="목" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="금" android:textSize="11sp" android:textColor="#9090A0" android:gravity="center"/>
+                    android:text="금" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                 <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="토" android:textSize="11sp" android:textColor="#82B1FF" android:gravity="center"/>
             </LinearLayout>
@@ -136,7 +137,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c00_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -163,7 +164,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c01_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -190,7 +191,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c02_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -217,7 +218,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c03_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -244,7 +245,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c04_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -271,7 +272,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c05_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -298,7 +299,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c06_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -330,7 +331,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c10_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -357,7 +358,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c11_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -384,7 +385,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c12_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -411,7 +412,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c13_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -438,7 +439,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c14_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -465,7 +466,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c15_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -492,7 +493,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c16_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -524,7 +525,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c20_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -551,7 +552,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c21_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -578,7 +579,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c22_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -605,7 +606,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c23_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -632,7 +633,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c24_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -659,7 +660,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c25_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -686,7 +687,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c26_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -718,7 +719,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c30_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -745,7 +746,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c31_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -772,7 +773,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c32_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -799,7 +800,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c33_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -826,7 +827,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c34_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -853,7 +854,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c35_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -880,7 +881,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c36_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -912,7 +913,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c40_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -939,7 +940,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c41_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -966,7 +967,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c42_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -993,7 +994,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c43_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1020,7 +1021,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c44_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1047,7 +1048,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c45_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1074,7 +1075,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c46_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1106,7 +1107,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c50_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1133,7 +1134,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c51_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1160,7 +1161,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c52_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1187,7 +1188,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c53_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1214,7 +1215,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c54_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1241,7 +1242,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c55_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1268,7 +1269,7 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:gravity="center" android:textSize="11sp"
                         android:includeFontPadding="false"
-                        android:textColor="#FFFFFF" android:textStyle="bold"/>
+                        android:textColor="@color/widget_text_primary" android:textStyle="bold"/>
                     <TextView android:id="@+id/c56_ev1"
                         android:layout_width="match_parent" android:layout_height="16dp"
                         android:gravity="center" android:textSize="12sp"
@@ -1300,12 +1301,12 @@
                 android:paddingBottom="6dp">
                 <ImageView android:id="@+id/cal_back_btn"
                     android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_back" android:tint="#A0A0C0" android:padding="4dp"
+                    android:src="@drawable/ic_back" android:tint="@color/widget_text_secondary" android:padding="4dp"
                     android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                 <TextView android:id="@+id/cal_day_label"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                     android:text="" android:textSize="13sp" android:textStyle="bold"
-                    android:textColor="#FFFFFF" android:paddingStart="4dp"/>
+                    android:textColor="@color/widget_text_primary" android:paddingStart="4dp"/>
                 <ImageView android:id="@+id/cal_day_add_btn"
                     android:layout_width="32dp" android:layout_height="32dp"
                     android:src="@drawable/ic_add" android:tint="#60D8A0" android:padding="4dp"
@@ -1321,10 +1322,10 @@
                     android:background="#4285F4" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_0"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                    android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
                 <TextView android:id="@+id/cal_day_title_0"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                    android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
                     android:paddingStart="6dp"/>
             </LinearLayout>
 
@@ -1337,10 +1338,10 @@
                     android:background="#0F9D58" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_1"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                    android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
                 <TextView android:id="@+id/cal_day_title_1"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                    android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
                     android:paddingStart="6dp"/>
             </LinearLayout>
 
@@ -1353,10 +1354,10 @@
                     android:background="#FBBC04" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_2"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                    android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
                 <TextView android:id="@+id/cal_day_title_2"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                    android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
                     android:paddingStart="6dp"/>
             </LinearLayout>
 
@@ -1369,16 +1370,16 @@
                     android:background="#EA4335" android:layout_marginEnd="8dp"/>
                 <TextView android:id="@+id/cal_day_time_3"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:textSize="10sp" android:textColor="#9090A8" android:minWidth="40dp"/>
+                    android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
                 <TextView android:id="@+id/cal_day_title_3"
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:textSize="12sp" android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+                    android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
                     android:paddingStart="6dp"/>
             </LinearLayout>
 
             <TextView android:id="@+id/cal_day_empty"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="이 날 일정이 없어요" android:textSize="12sp" android:textColor="#A0A0B0"
+                android:text="이 날 일정이 없어요" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
                 android:gravity="center" android:paddingTop="16dp" android:visibility="gone"/>
             <!-- 빈 공간: 오른쪽 스와이프 → 월 달력으로 이동 -->
             <FrameLayout android:id="@+id/cal_day_swipe_back"
@@ -1397,31 +1398,31 @@
             <TextView android:id="@+id/gmail_header_title"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="받은편지함" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#FFFFFF"/>
+                android:textColor="@color/widget_text_primary"/>
             <ImageView android:id="@+id/gmail_launch_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="#A0A0B0" android:padding="4dp"
+                android:src="@drawable/ic_launch" android:tint="@color/widget_text_secondary" android:padding="4dp"
                 android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             <ImageView android:id="@+id/gmail_refresh_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="#A0A0B0" android:padding="4dp"
+                android:src="@drawable/ic_refresh" android:tint="@color/widget_text_secondary" android:padding="4dp"
                 android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
             <ImageView android:id="@+id/gmail_compose_btn"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_compose" android:tint="#A0A0B0" android:padding="4dp"
+                android:src="@drawable/ic_compose" android:tint="@color/widget_text_secondary" android:padding="4dp"
                 android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
         </LinearLayout>
 
         <!-- Gmail 리스트뷰 -->
         <ListView android:id="@+id/gmail_list_view"
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:divider="#20FFFFFF" android:dividerHeight="1dp"
+            android:divider="@color/widget_divider" android:dividerHeight="1dp"
             android:scrollbars="none"
             android:visibility="gone" />
 
         <TextView android:id="@+id/gmail_empty"
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:text="새 메일 없음" android:textSize="12sp" android:textColor="#A0A0B0"
+            android:text="새 메일 없음" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
             android:gravity="center" android:visibility="gone"/>
 
         <!-- 하단 스와이프 존: 좌우로 탭 이동 -->
@@ -1457,24 +1458,24 @@
             <TextView android:id="@+id/tab_tasks"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:text="할 일" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#FFFFFF" android:gravity="center"
+                android:textColor="@color/widget_text_primary" android:gravity="center"
                 android:background="@drawable/tab_active_bg" />
 
             <TextView android:id="@+id/tab_calendar"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:text="캘린더" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#A0A0B0" android:gravity="center" />
+                android:textColor="@color/widget_text_secondary" android:gravity="center" />
 
             <TextView android:id="@+id/tab_gmail"
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:text="Gmail" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="#A0A0B0" android:gravity="center" />
+                android:textColor="@color/widget_text_secondary" android:gravity="center" />
         </LinearLayout>
 
         <!-- 원형 설정 버튼 단 1개만 배치 -->
         <ImageView android:id="@+id/widget_settings_btn"
             android:layout_width="36dp" android:layout_height="36dp"
-            android:src="@drawable/ic_settings" android:tint="#A0A0B0"
+            android:src="@drawable/ic_settings" android:tint="@color/widget_text_secondary"
             android:padding="6dp" android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
             android:background="@drawable/tab_active_bg"/>
             

@@ -36,6 +36,13 @@ class MainActivity : FlutterActivity() {
                     setWidgetConfig(id, setting)
                     result.success(null)
                 }
+                "setWidgetTheme"    -> {
+                    val args = call.arguments as Map<*, *>
+                    val id    = (args["id"] as Int)
+                    val theme = args["theme"] as String
+                    setWidgetTheme(id, theme)
+                    result.success(null)
+                }
                 "saveAttachment" -> {
                     val args = call.arguments as Map<*, *>
                     val filename  = args["filename"] as String
@@ -94,8 +101,9 @@ class MainActivity : FlutterActivity() {
             val manual = prefs.getString("widget_cover_manual_$id", "auto") ?: "auto"
             val isCover = HomeWidgetProvider.resolveIsCover(this, prefs, id, width)
             val isTablet = HomeWidgetProvider.resolveIsTablet(prefs, id, this)
+            val theme = prefs.getString("widget_theme_$id", "system") ?: "system"
             mapOf("id" to id, "width" to width, "height" to height,
-                  "manual" to manual, "isCover" to isCover, "isTablet" to isTablet)
+                  "manual" to manual, "isCover" to isCover, "isTablet" to isTablet, "theme" to theme)
         }
     }
 
@@ -127,6 +135,13 @@ class MainActivity : FlutterActivity() {
     private fun setWidgetConfig(widgetId: Int, setting: String) {
         getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE).edit()
             .putString("widget_cover_manual_$widgetId", setting).apply()
+        val mgr = AppWidgetManager.getInstance(this)
+        HomeWidgetProvider.updateWidget(this, mgr, widgetId)
+    }
+
+    private fun setWidgetTheme(widgetId: Int, theme: String) {
+        getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE).edit()
+            .putString("widget_theme_$widgetId", theme).apply()
         val mgr = AppWidgetManager.getInstance(this)
         HomeWidgetProvider.updateWidget(this, mgr, widgetId)
     }

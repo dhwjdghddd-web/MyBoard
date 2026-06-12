@@ -340,6 +340,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)
             val isCover = resolveIsCover(context, prefs, widgetId, widgetWidth)
             val isTablet = resolveIsTablet(prefs, widgetId, context)
+            val isDark = resolveIsDark(prefs, widgetId, context)
             
             val layoutId = when {
                 isTablet -> R.layout.tablet_widget_layout
@@ -348,10 +349,17 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             val views     = RemoteViews(context.packageName, layoutId)
 
+            // 최외각 FrameLayout 배경 설정
+            views.setInt(R.id.widget_root, "setBackgroundResource", if (isDark) R.drawable.widget_background else R.drawable.widget_background_light)
+
+            // 설정 톱니바퀴 아이콘 틴트 컬러 오버라이드
+            val cogColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+            views.setInt(R.id.widget_settings_btn, "setColorFilter", cogColor)
+
             if (isTablet) {
-                bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true)
-                bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true)
-                bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true)
+                bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true, isDark = isDark, widgetId = widgetId)
+                bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true, isDark = isDark)
+                bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true, isDark = isDark, widgetId = widgetId)
             } else {
                 val activeTab = prefs.getInt("active_widget_tab", 0)
 
@@ -359,11 +367,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.section_calendar, if (activeTab == 1) View.VISIBLE else View.GONE)
                 views.setViewVisibility(R.id.section_gmail,    if (activeTab == 2) View.VISIBLE else View.GONE)
 
-                val DIM   = Color.parseColor("#A0A0B0")
+                val activeColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+                val inactiveColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
 
-                views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) Color.WHITE else DIM)
-                views.setTextColor(R.id.tab_calendar, if (activeTab == 1) Color.WHITE else DIM)
-                views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) Color.WHITE else DIM)
+                views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) activeColor else inactiveColor)
+                views.setTextColor(R.id.tab_calendar, if (activeTab == 1) activeColor else inactiveColor)
+                views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) activeColor else inactiveColor)
                 
                 if (activeTab == 0) {
                     views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_active_bg)
@@ -393,14 +402,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
                 
                 when (activeTab) {
-                    0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false)
-                    1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false)
-                    2 -> bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false)
+                    0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false, isDark = isDark, widgetId = widgetId)
+                    1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false, isDark = isDark)
+                    2 -> bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false, isDark = isDark, widgetId = widgetId)
                 }
             }
 
             val manual = prefs.getString("widget_cover_manual_$widgetId", "auto")
-            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover isTablet=$isTablet")
+            Log.d("HomeWidget", "updateWidget id=$widgetId w=$widgetWidth h=$widgetHeight manual=$manual isCover=$isCover isTablet=$isTablet isDark=$isDark")
 
             // ⚙ 버튼 → WidgetConfigureActivity 직접 실행 (런처 무관)
             val configIntent = Intent(context, WidgetConfigureActivity::class.java).apply {
@@ -426,15 +435,27 @@ class HomeWidgetProvider : AppWidgetProvider() {
         // ─────────────────────────────────────────────────────────────────
         //  태스크 섹션
         // ─────────────────────────────────────────────────────────────────
-        private fun bindTasks(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
+        private fun bindTasks(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false, isDark: Boolean = true, widgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID) {
             val count = prefs.getString("task_count", "0")?.toIntOrNull() ?: 0
             val hasAny = (0 until count).any { i -> (prefs.getString("task_$i", "") ?: "").isNotEmpty() }
+
+            val primaryColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+            val secondaryColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+            views.setTextColor(R.id.task_header_title, primaryColor)
+            views.setTextColor(R.id.task_empty, secondaryColor)
+            views.setInt(R.id.task_launch_btn, "setColorFilter", secondaryColor)
+            views.setInt(R.id.task_refresh_btn, "setColorFilter", secondaryColor)
 
             if (hasAny) {
                 views.setViewVisibility(R.id.task_list_view, View.VISIBLE)
                 views.setViewVisibility(R.id.task_empty, View.GONE)
                 val svcClass = if (isCover) TaskWidgetServiceCover::class.java else TaskWidgetService::class.java
-                views.setRemoteAdapter(R.id.task_list_view, Intent(context, svcClass))
+                
+                val adapterIntent = Intent(context, svcClass).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                    data = android.net.Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                }
+                views.setRemoteAdapter(R.id.task_list_view, adapterIntent)
                 val template = PendingIntent.getBroadcast(
                     context, 450,
                     Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_TASK_ITEM },
@@ -467,20 +488,20 @@ class HomeWidgetProvider : AppWidgetProvider() {
         // ─────────────────────────────────────────────────────────────────
         //  캘린더 섹션
         // ─────────────────────────────────────────────────────────────────
-        private fun bindCalendar(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
+        private fun bindCalendar(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false, isDark: Boolean = true) {
             val showDayPanel = prefs.getBoolean("cal_show_day_panel", false)
 
             views.setViewVisibility(R.id.cal_grid_panel, if (!showDayPanel) View.VISIBLE else View.GONE)
             views.setViewVisibility(R.id.cal_day_panel,  if (showDayPanel)  View.VISIBLE else View.GONE)
 
             if (showDayPanel) {
-                bindCalendarDayPanel(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet)
+                bindCalendarDayPanel(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet, isDark)
             } else {
-                bindCalendarGrid(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet)
+                bindCalendarGrid(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet, isDark)
             }
         }
 
-        private fun bindCalendarGrid(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
+        private fun bindCalendarGrid(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false, isDark: Boolean = true) {
             val allPrefs    = prefs.all
             val actual      = now()
             val actualYear  = actual.get(java.util.Calendar.YEAR)
@@ -504,6 +525,21 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.cal_month_label, android.util.TypedValue.COMPLEX_UNIT_SP, monthLabelSp)
 
+            val primaryColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+            val secondaryColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+            views.setTextColor(R.id.cal_month_label, primaryColor)
+            
+            views.setInt(R.id.cal_prev, "setColorFilter", secondaryColor)
+            views.setInt(R.id.cal_next, "setColorFilter", secondaryColor)
+            views.setInt(R.id.cal_launch_btn, "setColorFilter", secondaryColor)
+            views.setInt(R.id.cal_refresh_btn, "setColorFilter", secondaryColor)
+            views.setInt(R.id.cal_add_btn, "setColorFilter", Color.parseColor("#60D8A0"))
+
+            val dowColor = if (isDark) Color.parseColor("#9090A0") else Color.parseColor("#707080")
+            listOf(R.id.cal_dow_mon, R.id.cal_dow_tue, R.id.cal_dow_wed,
+                   R.id.cal_dow_thu, R.id.cal_dow_fri).forEach {
+                views.setTextColor(it, dowColor)
+            }
 
             views.setOnClickPendingIntent(R.id.cal_prev, PendingIntent.getBroadcast(
                 context, 700,
@@ -608,7 +644,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             isToday  -> Color.parseColor("#4285F4")
                             col == 0 -> Color.parseColor("#FF8A80")
                             col == 6 -> Color.parseColor("#82B1FF")
-                            else     -> Color.parseColor("#D0D0E0")
+                            else     -> if (isDark) Color.parseColor("#D0D0E0") else Color.parseColor("#1C1C1E")
                         }
                         views.setTextColor(cellId, dayColor)
                         views.setTextViewTextSize(cellId, android.util.TypedValue.COMPLEX_UNIT_SP, dateSp)
@@ -687,7 +723,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun bindCalendarDayPanel(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
+        private fun bindCalendarDayPanel(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false, isDark: Boolean = true) {
             val dateKey = prefs.getString("cal_selected_date", "") ?: ""
 
             // 날짜 레이블 (MM/DD 요일 형식)
@@ -706,6 +742,14 @@ class HomeWidgetProvider : AppWidgetProvider() {
                              else if (isTablet) 11f
                              else         scaledSp(widgetWidth, widgetHeight, 11f, 14f)
             views.setTextViewTextSize(R.id.cal_day_label, android.util.TypedValue.COMPLEX_UNIT_SP, dayLabelSp)
+
+            val primaryColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+            val secondaryColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+            views.setTextColor(R.id.cal_day_label, primaryColor)
+            views.setTextColor(R.id.cal_day_empty, secondaryColor)
+            
+            views.setInt(R.id.cal_back_btn, "setColorFilter", secondaryColor)
+            views.setInt(R.id.cal_day_add_btn, "setColorFilter", Color.parseColor("#60D8A0"))
 
             // 뒤로 버튼
 
@@ -744,6 +788,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     views.setViewVisibility(r.row, View.VISIBLE)
                     views.setTextViewText(r.time, times.getOrElse(i) { "" })
                     views.setTextViewText(r.title, titles[i])
+                    views.setTextColor(r.time, secondaryColor)
+                    views.setTextColor(r.title, primaryColor)
                     
                     val colorStr = colors.getOrNull(i)
                     val eventColor = try {
@@ -783,12 +829,20 @@ class HomeWidgetProvider : AppWidgetProvider() {
         // ─────────────────────────────────────────────────────────────────
         //  Gmail 섹션
         // ─────────────────────────────────────────────────────────────────
-        private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false) {
+        private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false, isDark: Boolean = true, widgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID) {
             val count = try {
                 prefs.getInt("gmail_count", 0)
             } catch (e: ClassCastException) {
                 prefs.getString("gmail_count", "0")?.toIntOrNull() ?: 0
             }
+
+            val primaryColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+            val secondaryColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+            views.setTextColor(R.id.gmail_header_title, primaryColor)
+            views.setTextColor(R.id.gmail_empty, secondaryColor)
+            views.setInt(R.id.gmail_launch_btn, "setColorFilter", secondaryColor)
+            views.setInt(R.id.gmail_refresh_btn, "setColorFilter", secondaryColor)
+            views.setInt(R.id.gmail_compose_btn, "setColorFilter", secondaryColor)
 
             if (count == 0) {
                 views.setViewVisibility(R.id.gmail_list_view, View.GONE)
@@ -799,7 +853,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
                 // Bind ListView to RemoteViewsService
                 val gmailSvcClass = if (isCover) GmailWidgetServiceCover::class.java else GmailWidgetService::class.java
-                views.setRemoteAdapter(R.id.gmail_list_view, Intent(context, gmailSvcClass))
+                
+                val adapterIntent = Intent(context, gmailSvcClass).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                    data = android.net.Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                }
+                views.setRemoteAdapter(R.id.gmail_list_view, adapterIntent)
 
                 // Broadcast template → HomeWidgetProvider handles open/delete
                 // Activity template → opens MainActivity directly in the foreground
@@ -865,6 +924,18 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 "cover"  -> false
                 "home"   -> false
                 else     -> isTablet(context)
+            }
+        }
+
+        fun resolveIsDark(prefs: android.content.SharedPreferences, widgetId: Int, context: Context): Boolean {
+            val theme = prefs.getString("widget_theme_$widgetId", "system") ?: "system"
+            return when (theme) {
+                "dark"  -> true
+                "light" -> false
+                else    -> {
+                    val nightModeFlags = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                    nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+                }
             }
         }
 
