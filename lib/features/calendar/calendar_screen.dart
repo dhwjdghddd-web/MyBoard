@@ -295,41 +295,87 @@ class _MonthItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return InkWell(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(children: [
-          // 날짜 열
-          SizedBox(
-            width: 44,
-            child: Text(
-              item.displayDate,
-              style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
+    final today = DateTime.now();
+    final todayKey = '${today.year}-${today.month.toString().padLeft(2,'0')}-${today.day.toString().padLeft(2,'0')}';
+    final isToday = item.dateKey == todayKey;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: isToday
+          ? BoxDecoration(
+              color: scheme.primary.withAlpha(20),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: scheme.primary.withAlpha(50), width: 0.8),
+            )
+          : null,
+      child: InkWell(
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
-          ),
-          const SizedBox(width: 8),
-          // 색상 점 / 태스크 아이콘
-          item.isTask
-              ? Icon(Icons.check_box_outline_blank, size: 14, color: item.color)
-              : Container(width: 8, height: 8, decoration: BoxDecoration(color: item.color, shape: BoxShape.circle)),
-          const SizedBox(width: 8),
-          // 제목
-          Expanded(
-            child: Text(
-              item.title,
-              style: TextStyle(fontSize: 13, fontWeight: item.isTask ? FontWeight.normal : FontWeight.w500),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            builder: (_) => EventDetailSheet(dateKey: item.dateKey),
+          );
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(children: [
+            // 날짜 열
+            Container(
+              width: 50,
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+              decoration: isToday
+                  ? BoxDecoration(
+                      color: scheme.primary,
+                      borderRadius: BorderRadius.circular(4),
+                    )
+                  : null,
+              child: Text(
+                item.displayDate,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  color: isToday ? Colors.white : scheme.onSurfaceVariant,
+                  fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          // 시간
-          if (item.timeLabel.isNotEmpty)
-            Text(
-              item.timeLabel,
-              style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+            const SizedBox(width: 8),
+            // 색상 점 / 태스크 아이콘
+            item.isTask
+                ? Icon(Icons.check_box_outline_blank, size: 14, color: item.color)
+                : Container(width: 8, height: 8, decoration: BoxDecoration(color: item.color, shape: BoxShape.circle)),
+            const SizedBox(width: 8),
+            // 제목
+            Expanded(
+              child: Text(
+                item.title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isToday
+                      ? FontWeight.bold
+                      : (item.isTask ? FontWeight.normal : FontWeight.w500),
+                  color: isToday ? scheme.primary : null,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-        ]),
+            // 시간
+            if (item.timeLabel.isNotEmpty)
+              Text(
+                item.timeLabel,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isToday ? scheme.primary : scheme.onSurfaceVariant,
+                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+          ]),
+        ),
       ),
     );
   }
