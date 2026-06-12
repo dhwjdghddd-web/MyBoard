@@ -136,11 +136,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                     ),
                                   ),
                                 )
-                              : ListView.separated(
-                                  itemCount: allMonthItems.length,
-                                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
-                                  itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
-                                ),
+                              : Builder(builder: (ctx) {
+                                  final now = DateTime.now();
+                                  final todayKey = '${now.year}-${now.month.toString().padLeft(2,'0')}-${now.day.toString().padLeft(2,'0')}';
+                                  return ListView.separated(
+                                    itemCount: allMonthItems.length,
+                                    separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                                    itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i], todayKey: todayKey),
+                                  );
+                                }),
                         ),
                       ]),
                     ),
@@ -184,13 +188,17 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                               ),
                             ),
                           )
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: allMonthItems.length,
-                            separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
-                            itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
-                          ),
+                        : Builder(builder: (ctx) {
+                            final now = DateTime.now();
+                            final todayKey = '${now.year}-${now.month.toString().padLeft(2,'0')}-${now.day.toString().padLeft(2,'0')}';
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: allMonthItems.length,
+                              separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                              itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i], todayKey: todayKey),
+                            );
+                          }),
                   ]),
                 ),
         ),
@@ -289,14 +297,13 @@ class _MonthItem {
 // ── 이달 일정 타일 ────────────────────────────────────────────────────────
 
 class _MonthItemTile extends StatelessWidget {
-  const _MonthItemTile({required this.item});
+  const _MonthItemTile({required this.item, required this.todayKey});
   final _MonthItem item;
+  final String todayKey;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final today = DateTime.now();
-    final todayKey = '${today.year}-${today.month.toString().padLeft(2,'0')}-${today.day.toString().padLeft(2,'0')}';
     final isToday = item.dateKey == todayKey;
 
     return Container(

@@ -284,7 +284,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
   }
 }
 
-class _WidgetCard extends StatelessWidget {
+class _WidgetCard extends StatefulWidget {
   final int widgetId;
   final int width;
   final int height;
@@ -314,6 +314,27 @@ class _WidgetCard extends StatelessWidget {
   });
 
   @override
+  State<_WidgetCard> createState() => _WidgetCardState();
+}
+
+class _WidgetCardState extends State<_WidgetCard> {
+  late double _localOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _localOpacity = widget.opacity;
+  }
+
+  @override
+  void didUpdateWidget(covariant _WidgetCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.opacity != widget.opacity) {
+      _localOpacity = widget.opacity;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final themeSurface = theme.cardColor;
@@ -335,32 +356,32 @@ class _WidgetCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  isCover ? Icons.phone_android : (isTablet ? Icons.tablet : Icons.home),
+                  widget.isCover ? Icons.phone_android : (widget.isTablet ? Icons.tablet : Icons.home),
                   size: 18,
-                  color: isCover ? accentColor : (isTablet ? Colors.teal : secondaryTextColor),
+                  color: widget.isCover ? accentColor : (widget.isTablet ? Colors.teal : secondaryTextColor),
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Widget #$widgetId',
+                  'Widget #${widget.widgetId}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: isCover
+                    color: widget.isCover
                         ? accentColor.withValues(alpha: 0.15)
-                        : (isTablet
+                        : (widget.isTablet
                             ? Colors.teal.withValues(alpha: 0.15)
                             : secondaryTextColor.withValues(alpha: 0.15)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    isCover ? '커버화면' : (isTablet ? '태블릿' : '홈화면'),
+                    widget.isCover ? '커버화면' : (widget.isTablet ? '태블릿' : '홈화면'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isCover ? accentColor : (isTablet ? Colors.teal : secondaryTextColor),
+                      color: widget.isCover ? accentColor : (widget.isTablet ? Colors.teal : secondaryTextColor),
                     ),
                   ),
                 ),
@@ -368,7 +389,7 @@ class _WidgetCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '크기: ${width}dp × ${height}dp',
+              '크기: ${widget.width}dp × ${widget.height}dp',
               style: TextStyle(color: secondaryTextColor, fontSize: 12),
             ),
             const SizedBox(height: 12),
@@ -381,8 +402,8 @@ class _WidgetCard extends StatelessWidget {
                   ButtonSegment(value: 'tablet', label: Text('태블릿'), icon: Icon(Icons.tablet, size: 14)),
                   ButtonSegment(value: 'auto',  label: Text('자동'),     icon: Icon(Icons.auto_fix_high, size: 14)),
                 ],
-                selected: {manual},
-                onSelectionChanged: (s) => onChanged(s.first),
+                selected: {widget.manual},
+                onSelectionChanged: (s) => widget.onChanged(s.first),
                 style: SegmentedButton.styleFrom(
                   selectedBackgroundColor: accentColor.withValues(alpha: 0.15),
                   selectedForegroundColor: accentColor,
@@ -397,7 +418,7 @@ class _WidgetCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: isDark ? accentColor : Colors.grey[700],
+                color: widget.isDark ? accentColor : Colors.grey[700],
               ),
             ),
             const SizedBox(height: 8),
@@ -409,8 +430,8 @@ class _WidgetCard extends StatelessWidget {
                   ButtonSegment(value: 'light',  label: Text('라이트'), icon: Icon(Icons.light_mode, size: 14)),
                   ButtonSegment(value: 'dark',   label: Text('다크'),   icon: Icon(Icons.dark_mode, size: 14)),
                 ],
-                selected: {widgetTheme},
-                onSelectionChanged: (s) => onThemeChanged(s.first),
+                selected: {widget.widgetTheme},
+                onSelectionChanged: (s) => widget.onThemeChanged(s.first),
                 style: SegmentedButton.styleFrom(
                   selectedBackgroundColor: accentColor.withValues(alpha: 0.15),
                   selectedForegroundColor: accentColor,
@@ -428,15 +449,15 @@ class _WidgetCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? accentColor : Colors.grey[700],
+                    color: widget.isDark ? accentColor : Colors.grey[700],
                   ),
                 ),
                 Text(
-                  '${(opacity * 100).round()}%',
+                  '${(_localOpacity * 100).round()}%',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? accentColor : Colors.grey[700],
+                    color: widget.isDark ? accentColor : Colors.grey[700],
                   ),
                 ),
               ],
@@ -451,11 +472,12 @@ class _WidgetCard extends StatelessWidget {
                 trackHeight: 4,
               ),
               child: Slider(
-                value: opacity,
+                value: _localOpacity,
                 min: 0.0,
                 max: 1.0,
                 divisions: 10,
-                onChanged: onOpacityChanged,
+                onChanged: (v) => setState(() => _localOpacity = v),
+                onChangeEnd: widget.onOpacityChanged,
               ),
             ),
           ],
