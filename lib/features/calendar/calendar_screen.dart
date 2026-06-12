@@ -557,7 +557,7 @@ class _DayCell extends StatelessWidget {
                     TextSpan(text: item.title),
                   ],
                 ),
-                style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

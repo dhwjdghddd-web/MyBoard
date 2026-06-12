@@ -4,7 +4,7 @@ import 'calendar_service.dart';
 import 'event_form_screen.dart';
 import '../tasks/task_service.dart';
 
-class EventDetailSheet extends ConsumerWidget {
+class EventDetailSheet extends ConsumerStatefulWidget {
   const EventDetailSheet({
     super.key,
     required this.dateKey,
@@ -12,26 +12,40 @@ class EventDetailSheet extends ConsumerWidget {
 
   final String dateKey;
 
+  @override
+  ConsumerState<EventDetailSheet> createState() => _EventDetailSheetState();
+}
+
+class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(calendarProvider.notifier).loadEvents();
+      ref.read(taskServiceProvider.notifier).loadTasks();
+    });
+  }
+
   String _dateLabel() {
-    final parts = dateKey.split('-');
-    if (parts.length < 3) return dateKey;
+    final parts = widget.dateKey.split('-');
+    if (parts.length < 3) return widget.dateKey;
     final dt = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
     return '${dt.month}월 ${dt.day}일 (${weekdays[dt.weekday % 7]})';
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final cal = ref.watch(calendarProvider);
     final tasksAsync = ref.watch(taskServiceProvider);
 
-    final events = cal.events.where((e) => e.dateKey == dateKey).toList();
+    final events = cal.events.where((e) => e.dateKey == widget.dateKey).toList();
     final tasks = tasksAsync.value ?? [];
     final dayTasks = tasks.where((t) {
       if (t.due == null || t.isCompleted) return false;
       final d = t.due!.toLocal();
       final key = '${d.year}-${d.month.toString().padLeft(2,'0')}-${d.day.toString().padLeft(2,'0')}';
-      return key == dateKey;
+      return key == widget.dateKey;
     }).toList();
 
     return DraggableScrollableSheet(
@@ -73,7 +87,7 @@ class EventDetailSheet extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => EventFormScreen(initialDateKey: dateKey),
+                          builder: (_) => EventFormScreen(initialDateKey: widget.dateKey),
                         ),
                       );
                     },
@@ -106,14 +120,13 @@ class EventDetailSheet extends ConsumerWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => EventFormScreen(
-                                    initialDateKey: dateKey,
+                                    initialDateKey: widget.dateKey,
                                     event: event,
                                   ),
                                 ),
                               );
                             },
                             onDelete: () async {
-                              Navigator.pop(context);
                               await ref.read(calendarProvider.notifier).deleteEvent(
                                     event.calendarId, event.id);
                               if (context.mounted) {
