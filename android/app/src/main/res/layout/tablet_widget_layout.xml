@@ -18,15 +18,10 @@
             android:gravity="center_vertical"
             android:paddingBottom="6dp">
             
-            <TextView
+            <FrameLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="MyBoard 대시보드"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:paddingStart="4dp" />
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <!-- 원형 설정 버튼 -->
             <ImageView android:id="@+id/widget_settings_btn"
