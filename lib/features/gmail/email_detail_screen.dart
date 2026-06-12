@@ -21,9 +21,11 @@ String _sanitizeHtml(String html) {
   sanitized = sanitized.replaceAll(RegExp(r'<form[^>]*>[\s\S]*?</form>', caseSensitive: false), '');
   sanitized = sanitized.replaceAll(RegExp(r'<applet[^>]*>[\s\S]*?</applet>', caseSensitive: false), '');
   sanitized = sanitized.replaceAll(RegExp(r'<base[^>]*/?>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<link[^>]*rel=["\']?stylesheet[^>]*/?>', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'<link[^>]*stylesheet[^>]*/?>', caseSensitive: false), '');
   // 인라인 이벤트 핸들러 제거 (on으로 시작하는 속성)
-  sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*["\'][^"\']*["\']', caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*"[^"]*"',
+      caseSensitive: false), '');
+  sanitized = sanitized.replaceAll(RegExp(r"\s+on\w+\s*=\s*'[^']*'", caseSensitive: false), '');
   sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*\S+', caseSensitive: false), '');
   return sanitized;
 }
