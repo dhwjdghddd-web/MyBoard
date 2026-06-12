@@ -8,13 +8,9 @@ class EventDetailSheet extends ConsumerWidget {
   const EventDetailSheet({
     super.key,
     required this.dateKey,
-    required this.events,
-    required this.tasks,
   });
 
   final String dateKey;
-  final List<CalendarEvent> events;
-  final List<Task> tasks;
 
   String _dateLabel() {
     final parts = dateKey.split('-');
@@ -26,6 +22,18 @@ class EventDetailSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cal = ref.watch(calendarProvider);
+    final tasksAsync = ref.watch(taskServiceProvider);
+
+    final events = cal.events.where((e) => e.dateKey == dateKey).toList();
+    final tasks = tasksAsync.value ?? [];
+    final dayTasks = tasks.where((t) {
+      if (t.due == null || t.isCompleted) return false;
+      final d = t.due!.toLocal();
+      final key = '${d.year}-${d.month.toString().padLeft(2,'0')}-${d.day.toString().padLeft(2,'0')}';
+      return key == dateKey;
+    }).toList();
+
     return DraggableScrollableSheet(
       initialChildSize: 0.5,
       minChildSize: 0.3,
@@ -76,7 +84,7 @@ class EventDetailSheet extends ConsumerWidget {
             const Divider(height: 1),
             // 이벤트/태스크 목록
             Expanded(
-              child: (events.isEmpty && tasks.isEmpty)
+              child: (events.isEmpty && dayTasks.isEmpty)
                   ? Center(
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Icon(Icons.event_available, size: 48, color: Colors.grey[300]),
@@ -86,7 +94,7 @@ class EventDetailSheet extends ConsumerWidget {
                     )
                   : ListView.builder(
                       controller: ctrl,
-                      itemCount: events.length + tasks.length,
+                      itemCount: events.length + dayTasks.length,
                       itemBuilder: (_, i) {
                         if (i < events.length) {
                           final event = events[i];
@@ -116,7 +124,7 @@ class EventDetailSheet extends ConsumerWidget {
                             },
                           );
                         } else {
-                          final task = tasks[i - events.length];
+                          final task = dayTasks[i - events.length];
                           return _TaskCard(task: task);
                         }
                       },
@@ -232,54 +240,50 @@ class _TaskCard extends ConsumerWidget {
         border: const Border(left: BorderSide(color: Color(0xFF1A73E8), width: 4)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(
-                  task.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: const Color(0xFF1A73E8),
-                ),
-                onPressed: () {
-                  ref.read(taskServiceProvider.notifier).toggleComplete(task);
-                },
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  task.title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                    color: task.isCompleted ? Colors.grey : null,
+          // 체크박스
+          Checkbox(
+            value: task.isCompleted,
+            activeColor: const Color(0xFF1A73E8),
+            onChanged: (_) {
+              ref.read(taskServiceProvider.notifier).toggleComplete(task);
+            },
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(text: '● ', style: TextStyle(color: Color(0xFF1A73E8), fontWeight: FontWeight.bold)),
+                      TextSpan(
+                        text: task.title,
+                        style: TextStyle(
+                          decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                          color: task.isCompleted ? Colors.grey : null,
+                        ),
+                      ),
+                    ],
                   ),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Text('할 일', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              const Spacer(),
-              IconButton(
-                icon: Icon(Icons.delete, size: 14, color: Colors.red[400]),
-                onPressed: () => _confirmDelete(context, ref),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-          if (task.notes?.isNotEmpty == true)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(task.notes!, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                const SizedBox(height: 4),
+                const Text('할 일', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                if (task.notes?.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(task.notes!, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  ),
+              ],
             ),
+          ),
+          IconButton(
+            icon: Icon(Icons.delete_outline, size: 20, color: Colors.red[400]),
+            onPressed: () => _confirmDelete(context, ref),
+          ),
         ],
       ),
     );

@@ -382,6 +382,8 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
     await _api.delete(
       'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(calendarId)}/events/${Uri.encodeComponent(eventId)}',
     );
-    state = state.copyWith(events: state.events.where((e) => e.id != eventId).toList());
+    final updatedEvents = state.events.where((e) => e.id != eventId).toList();
+    state = state.copyWith(events: updatedEvents);
+    await WidgetService.updateCalendar(updatedEvents);
   }
 }

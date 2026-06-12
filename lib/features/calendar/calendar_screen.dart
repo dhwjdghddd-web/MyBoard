@@ -467,7 +467,7 @@ class _CalendarGrid extends ConsumerWidget {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
-            builder: (_) => EventDetailSheet(dateKey: dateKey, events: dayEvents, tasks: dayTasks),
+            builder: (_) => EventDetailSheet(dateKey: dateKey),
           ),
           child: _DayCell(
             day: dayNum, isToday: isToday, isSunday: isSunday,
@@ -549,11 +549,17 @@ class _DayCell extends StatelessWidget {
           if (item.isTask)
             Padding(
               padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-              child: Row(children: [
-                Container(width: 5, height: 5, decoration: const BoxDecoration(color: Color(0xFF1A73E8), shape: BoxShape.circle)),
-                const SizedBox(width: 3),
-                Expanded(child: Text(item.title, style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              ]),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(text: '● ', style: TextStyle(color: Color(0xFF1A73E8), fontWeight: FontWeight.bold)),
+                    TextSpan(text: item.title),
+                  ],
+                ),
+                style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             )
           else
             Container(

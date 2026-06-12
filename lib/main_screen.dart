@@ -190,24 +190,12 @@ class _MainScreenState extends ConsumerState<MainScreen>
 
   void _openCalendarDate(String eventId, String dateKey) {
     if (!mounted) return;
-    final events = ref.read(calendarProvider).events
-        .where((e) => e.dateKey == dateKey)
-        .toList();
-    final tasks = ref.read(taskServiceProvider).value ?? [];
-    final dayTasks = tasks.where((t) {
-      if (t.due == null || t.isCompleted) return false;
-      final d = t.due!.toLocal();
-      final key = '${d.year}-${d.month.toString().padLeft(2,'0')}-${d.day.toString().padLeft(2,'0')}';
-      return key == dateKey;
-    }).toList();
-
-    if (events.isEmpty && dayTasks.isEmpty) return; // 이벤트와 태스크 모두 없으면 캘린더 탭만 전환
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) => EventDetailSheet(dateKey: dateKey, events: events, tasks: dayTasks),
+      builder: (_) => EventDetailSheet(dateKey: dateKey),
     );
   }
 

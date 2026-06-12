@@ -13,6 +13,7 @@ const kSurfaceDark = Color(0xFF1E1E30);
 class AppTheme {
   static ThemeData get light => ThemeData(
         useMaterial3: true,
+        fontFamily: 'sans-serif',
         colorScheme: ColorScheme.fromSeed(
           seedColor: kPrimaryLight,
           surface: kSurfaceLight,
@@ -39,6 +40,7 @@ class AppTheme {
 
   static ThemeData get dark => ThemeData(
         useMaterial3: true,
+        fontFamily: 'sans-serif',
         colorScheme: ColorScheme.fromSeed(
           seedColor: kPrimaryDark,
           brightness: Brightness.dark,

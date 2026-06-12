@@ -78,6 +78,13 @@ class WidgetService {
       // 일별 이벤트 데이터 저장 (위젯 날짜 탭 시 상세 패널 표시용)
       // key: cal_day_YYYYMMDD_titles / _times / _ids
       final Map<String, List<CalendarEvent>> byDay = {};
+      final startMonth = DateTime(now.year, now.month - 1, 1);
+      final endMonth = DateTime(now.year, now.month + 2, 0);
+      for (var d = startMonth; d.isBefore(endMonth.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
+        final dayKey = '${d.year.toString().padLeft(4,'0')}${d.month.toString().padLeft(2,'0')}${d.day.toString().padLeft(2,'0')}';
+        byDay[dayKey] = [];
+      }
+
       for (final e in events) {
         String? dayKey;
         if (e.startDt != null) {
