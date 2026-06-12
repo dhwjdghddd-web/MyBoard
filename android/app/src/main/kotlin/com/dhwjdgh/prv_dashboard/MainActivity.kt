@@ -45,6 +45,13 @@ class MainActivity : FlutterActivity() {
                     setWidgetTheme(id, theme)
                     result.success(null)
                 }
+                "setWidgetOpacity"  -> {
+                    val args = call.arguments as Map<*, *>
+                    val id      = (args["id"] as Int)
+                    val opacity = (args["opacity"] as Number).toFloat()
+                    setWidgetOpacity(id, opacity)
+                    result.success(null)
+                }
                 "saveAttachment" -> {
                     val args = call.arguments as Map<*, *>
                     val filename  = args["filename"] as String
@@ -104,8 +111,10 @@ class MainActivity : FlutterActivity() {
             val isCover = HomeWidgetProvider.resolveIsCover(this, prefs, id, width)
             val isTablet = HomeWidgetProvider.resolveIsTablet(prefs, id, this)
             val theme = prefs.getString("widget_theme_$id", "system") ?: "system"
+            val opacity = prefs.getFloat("widget_opacity_$id", 1.0f).toDouble()
             mapOf("id" to id, "width" to width, "height" to height,
-                  "manual" to manual, "isCover" to isCover, "isTablet" to isTablet, "theme" to theme)
+                  "manual" to manual, "isCover" to isCover, "isTablet" to isTablet, "theme" to theme,
+                  "opacity" to opacity)
         }
     }
 
@@ -144,6 +153,13 @@ class MainActivity : FlutterActivity() {
     private fun setWidgetTheme(widgetId: Int, theme: String) {
         getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE).edit()
             .putString("widget_theme_$widgetId", theme).apply()
+        val mgr = AppWidgetManager.getInstance(this)
+        HomeWidgetProvider.updateWidget(this, mgr, widgetId)
+    }
+
+    private fun setWidgetOpacity(widgetId: Int, opacity: Float) {
+        getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE).edit()
+            .putFloat("widget_opacity_$widgetId", opacity).apply()
         val mgr = AppWidgetManager.getInstance(this)
         HomeWidgetProvider.updateWidget(this, mgr, widgetId)
     }

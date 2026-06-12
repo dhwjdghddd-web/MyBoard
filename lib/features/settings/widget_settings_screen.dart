@@ -50,6 +50,13 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
     } catch (e) { debugPrint('위젯 테마 변경 실패: $e'); }
   }
 
+  Future<void> _setOpacity(int id, double opacity) async {
+    try {
+      await _channel.invokeMethod('setWidgetOpacity', {'id': id, 'opacity': opacity});
+      await _loadConfigs();
+    } catch (e) { debugPrint('위젯 투명도 변경 실패: $e'); }
+  }
+
   void _showPrivacyPolicy(BuildContext context, bool isDark) {
     showDialog(
       context: context,
@@ -199,11 +206,13 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                   height: w['height'] as int,
                   manual: w['manual'] as String,
                   widgetTheme: w['theme'] as String? ?? 'system',
+                  opacity: (w['opacity'] as num?)?.toDouble() ?? 1.0,
                   isCover: w['isCover'] as bool,
                   isTablet: w['isTablet'] as bool? ?? false,
                   isDark: isDark,
                   onChanged: (setting) => _setSetting(w['id'] as int, setting),
                   onThemeChanged: (theme) => _setTheme(w['id'] as int, theme),
+                  onOpacityChanged: (opacity) => _setOpacity(w['id'] as int, opacity),
                 )),
           const SizedBox(height: 24),
           // 앱 정보 & 법적 고지
@@ -281,11 +290,13 @@ class _WidgetCard extends StatelessWidget {
   final int height;
   final String manual;
   final String widgetTheme;
+  final double opacity;
   final bool isCover;
   final bool isTablet;
   final bool isDark;
   final void Function(String) onChanged;
   final void Function(String) onThemeChanged;
+  final void Function(double) onOpacityChanged;
 
   const _WidgetCard({
     required this.widgetId,
@@ -293,11 +304,13 @@ class _WidgetCard extends StatelessWidget {
     required this.height,
     required this.manual,
     required this.widgetTheme,
+    required this.opacity,
     required this.isCover,
     required this.isTablet,
     required this.isDark,
     required this.onChanged,
     required this.onThemeChanged,
+    required this.onOpacityChanged,
   });
 
   @override
@@ -404,6 +417,45 @@ class _WidgetCard extends StatelessWidget {
                   side: BorderSide(color: theme.colorScheme.outlineVariant),
                   textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '위젯 배경 투명도 설정',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? accentColor : Colors.grey[700],
+                  ),
+                ),
+                Text(
+                  '${(opacity * 100).round()}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? accentColor : Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: accentColor,
+                inactiveTrackColor: theme.colorScheme.outlineVariant.withAlpha(100),
+                thumbColor: accentColor,
+                overlayColor: accentColor.withAlpha(30),
+                trackHeight: 4,
+              ),
+              child: Slider(
+                value: opacity,
+                min: 0.0,
+                max: 1.0,
+                divisions: 10,
+                onChanged: onOpacityChanged,
               ),
             ),
           ],
