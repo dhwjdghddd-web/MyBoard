@@ -547,7 +547,8 @@ class _DayCell extends StatelessWidget {
         ),
         for (final item in visible)
           if (item.isTask)
-            Padding(
+            Container(
+              width: double.infinity,
               padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
               child: Text.rich(
                 TextSpan(
