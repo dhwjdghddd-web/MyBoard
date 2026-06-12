@@ -137,6 +137,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
       await ref.read(calendarProvider.notifier).saveEvent(
         eventId: widget.event?.id,
         calendarId: _calendarId,
+        originalCalendarId: widget.event?.calendarId,
         title: title,
         isAllDay: _allDay,
         startDt: _allDay ? null : _startDt,
@@ -320,14 +321,19 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
           const SizedBox(height: 12),
 
           // ── 캘린더 선택 ──────────────────────────────────────────────
-          if (calendars.isNotEmpty)
-            Card(child: ListTile(
+          // ── 캘린더 선택 ──────────────────────────────────────────────
+          (() {
+            final displayCalendars = calendars.where((c) => c.isWritable).toList();
+            if (displayCalendars.isEmpty) return const SizedBox();
+            return Card(child: ListTile(
               leading: const Icon(Icons.calendar_month),
               title: const Text('캘린더'),
               trailing: DropdownButton<String>(
-                value: calendars.any((c) => c.id == _calendarId) ? _calendarId : calendars.first.id,
+                value: displayCalendars.any((c) => c.id == _calendarId)
+                    ? _calendarId
+                    : (displayCalendars.isNotEmpty ? displayCalendars.first.id : _calendarId),
                 underline: const SizedBox(),
-                items: calendars.map((c) => DropdownMenuItem(
+                items: displayCalendars.map((c) => DropdownMenuItem(
                   value: c.id,
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Container(width: 12, height: 12, decoration: BoxDecoration(color: c.color, shape: BoxShape.circle)),
@@ -337,7 +343,8 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                 )).toList(),
                 onChanged: (v) { if (v != null) setState(() => _calendarId = v); },
               ),
-            )),
+            ));
+          })(),
           const SizedBox(height: 12),
 
           // ── 이벤트 색상 (11가지) ─────────────────────────────────────

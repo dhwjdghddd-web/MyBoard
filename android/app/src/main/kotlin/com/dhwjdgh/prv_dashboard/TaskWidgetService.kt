@@ -62,8 +62,8 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         views.setTextViewText(R.id.task_item_check, if (item.done) "☑" else "☐")
 
         val isDark = resolveIsDark()
-        val activeTextColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
-        val doneTextColor = if (isDark) Color.parseColor("#606070") else Color.parseColor("#A0A0B0")
+        val activeTextColor = if (isDark) Color.WHITE else Color.parseColor("#1F2937")
+        val doneTextColor = if (isDark) Color.parseColor("#606070") else Color.parseColor("#9CA3AF")
         val checkColor = if (isDark) Color.parseColor("#4285F4") else Color.parseColor("#1A73E8")
 
         views.setTextColor(R.id.task_item_title, if (item.done) doneTextColor else activeTextColor)

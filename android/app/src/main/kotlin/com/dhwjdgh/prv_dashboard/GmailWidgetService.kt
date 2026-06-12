@@ -78,15 +78,16 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
         views.setTextViewText(R.id.gmail_item_time, item.time)
 
         val isDark = resolveIsDark()
-        val unreadSender = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
+        val unreadSender = if (isDark) Color.WHITE else Color.parseColor("#1F2937")
         val unreadSubject = if (isDark) Color.parseColor("#E0E0FF") else Color.parseColor("#1A73E8")
-        val readSender = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
-        val readSubject = if (isDark) Color.parseColor("#707080") else Color.parseColor("#9090A0")
-        val timeColor = if (isDark) Color.parseColor("#707080") else Color.parseColor("#9090A0")
+        val readSender = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#6B7280")
+        val readSubject = if (isDark) Color.parseColor("#707080") else Color.parseColor("#9CA3AF")
+        val timeColor = if (isDark) Color.parseColor("#707080") else Color.parseColor("#9CA3AF")
 
         views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) unreadSender else readSender)
         views.setTextColor(R.id.gmail_item_subject, if (item.isUnread) unreadSubject else readSubject)
         views.setTextColor(R.id.gmail_item_time, timeColor)
+        views.setTextColor(R.id.gmail_item_delete, if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#8C8275"))
         
         val openIntent = Intent().apply {
             putExtra("gmail_item_action", "open")
@@ -94,6 +95,13 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
             if (item.emailId.isNotEmpty()) putExtra("email_id", item.emailId)
         }
         views.setOnClickFillInIntent(R.id.gmail_item_root, openIntent)
+
+        val deleteIntent = Intent().apply {
+            putExtra("gmail_item_action", "delete")
+            putExtra("email_id", item.emailId)
+            putExtra("email_idx", position)
+        }
+        views.setOnClickFillInIntent(R.id.gmail_item_delete, deleteIntent)
         
         return views
     }

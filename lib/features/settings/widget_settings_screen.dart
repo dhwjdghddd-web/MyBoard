@@ -62,6 +62,12 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
       backgroundColor: themeBg,
       appBar: AppBar(
         backgroundColor: themeBg,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        ),
         title: const Text('설정'),
         actions: [
           IconButton(

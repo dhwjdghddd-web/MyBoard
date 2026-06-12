@@ -144,9 +144,10 @@ class TasksSyncJobService : JobService() {
                 val id = item.optString("id", "")
                 val title = item.optString("title", "")
                 val status = item.optString("status", "needsAction")
+                val due = if (item.has("due")) item.optString("due", null) else null
                 if (id.isEmpty()) continue
                 
-                val task = TaskItem(id, title, status == "completed")
+                val task = TaskItem(id, title, status == "completed", due)
                 if (task.isCompleted) {
                     completedTasks.add(task)
                 } else {
@@ -166,6 +167,7 @@ class TasksSyncJobService : JobService() {
                 edit.putString("task_$i", task.title)
                 edit.putString("task_${i}_id", task.id)
                 edit.putString("task_${i}_done", if (task.isCompleted) "true" else "false")
+                edit.putString("task_${i}_due", task.due ?: "")
             }
             // 이전 동기화에서 남은 슬롯 제거
             for (i in sorted.size until sorted.size + 30) {
@@ -173,6 +175,7 @@ class TasksSyncJobService : JobService() {
                 edit.putString("task_$i", "")
                 edit.putString("task_${i}_id", "")
                 edit.putString("task_${i}_done", "false")
+                edit.putString("task_${i}_due", "")
             }
             edit.commit()
             Log.d(TAG, "syncTasks written ${activeTasks.size} active tasks to prefs")
@@ -262,5 +265,5 @@ class TasksSyncJobService : JobService() {
         }.getOrNull()
     }
 
-    private data class TaskItem(val id: String, val title: String, val isCompleted: Boolean)
+    private data class TaskItem(val id: String, val title: String, val isCompleted: Boolean, val due: String?)
 }

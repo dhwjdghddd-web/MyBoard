@@ -40,7 +40,13 @@ class CalendarInfo {
   final String id;
   final String summary;
   final Color color;
-  const CalendarInfo({required this.id, required this.summary, required this.color});
+  final bool isWritable;
+  const CalendarInfo({
+    required this.id,
+    required this.summary,
+    required this.color,
+    this.isWritable = true,
+  });
 }
 
 class CalendarEvent {
@@ -221,10 +227,13 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       final calendars = calItems.map((item) {
         final m = item as Map<String, dynamic>;
         final colorHex = (m['backgroundColor'] as String?) ?? '#4285F4';
+        final role = m['accessRole'] as String?;
+        final isWritable = role == 'owner' || role == 'writer';
         return CalendarInfo(
           id: m['id'] as String,
           summary: (m['summary'] as String?) ?? '',
           color: hexToColor(colorHex),
+          isWritable: isWritable,
         );
       }).toList();
 
@@ -309,6 +318,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
   Future<void> saveEvent({
     String? eventId,
     required String calendarId,
+    String? originalCalendarId,
     required String title,
     required bool isAllDay,
     DateTime? startDt,
@@ -346,6 +356,14 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
 
     final calEnc = Uri.encodeComponent(calendarId);
     if (eventId != null) {
+      if (originalCalendarId != null && originalCalendarId != calendarId) {
+        // Move the event to the destination calendar first
+        final srcEnc = Uri.encodeComponent(originalCalendarId);
+        final evEnc = Uri.encodeComponent(eventId);
+        await _api.post(
+          'https://www.googleapis.com/calendar/v3/calendars/$srcEnc/events/$evEnc/move?destination=${Uri.encodeComponent(calendarId)}',
+        );
+      }
       await _api.patch(
         'https://www.googleapis.com/calendar/v3/calendars/$calEnc/events/${Uri.encodeComponent(eventId)}',
         body: body,

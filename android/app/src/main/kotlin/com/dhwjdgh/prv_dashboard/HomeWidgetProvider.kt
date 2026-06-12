@@ -297,6 +297,50 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val lum = 0.299 * red + 0.587 * green + 0.114 * blue
             return if (lum > 180) Color.BLACK else Color.WHITE
         }
+
+        private class DisplayItem(val title: String, val isTask: Boolean, val color: Int)
+
+        private fun getLocalDateKey(dueStr: String): String {
+            if (dueStr.length < 10) return ""
+            return try {
+                if (dueStr.contains("T")) {
+                    val instant = java.time.Instant.parse(dueStr)
+                    val local = instant.atZone(java.time.ZoneId.systemDefault())
+                    val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")
+                    local.format(formatter)
+                } else {
+                    dueStr.substring(0, 10).replace("-", "")
+                }
+            } catch (e: Exception) {
+                dueStr.substring(0, 10).replace("-", "")
+            }
+        }
+
+        private fun bindEventOrTask(views: RemoteViews, viewId: Int, item: DisplayItem, textDp: Float, isDark: Boolean) {
+            views.setTextViewTextSize(viewId, android.util.TypedValue.COMPLEX_UNIT_DIP, textDp)
+            if (item.isTask) {
+                views.setInt(viewId, "setBackgroundColor", Color.TRANSPARENT)
+                
+                val ssb = SpannableStringBuilder("● ${item.title}")
+                ssb.setSpan(ForegroundColorSpan(Color.parseColor("#4285F4")), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                val textColor = if (isDark) Color.WHITE else Color.parseColor("#1F2937")
+                ssb.setSpan(ForegroundColorSpan(textColor), 2, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                
+                views.setTextViewText(viewId, ssb)
+                views.setTextColor(viewId, textColor)
+            } else {
+                views.setInt(viewId, "setBackgroundResource", R.drawable.event_chip_bg)
+                views.setColorStateList(viewId, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(item.color))
+                
+                val ssb = SpannableStringBuilder(item.title)
+                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                
+                views.setTextViewText(viewId, ssb)
+                views.setTextColor(viewId, getContrastColor(item.color))
+            }
+        }
+
         const val ACTION_COMPLETE_TASK   = "com.dhwjdgh.prv_dashboard.COMPLETE_TASK"
         const val ACTION_DELETE_TASK     = "com.dhwjdgh.prv_dashboard.DELETE_TASK"
         const val ACTION_TASK_ITEM       = "com.dhwjdgh.prv_dashboard.TASK_ITEM"
@@ -350,7 +394,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val views     = RemoteViews(context.packageName, layoutId)
 
             // 최외각 LinearLayout 배경 설정
-            views.setInt(R.id.widget_container, "setBackgroundResource", if (isDark) R.drawable.widget_background else R.drawable.widget_background_light)
+            views.setInt(R.id.widget_container, "setBackgroundResource", if (isDark) R.drawable.widget_background_dark else R.drawable.widget_background_light)
 
             // 설정 톱니바퀴 아이콘 틴트 컬러 오버라이드
             val cogColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
@@ -367,8 +411,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.section_calendar, if (activeTab == 1) View.VISIBLE else View.GONE)
                 views.setViewVisibility(R.id.section_gmail,    if (activeTab == 2) View.VISIBLE else View.GONE)
 
-                val activeColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
-                val inactiveColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
+                val activeColor = if (isDark) Color.WHITE else Color.parseColor("#1F2937")
+                val inactiveColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#8C8275")
 
                 views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) activeColor else inactiveColor)
                 views.setTextColor(R.id.tab_calendar, if (activeTab == 1) activeColor else inactiveColor)
@@ -518,6 +562,34 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 else -> actualMonth
             }
 
+            val tasksByDate = mutableMapOf<String, MutableList<String>>()
+            val taskCount = when (val tc = allPrefs["task_count"]) {
+                is Int -> tc
+                is String -> tc.toIntOrNull() ?: 0
+                else -> 0
+            }
+            for (i in 0 until taskCount) {
+                val title = when (val t = allPrefs["task_$i"]) {
+                    is String -> t
+                    else -> ""
+                }
+                val done = when (val d = allPrefs["task_${i}_done"]) {
+                    is Boolean -> d.toString()
+                    is String -> d
+                    else -> "false"
+                }
+                val due = when (val d = allPrefs["task_${i}_due"]) {
+                    is String -> d
+                    else -> ""
+                }
+                if (title.isNotEmpty() && done != "true" && due.length >= 10) {
+                    val dateKey = getLocalDateKey(due)
+                    if (dateKey.isNotEmpty()) {
+                        tasksByDate.getOrPut(dateKey) { mutableListOf() }.add(title)
+                    }
+                }
+            }
+
             val monthNames = arrayOf("","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
             views.setTextViewText(R.id.cal_month_label, "${dispYear}년 ${monthNames[dispMonth]}")
             val monthLabelSp = if (isCover) 20f
@@ -581,29 +653,24 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val gridHeightDp = safeWidgetHeight - if (isCover) 88 else 100
             val rowHeightDp = (gridHeightDp.toFloat() / neededRows.toFloat()).toInt()
 
-            val showEv1 = true
-            val showEv2 = true
-
-            // Calculate font sizes dynamically
-            val rawDateSp = 8.5f + ((rowHeightDp - 10) * 0.15f)
-            var dateSp = rawDateSp.coerceIn(8.5f, 14.0f)
-            if (isTablet) {
-                dateSp = dateSp.coerceAtMost(11.0f)
-            }
-
-            // Calculate remaining vertical space for event chips to prevent clipping
-            // wrap_content Date view takes about dateSp * 1.2 in dp
-            val dateHeightDp = dateSp * 1.20f
-            val remainingHeightDp = maxOf(rowHeightDp - dateHeightDp, 0f)
+            // Calculate font sizes dynamically in DP to fill the vertical space as much as possible
+            val scaleFactor = if (isCover) 3.1f else 3.45f
+            val overhead = if (isCover) 2.5f else 3.15f
+            val rawEventDp = (rowHeightDp.toFloat() - overhead) / scaleFactor
             
-            // Event chips divide the remaining height equally (2 events)
-            val maxEventSp = ((remainingHeightDp / 2f) * 1.1f).coerceAtLeast(7.0f)
+            var eventDp = rawEventDp
+            var dateDp = eventDp + 1.0f
             
-            val rawEventSp = 7.5f + ((rowHeightDp - 10) * 0.15f)
-            var eventSp = rawEventSp.coerceIn(7.5f, 13.0f).coerceAtMost(maxEventSp)
-            if (isTablet) {
-                eventSp = eventSp.coerceAtMost(10.0f)
-            }
+            // Apply maximum constraints depending on device type (tablet is kept compact, cover screen scales larger for readability, home screen is kept balanced to prevent horizontal overflow)
+            val maxDate = if (isTablet) 11.0f else if (isCover) 19.0f else 13.0f
+            val maxEvent = if (isTablet) 10.0f else if (isCover) 16.5f else 11.0f
+            
+            dateDp = dateDp.coerceAtMost(maxDate)
+            eventDp = eventDp.coerceAtMost(maxEvent)
+            
+            // Apply minimum constraints (hard floor)
+            dateDp = dateDp.coerceAtLeast(7.0f)
+            eventDp = eventDp.coerceAtLeast(5.5f)
 
             for (row in 0..5) {
                 for (col in 0..6) {
@@ -647,7 +714,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             else     -> if (isDark) Color.parseColor("#D0D0E0") else Color.parseColor("#1C1C1E")
                         }
                         views.setTextColor(cellId, dayColor)
-                        views.setTextViewTextSize(cellId, android.util.TypedValue.COMPLEX_UNIT_SP, dateSp)
+                        views.setTextViewTextSize(cellId, android.util.TypedValue.COMPLEX_UNIT_DIP, dateDp)
 
                         views.setInt(cellId, "setBackgroundColor", Color.TRANSPARENT)
                         if (parentId != 0) {
@@ -658,49 +725,41 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             }
                         }
 
-                        // 2. 일정 바인딩 (최대 2개)
+                        // 2. 일정 및 태스크 결합 바인딩 (최대 2개)
+                        val dayTasks = tasksByDate[compactKey] ?: emptyList<String>()
+                        val displayItems = mutableListOf<DisplayItem>()
+                        
+                        for (i in titles.indices) {
+                            val t = titles[i]
+                            val cStr = colors.getOrNull(i)
+                            val c = try {
+                                if (!cStr.isNullOrEmpty()) Color.parseColor(cStr) else Color.parseColor("#ff4285f4")
+                            } catch (e: Exception) {
+                                Color.parseColor("#ff4285f4")
+                            }
+                            displayItems.add(DisplayItem(t, false, c))
+                        }
+                        for (t in dayTasks) {
+                            displayItems.add(DisplayItem(t, true, Color.parseColor("#4285F4")))
+                        }
+
+                        val item1 = displayItems.getOrNull(0)
+                        val item2 = displayItems.getOrNull(1)
+
                         if (ev1Id != 0) {
-                            if (titles.isNotEmpty()) {
+                            if (item1 != null) {
                                 views.setViewVisibility(ev1Id, View.VISIBLE)
-                                val title = titles[0]
-                                val colorStr = colors.getOrNull(0)
-                                val eventColor = try {
-                                    if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
-                                } catch (e: Exception) {
-                                    Color.parseColor("#ff4285f4")
-                                }
-
-                                val ssb = SpannableStringBuilder(title)
-                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                views.setTextViewText(ev1Id, ssb)
-                                views.setTextViewTextSize(ev1Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
-
-                                views.setColorStateList(ev1Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
-                                views.setTextColor(ev1Id, getContrastColor(eventColor))
+                                bindEventOrTask(views, ev1Id, item1, eventDp, isDark)
                             } else {
                                 views.setViewVisibility(ev1Id, View.GONE)
                             }
                         }
 
                         if (ev2Id != 0) {
-                            if (titles.size > 1) {
+                            if (item2 != null) {
                                 views.setViewVisibility(ev2Id, View.VISIBLE)
-                                val title = titles[1]
-                                val colorStr = colors.getOrNull(1)
-                                val eventColor = try {
-                                    if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
-                                } catch (e: Exception) {
-                                    Color.parseColor("#ff4285f4")
-                                }
-
-                                val ssb = SpannableStringBuilder(title)
-                                ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                views.setTextViewText(ev2Id, ssb)
-                                views.setTextViewTextSize(ev2Id, android.util.TypedValue.COMPLEX_UNIT_SP, eventSp)
-
-                                views.setColorStateList(ev2Id, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(eventColor))
-                                views.setTextColor(ev2Id, getContrastColor(eventColor))
-                            } else if (titles.size == 1) {
+                                bindEventOrTask(views, ev2Id, item2, eventDp, isDark)
+                            } else if (item1 != null) {
                                 views.setViewVisibility(ev2Id, View.INVISIBLE)
                             } else {
                                 views.setViewVisibility(ev2Id, View.GONE)
@@ -770,10 +829,59 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val idsRaw    = prefs.getString("cal_day_${compactKey}_ids",    "") ?: ""
             val colorsRaw = prefs.getString("cal_day_${compactKey}_colors", "") ?: ""
 
-            val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
-            val times  = if (timesRaw.isEmpty())  emptyList() else timesRaw.split("|")
-            val ids    = if (idsRaw.isEmpty())     emptyList() else idsRaw.split("|")
-            val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
+            val allPrefs = prefs.all
+            val tasksByDate = mutableMapOf<String, MutableList<String>>()
+            val taskCount = when (val tc = allPrefs["task_count"]) {
+                is Int -> tc
+                is String -> tc.toIntOrNull() ?: 0
+                else -> 0
+            }
+            for (i in 0 until taskCount) {
+                val title = when (val t = allPrefs["task_$i"]) {
+                    is String -> t
+                    else -> ""
+                }
+                val done = when (val d = allPrefs["task_${i}_done"]) {
+                    is Boolean -> d.toString()
+                    is String -> d
+                    else -> "false"
+                }
+                val due = when (val d = allPrefs["task_${i}_due"]) {
+                    is String -> d
+                    else -> ""
+                }
+                if (title.isNotEmpty() && done != "true" && due.length >= 10) {
+                    val dk = getLocalDateKey(due)
+                    if (dk.isNotEmpty()) {
+                        tasksByDate.getOrPut(dk) { mutableListOf() }.add(title)
+                    }
+                }
+            }
+            val dayTasks = tasksByDate[compactKey] ?: emptyList<String>()
+
+            class DayDisplayItem(val title: String, val time: String, val id: String, val color: Int, val isTask: Boolean)
+            val displayItems = mutableListOf<DayDisplayItem>()
+
+            val eventTitles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
+            val eventTimes  = if (timesRaw.isEmpty())  emptyList() else timesRaw.split("|")
+            val eventIds    = if (idsRaw.isEmpty())     emptyList() else idsRaw.split("|")
+            val eventColors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
+
+            for (i in eventTitles.indices) {
+                val t = eventTitles[i]
+                val timeStr = eventTimes.getOrElse(i) { "" }
+                val evId = eventIds.getOrElse(i) { "" }
+                val colorStr = eventColors.getOrNull(i)
+                val eventColor = try {
+                    if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#ff4285f4")
+                } catch (e: Exception) {
+                    Color.parseColor("#ff4285f4")
+                }
+                displayItems.add(DayDisplayItem(t, timeStr, evId, eventColor, isTask = false))
+            }
+            for (t in dayTasks) {
+                displayItems.add(DayDisplayItem(t, "할 일", "", Color.parseColor("#4285F4"), isTask = true))
+            }
 
             data class DayRow(val row: Int, val time: Int, val title: Int, val colorBar: Int)
             val dayRows = listOf(
@@ -784,26 +892,34 @@ class HomeWidgetProvider : AppWidgetProvider() {
             )
             var visible = 0
             for ((i, r) in dayRows.withIndex()) {
-                if (i < titles.size && titles[i].isNotEmpty()) {
+                val item = displayItems.getOrNull(i)
+                if (item != null && item.title.isNotEmpty()) {
                     views.setViewVisibility(r.row, View.VISIBLE)
-                    views.setTextViewText(r.time, times.getOrElse(i) { "" })
-                    views.setTextViewText(r.title, titles[i])
                     views.setTextColor(r.time, secondaryColor)
-                    views.setTextColor(r.title, primaryColor)
                     
-                    val colorStr = colors.getOrNull(i)
-                    val eventColor = try {
-                        if (!colorStr.isNullOrEmpty()) Color.parseColor(colorStr) else Color.parseColor("#4285F4")
-                    } catch (e: Exception) {
-                        Color.parseColor("#4285F4")
+                    if (item.isTask) {
+                        views.setTextViewText(r.time, "할 일")
+                        val ssb = SpannableStringBuilder("● ${item.title}")
+                        ssb.setSpan(ForegroundColorSpan(Color.parseColor("#4285F4")), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        views.setTextViewText(r.title, ssb)
+                        views.setTextColor(r.title, primaryColor)
+                        views.setInt(r.colorBar, "setBackgroundColor", Color.TRANSPARENT)
+                        
+                        views.setOnClickPendingIntent(r.row, openAppIntent(context, 0))
+                    } else {
+                        views.setTextViewText(r.time, item.time)
+                        val ssb = SpannableStringBuilder(item.title)
+                        ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        views.setTextViewText(r.title, ssb)
+                        views.setTextColor(r.title, primaryColor)
+                        views.setInt(r.colorBar, "setBackgroundColor", item.color)
+                        
+                        views.setOnClickPendingIntent(r.row,
+                            if (item.id.isNotEmpty()) openEventDetailIntent(context, item.id, dateKey, i)
+                            else openCalendarDateAppIntent(context, dateKey)
+                        )
                     }
-                    views.setInt(r.colorBar, "setBackgroundColor", eventColor)
-
-                    val evId = ids.getOrElse(i) { "" }
-                    views.setOnClickPendingIntent(r.row,
-                        if (evId.isNotEmpty()) openEventDetailIntent(context, evId, dateKey, i)
-                        else openCalendarDateAppIntent(context, dateKey)
-                    )
                     visible++
                 } else {
                     views.setViewVisibility(r.row, View.GONE)
@@ -861,11 +977,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setRemoteAdapter(R.id.gmail_list_view, adapterIntent)
 
                 // Broadcast template → HomeWidgetProvider handles open/delete
-                // Activity template → opens MainActivity directly in the foreground
-                val template = PendingIntent.getActivity(
+                val template = PendingIntent.getBroadcast(
                     context, 350,
-                    Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    Intent(context, HomeWidgetProvider::class.java).apply {
+                        action = ACTION_GMAIL_ITEM
                     },
                     PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )

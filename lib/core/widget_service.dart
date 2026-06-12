@@ -23,6 +23,7 @@ class WidgetService {
         await HomeWidget.saveWidgetData<String>('task_$i', display[i].title);
         await HomeWidget.saveWidgetData<String>('task_${i}_id', display[i].id);
         await HomeWidget.saveWidgetData<String>('task_${i}_done', display[i].isCompleted ? 'true' : 'false');
+        await HomeWidget.saveWidgetData<String>('task_${i}_due', display[i].due != null ? display[i].due!.toIso8601String() : '');
       }
       // 이전 동기화에서 남은 슬롯 제거
       for (var i = display.length; i < display.length + 30; i++) {
@@ -31,6 +32,7 @@ class WidgetService {
         await HomeWidget.saveWidgetData<String>('task_$i', '');
         await HomeWidget.saveWidgetData<String>('task_${i}_id', '');
         await HomeWidget.saveWidgetData<String>('task_${i}_done', 'false');
+        await HomeWidget.saveWidgetData<String>('task_${i}_due', '');
       }
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
     } catch (e, st) {

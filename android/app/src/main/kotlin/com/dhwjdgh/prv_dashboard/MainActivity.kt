@@ -146,6 +146,19 @@ class MainActivity : FlutterActivity() {
         HomeWidgetProvider.updateWidget(this, mgr, widgetId)
     }
 
+    override fun onResume() {
+        super.onResume()
+        try {
+            val mgr = AppWidgetManager.getInstance(this)
+            val ids = mgr.getAppWidgetIds(ComponentName(this, HomeWidgetProvider::class.java))
+            for (id in ids) {
+                HomeWidgetProvider.updateWidget(this, mgr, id)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     override fun onDestroy() {
         if (activeChannel == methodChannel) {
             activeChannel = null
