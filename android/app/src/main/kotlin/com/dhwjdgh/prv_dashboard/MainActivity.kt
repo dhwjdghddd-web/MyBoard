@@ -198,12 +198,12 @@ class MainActivity : FlutterActivity() {
         when {
             emailId.isNotEmpty() ->
                 methodChannel?.invokeMethod("openEmail", emailId)
+            action == "create_event" ->
+                methodChannel?.invokeMethod("openCreateEvent", dateKey.ifEmpty { null })
             dateKey.isNotEmpty() ->
                 methodChannel?.invokeMethod("openCalendarDate", mapOf("eventId" to eventId, "dateKey" to dateKey))
             action == "create_task" ->
                 methodChannel?.invokeMethod("openCreateTask", null)
-            action == "create_event" ->
-                methodChannel?.invokeMethod("openCreateEvent", null)
             action == "compose_email" ->
                 methodChannel?.invokeMethod("openComposeEmail", null)
             tab >= 0 ->

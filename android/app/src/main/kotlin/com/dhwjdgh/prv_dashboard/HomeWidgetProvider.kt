@@ -845,7 +845,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
             // 일정 추가 → 앱 열기
             views.setOnClickPendingIntent(R.id.cal_day_add_btn,
-                openCalendarDateAppIntent(context, dateKey))
+                openCreateEventForDateIntent(context, dateKey))
 
             // 저장된 일정 데이터 로드 (compact key: cal_day_YYYYMMDD)
             val compactKey = dateKey.replace("-", "")
@@ -909,12 +909,17 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
 
             data class DayRow(val row: Int, val time: Int, val title: Int, val colorBar: Int)
-            val dayRows = listOf(
-                DayRow(R.id.cal_day_row_0, R.id.cal_day_time_0, R.id.cal_day_title_0, R.id.cal_day_color_0),
-                DayRow(R.id.cal_day_row_1, R.id.cal_day_time_1, R.id.cal_day_title_1, R.id.cal_day_color_1),
-                DayRow(R.id.cal_day_row_2, R.id.cal_day_time_2, R.id.cal_day_title_2, R.id.cal_day_color_2),
-                DayRow(R.id.cal_day_row_3, R.id.cal_day_time_3, R.id.cal_day_title_3, R.id.cal_day_color_3),
-            )
+            val maxRowsCount = if (isTablet) 12 else 4
+            val dayRows = mutableListOf<DayRow>()
+            for (i in 0 until maxRowsCount) {
+                val rowId = context.resources.getIdentifier("cal_day_row_$i", "id", context.packageName)
+                val timeId = context.resources.getIdentifier("cal_day_time_$i", "id", context.packageName)
+                val titleId = context.resources.getIdentifier("cal_day_title_$i", "id", context.packageName)
+                val colorId = context.resources.getIdentifier("cal_day_color_$i", "id", context.packageName)
+                if (rowId != 0 && timeId != 0 && titleId != 0 && colorId != 0) {
+                    dayRows.add(DayRow(rowId, timeId, titleId, colorId))
+                }
+            }
             var visible = 0
             for ((i, r) in dayRows.withIndex()) {
                 val item = displayItems.getOrNull(i)
@@ -1190,6 +1195,17 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 context, 850,
                 Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    putExtra("date_key", dateKey)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        private fun openCreateEventForDateIntent(context: Context, dateKey: String): PendingIntent =
+            PendingIntent.getActivity(
+                context, 505,
+                Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    putExtra("action", "create_event")
                     putExtra("date_key", dateKey)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

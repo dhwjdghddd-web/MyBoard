@@ -427,6 +427,11 @@ class _CalendarGrid extends ConsumerWidget {
     final minCellHeight = 28.0 + (38.0 * textScale);
     final childAspectRatio = (cellWidth / minCellHeight).clamp(0.45, 0.85);
 
+    final cellHeight = cellWidth / childAspectRatio;
+    final availableForEvents = cellHeight - 24.0;
+    final calculatedSlots = (availableForEvents / 15.0).floor();
+    final maxSlots = isTablet ? calculatedSlots.clamp(2, 6) : 2;
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -467,6 +472,7 @@ class _CalendarGrid extends ConsumerWidget {
           child: _DayCell(
             day: dayNum, isToday: isToday, isSunday: isSunday,
             events: dayEvents, tasks: dayTasks, isWeekend: isWeekend,
+            maxSlots: maxSlots,
           ),
         );
       },
@@ -480,12 +486,14 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.day, required this.isToday, required this.isSunday,
     required this.events, required this.tasks, required this.isWeekend,
+    required this.maxSlots,
   });
 
   final int day;
   final bool isToday, isWeekend, isSunday;
   final List<CalendarEvent> events;
   final List<Task> tasks;
+  final int maxSlots;
 
   @override
   Widget build(BuildContext context) {
@@ -505,7 +513,7 @@ class _DayCell extends StatelessWidget {
       }
       return 0;
     });
-    final visible = allItems.take(2).toList();
+    final visible = allItems.take(maxSlots).toList();
     final extra = allItems.length - visible.length;
 
     return Container(

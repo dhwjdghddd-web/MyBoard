@@ -87,7 +87,8 @@ class _MainScreenState extends ConsumerState<MainScreen>
         } else if (action == 'create_event') {
           setState(() => _index = 1);
           await Future.delayed(const Duration(milliseconds: 300));
-          _showCreateEventScreen();
+          final dateKey = await _channel.invokeMethod<String>('getInitialDateKey') ?? '';
+          _showCreateEventScreen(dateKey: dateKey.isNotEmpty ? dateKey : null);
         } else if (action == 'compose_email') {
           setState(() => _index = 2);
           await Future.delayed(const Duration(milliseconds: 300));
@@ -171,10 +172,11 @@ class _MainScreenState extends ConsumerState<MainScreen>
         }
 
       case 'openCreateEvent':
+        final dateKey = call.arguments as String?;
         if (mounted) {
           setState(() => _index = 1);
           await Future.delayed(const Duration(milliseconds: 200));
-          _showCreateEventScreen();
+          _showCreateEventScreen(dateKey: dateKey);
         }
 
       case 'openComposeEmail':
@@ -218,13 +220,12 @@ class _MainScreenState extends ConsumerState<MainScreen>
         MaterialPageRoute(builder: (_) => const GmailComposeScreen()));
   }
 
-  void _showCreateEventScreen() {
+  void _showCreateEventScreen({String? dateKey}) {
     if (!mounted) return;
-    final now = DateTime.now();
-    final dateKey =
-        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final targetDate = dateKey ??
+        '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}';
     Navigator.push(context,
-        MaterialPageRoute(builder: (_) => EventFormScreen(initialDateKey: dateKey)));
+        MaterialPageRoute(builder: (_) => EventFormScreen(initialDateKey: targetDate)));
   }
 
   @override

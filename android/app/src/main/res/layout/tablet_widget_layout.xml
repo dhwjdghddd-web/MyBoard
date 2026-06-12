@@ -2741,6 +2741,134 @@
                             android:paddingStart="6dp"/>
                     </LinearLayout>
 
+                    <!-- 일정 행 4 -->
+                    <LinearLayout android:id="@+id/cal_day_row_4"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_4" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_4"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_4"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 5 -->
+                    <LinearLayout android:id="@+id/cal_day_row_5"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_5" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_5"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_5"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 6 -->
+                    <LinearLayout android:id="@+id/cal_day_row_6"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_6" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_6"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_6"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 7 -->
+                    <LinearLayout android:id="@+id/cal_day_row_7"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_7" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_7"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_7"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 8 -->
+                    <LinearLayout android:id="@+id/cal_day_row_8"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_8" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_8"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_8"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 9 -->
+                    <LinearLayout android:id="@+id/cal_day_row_9"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_9" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_9"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_9"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 10 -->
+                    <LinearLayout android:id="@+id/cal_day_row_10"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_10" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_10"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_10"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
+                    <!-- 일정 행 11 -->
+                    <LinearLayout android:id="@+id/cal_day_row_11"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingTop="4dp" android:paddingBottom="4dp" android:visibility="gone">
+                        <FrameLayout android:id="@+id/cal_day_color_11" android:layout_width="4dp" android:layout_height="match_parent"
+                            android:background="#4285F4" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/cal_day_time_11"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textSize="10sp" android:textColor="@color/widget_text_secondary" android:minWidth="40dp"/>
+                        <TextView android:id="@+id/cal_day_title_11"
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:textSize="12sp" android:textColor="@color/widget_text_primary" android:maxLines="1" android:ellipsize="end"
+                            android:paddingStart="6dp"/>
+                    </LinearLayout>
+
                     <TextView android:id="@+id/cal_day_empty"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:text="이 날 일정이 없어요" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
