@@ -12,6 +12,8 @@ class MainActivity : FlutterActivity() {
 
     private val CHANNEL = "widget_channel"
     private var methodChannel: MethodChannel? = null
+    private var isActivityResumed = false
+    private var pendingIntentAction: Intent? = null
 
     companion object {
         var activeChannel: MethodChannel? = null
@@ -148,6 +150,7 @@ class MainActivity : FlutterActivity() {
 
     override fun onResume() {
         super.onResume()
+        isActivityResumed = true
         try {
             val mgr = AppWidgetManager.getInstance(this)
             val ids = mgr.getAppWidgetIds(ComponentName(this, HomeWidgetProvider::class.java))
@@ -157,6 +160,15 @@ class MainActivity : FlutterActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        pendingIntentAction?.let {
+            processIntentAction(it)
+            pendingIntentAction = null
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isActivityResumed = false
     }
 
     override fun onDestroy() {
@@ -169,6 +181,14 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (isActivityResumed) {
+            processIntentAction(intent)
+        } else {
+            pendingIntentAction = intent
+        }
+    }
+
+    private fun processIntentAction(intent: Intent) {
         val emailId = intent.getStringExtra("email_id") ?: ""
         val eventId = intent.getStringExtra("event_id") ?: ""
         val dateKey = intent.getStringExtra("date_key") ?: ""

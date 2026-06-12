@@ -172,7 +172,7 @@ class CalendarSyncJobService : JobService() {
                     if (!aAllDay && bAllDay) return@Comparator 1
                     a.time.compareTo(b.time)
                 })
-                val take = events.take(4)
+                val take = events.take(25)
                 edit.putString("cal_day_${key}_titles", take.joinToString("|") { it.title })
                 edit.putString("cal_day_${key}_times",  take.joinToString("|") { it.time })
                 edit.putString("cal_day_${key}_ids",    take.joinToString("|") { it.id })

@@ -653,15 +653,24 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val gridHeightDp = safeWidgetHeight - if (isCover) 88 else 100
             val rowHeightDp = (gridHeightDp.toFloat() / neededRows.toFloat()).toInt()
 
-            // Calculate font sizes dynamically in DP to fill the vertical space as much as possible
-            val scaleFactor = if (isCover) 3.1f else 3.45f
+            // 태블릿: 행 높이에서 날짜(~12dp) 빼고 이벤트 칩 높이(~11dp)로 나누어 슬롯 수 동적 계산
+            val tabletMaxSlots = if (isTablet) {
+                val availableForEvents = rowHeightDp - 14
+                val slotHeight = 11
+                maxOf(2, minOf(6, availableForEvents / slotHeight))
+            } else 2
+
+            // Calculate font sizes dynamically
+            val scaleFactor = if (isTablet) {
+                (tabletMaxSlots.toFloat() + 1.2f)
+            } else if (isCover) 3.1f else 3.45f
             val overhead = if (isCover) 2.5f else 3.15f
             val rawEventDp = (rowHeightDp.toFloat() - overhead) / scaleFactor
             
             var eventDp = rawEventDp
             var dateDp = eventDp + 1.0f
             
-            // Apply maximum constraints depending on device type (tablet is kept compact, cover screen scales larger for readability, home screen is kept balanced to prevent horizontal overflow)
+            // Apply maximum constraints depending on device type
             val maxDate = if (isTablet) 11.0f else if (isCover) 19.0f else 13.0f
             val maxEvent = if (isTablet) 10.0f else if (isCover) 16.5f else 11.0f
             
@@ -725,7 +734,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             }
                         }
 
-                        // 2. 일정 및 태스크 결합 바인딩 (최대 2개)
+                        // 2. 일정 및 태스크 결합 바인딩 (태블릿: 높이 따라 최대 4개, 그 외: 최대 2개)
                         val dayTasks = tasksByDate[compactKey] ?: emptyList<String>()
                         val displayItems = mutableListOf<DisplayItem>()
                         
@@ -743,26 +752,42 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             displayItems.add(DisplayItem(t, true, Color.parseColor("#4285F4")))
                         }
 
-                        val item1 = displayItems.getOrNull(0)
-                        val item2 = displayItems.getOrNull(1)
+                        // 태블릿: 행 높이에 따라 표시 가능한 슬롯 수를 동적 결정 (최대 6, XML 한계)
+                        val maxSlots = if (isTablet) tabletMaxSlots else 2
 
-                        if (ev1Id != 0) {
-                            if (item1 != null) {
-                                views.setViewVisibility(ev1Id, View.VISIBLE)
-                                bindEventOrTask(views, ev1Id, item1, eventDp, isDark)
-                            } else {
-                                views.setViewVisibility(ev1Id, View.GONE)
-                            }
-                        }
+                        // ev1~ev6 ID 조회 (태블릿만 ev3~ev6 사용)
+                        val ev3Id = if (isTablet) context.resources.getIdentifier("${resName}_ev3", "id", context.packageName) else 0
+                        val ev4Id = if (isTablet) context.resources.getIdentifier("${resName}_ev4", "id", context.packageName) else 0
+                        val ev5Id = if (isTablet) context.resources.getIdentifier("${resName}_ev5", "id", context.packageName) else 0
+                        val ev6Id = if (isTablet) context.resources.getIdentifier("${resName}_ev6", "id", context.packageName) else 0
 
-                        if (ev2Id != 0) {
-                            if (item2 != null) {
-                                views.setViewVisibility(ev2Id, View.VISIBLE)
-                                bindEventOrTask(views, ev2Id, item2, eventDp, isDark)
-                            } else if (item1 != null) {
-                                views.setViewVisibility(ev2Id, View.INVISIBLE)
+                        val slotIds = listOf(ev1Id, ev2Id, ev3Id, ev4Id, ev5Id, ev6Id)
+                        val totalItems = displayItems.size
+                        val hasOverflow = totalItems > maxSlots
+
+                        for (s in 0 until 6) {
+                            val slotId = slotIds[s]
+                            if (slotId == 0) continue
+
+                            if (s >= maxSlots) {
+                                // 슬롯 한계 초과 → 숨기기
+                                views.setViewVisibility(slotId, View.GONE)
+                            } else if (hasOverflow && s == maxSlots - 1) {
+                                // 마지막 가시 슬롯 → "+N" 오버플로 표시
+                                val remaining = totalItems - (maxSlots - 1)
+                                views.setViewVisibility(slotId, View.VISIBLE)
+                                views.setTextViewText(slotId, "+$remaining")
+                                views.setTextViewTextSize(slotId, android.util.TypedValue.COMPLEX_UNIT_DIP, eventDp)
+                                views.setTextColor(slotId, if (isDark) Color.parseColor("#9E9EBF") else Color.parseColor("#757575"))
+                                views.setInt(slotId, "setBackgroundResource", R.drawable.overflow_chip_bg)
                             } else {
-                                views.setViewVisibility(ev2Id, View.GONE)
+                                val item = displayItems.getOrNull(s)
+                                if (item != null) {
+                                    views.setViewVisibility(slotId, View.VISIBLE)
+                                    bindEventOrTask(views, slotId, item, eventDp, isDark)
+                                } else {
+                                    views.setViewVisibility(slotId, View.GONE)
+                                }
                             }
                         }
 

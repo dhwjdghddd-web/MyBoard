@@ -81,7 +81,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
           .toList();
       final sorted = _sorted(tasks);
       state = AsyncValue.data(sorted);
-      WidgetService.updateTasks(sorted);
+      await WidgetService.updateTasks(sorted);
 
       // 위젯에서 체크한 태스크 동기화
       final pending = await WidgetService.getPendingCompletions();
@@ -113,7 +113,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
       final current = state.value ?? [];
       final sorted = _sorted([newTask, ...current]);
       state = AsyncValue.data(sorted);
-      WidgetService.updateTasks(sorted);
+      await WidgetService.updateTasks(sorted);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -133,7 +133,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       await _api.patch('$_base/lists/$_listId/tasks/${task.id}', body: body);
-      WidgetService.updateTasks(state.value ?? []);
+      await WidgetService.updateTasks(state.value ?? []);
     } catch (e) {
       debugPrint('태스크 상태 변경 실패: $e');
       state = AsyncValue.data(_sorted(current)); // 실패 시 원복
@@ -183,7 +183,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       await _api.delete('$_base/lists/$_listId/tasks/$taskId');
-      WidgetService.updateTasks(state.value ?? []);
+      await WidgetService.updateTasks(state.value ?? []);
     } catch (e) {
       debugPrint('태스크 삭제 API 실패: $e');
       state = AsyncValue.data(current); // 실패 시 원복

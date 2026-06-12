@@ -101,7 +101,7 @@ class WidgetService {
           }
           return 0;
         });
-        final take = evList.take(4).toList();
+        final take = evList.take(25).toList();
         final titles = take.map((e) => e.summary).join('|');
         final times  = take.map((e) {
           if (e.isAllDay) return '종일';

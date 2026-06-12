@@ -280,7 +280,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       });
 
       state = state.copyWith(events: events, loading: false);
-      WidgetService.updateCalendar(events);
+      await WidgetService.updateCalendar(events);
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
     }
