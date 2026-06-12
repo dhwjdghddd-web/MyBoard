@@ -246,6 +246,46 @@ class _MainScreenState extends ConsumerState<MainScreen>
   Widget build(BuildContext context) {
     final tasks = ref.watch(taskServiceProvider).value ?? [];
     final activeCount = tasks.where((t) => !t.isCompleted).length;
+    final bool isTablet = MediaQuery.of(context).size.width >= 600;
+
+    if (isTablet) {
+      return Scaffold(
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: _index,
+              onDestinationSelected: (i) => setState(() => _index = i),
+              labelType: NavigationRailLabelType.all,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Badge(
+                    isLabelVisible: activeCount > 0,
+                    label: Text('$activeCount'),
+                    child: const Icon(Icons.check_circle_outline),
+                  ),
+                  selectedIcon: const Icon(Icons.check_circle),
+                  label: const Text('태스크'),
+                ),
+                const NavigationRailDestination(
+                  icon: Icon(Icons.calendar_today_outlined),
+                  selectedIcon: Icon(Icons.calendar_today),
+                  label: Text('캘린더'),
+                ),
+                const NavigationRailDestination(
+                  icon: Icon(Icons.email_outlined),
+                  selectedIcon: Icon(Icons.email),
+                  label: Text('Gmail'),
+                ),
+              ],
+            ),
+            const VerticalDivider(thickness: 1, width: 1),
+            Expanded(
+              child: IndexedStack(index: _index, children: _screens),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       body: IndexedStack(index: _index, children: _screens),

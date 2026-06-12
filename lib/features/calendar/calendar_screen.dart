@@ -87,53 +87,112 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       body: Stack(children: [
         RefreshIndicator(
           onRefresh: () => ref.read(calendarProvider.notifier).loadEvents(),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(children: [
-              // 요일 헤더
-              _DowHeader(),
-              // 달력 그리드 (자연 높이)
-              _CalendarGrid(
-                year: cal.year,
-                month: cal.month,
-                eventsByDate: cal.eventsByDate,
-                tasksByDate: tasksByDate,
-              ),
-              const Divider(height: 1),
-              // 이달 일정 목록 헤더
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
-              // 이달 일정 리스트
-              allMonthItems.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Text(
-                          '이번 달 일정이 없어요',
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+          child: MediaQuery.of(context).size.width >= 600
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 좌측 60%: 달력 그리드
+                    Expanded(
+                      flex: 6,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(children: [
+                          _DowHeader(),
+                          _CalendarGrid(
+                            year: cal.year,
+                            month: cal.month,
+                            eventsByDate: cal.eventsByDate,
+                            tasksByDate: tasksByDate,
+                          ),
+                        ]),
+                      ),
+                    ),
+                    const VerticalDivider(width: 1, thickness: 1),
+                    // 우측 40%: 이달 일정 목록
+                    Expanded(
+                      flex: 4,
+                      child: Column(children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: allMonthItems.isEmpty
+                              ? Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Text(
+                                      '이번 달 일정이 없어요',
+                                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                    ),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  itemCount: allMonthItems.length,
+                                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                                  itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
+                                ),
+                        ),
+                      ]),
+                    ),
+                  ],
+                )
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(children: [
+                    // 요일 헤더
+                    _DowHeader(),
+                    // 달력 그리드 (자연 높이)
+                    _CalendarGrid(
+                      year: cal.year,
+                      month: cal.month,
+                      eventsByDate: cal.eventsByDate,
+                      tasksByDate: tasksByDate,
+                    ),
+                    const Divider(height: 1),
+                    // 이달 일정 목록 헤더
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          letterSpacing: 0.3,
                         ),
                       ),
-                    )
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: allMonthItems.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
-                      itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
                     ),
-            ]),
-          ),
+                    // 이달 일정 리스트
+                    allMonthItems.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Text(
+                                '이번 달 일정이 없어요',
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: allMonthItems.length,
+                            separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                            itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i]),
+                          ),
+                  ]),
+                ),
         ),
         // 캘린더 필터 패널
         if (_showFilter)
@@ -361,8 +420,10 @@ class _CalendarGrid extends ConsumerWidget {
     final totalCells = startOffset + lastDay.day;
     final rows = (totalCells / 7).ceil();
     final double textScale = MediaQuery.maybeTextScalerOf(context)?.scale(1.0) ?? 1.0;
+    final bool isTablet = MediaQuery.of(context).size.width >= 600;
     final screenWidth = MediaQuery.of(context).size.width;
-    final cellWidth = screenWidth / 7;
+    final calendarWidth = isTablet ? (screenWidth * 0.6) : screenWidth;
+    final cellWidth = calendarWidth / 7;
     final minCellHeight = 28.0 + (38.0 * textScale);
     final childAspectRatio = (cellWidth / minCellHeight).clamp(0.45, 0.85);
 
