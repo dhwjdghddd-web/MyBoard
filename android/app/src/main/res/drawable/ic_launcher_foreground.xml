@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Material dashboard icon scaled to adaptive icon safe zone (18-90dp) -->
+    <!-- Four blocks: top-left tall, bottom-left short, bottom-right tall, top-right short -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,56 H52 V34 H34 Z
+                          M34,74 H52 V61 H34 Z
+                          M56,74 H74 V52 H56 Z
+                          M56,47 H74 V34 H56 Z"/>
+</vector>

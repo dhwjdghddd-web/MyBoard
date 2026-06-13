@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Adaptive Icon Background -->
+    <color name="ic_launcher_background">#1A73E8</color>
+
     <!-- Light Mode Widget Colors -->
     <color name="widget_background">#FAF2EA</color>
     <color name="widget_text_primary">#1F2937</color>
