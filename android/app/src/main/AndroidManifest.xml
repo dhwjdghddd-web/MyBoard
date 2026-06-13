@@ -150,5 +150,9 @@
         </intent>
         <!-- Gmail 앱 열기 -->
         <package android:name="com.google.android.gm"/>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="googlegmail" />
+        </intent>
     </queries>
 </manifest>

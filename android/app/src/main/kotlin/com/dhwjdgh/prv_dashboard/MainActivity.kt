@@ -94,6 +94,16 @@ class MainActivity : FlutterActivity() {
                     val filename = call.arguments as String
                     result.success(findExistingDownload(filename))
                 }
+                "launchGmail" -> {
+                    val launch = packageManager.getLaunchIntentForPackage("com.google.android.gm")
+                    if (launch != null) {
+                        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(launch)
+                        result.success(true)
+                    } else {
+                        result.success(false)
+                    }
+                }
                 else -> result.notImplemented()
             }
         }

@@ -227,12 +227,12 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
   }
 
   Future<void> _openGmailApp() async {
-    final uri = Uri.parse('googlegmail://');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      await launchUrl(Uri.parse('https://mail.google.com'), mode: LaunchMode.externalApplication);
-    }
+    try {
+      final launched = await _saveChannel.invokeMethod<bool>('launchGmail') ?? false;
+      if (launched) return;
+    } catch (_) {}
+    await launchUrl(Uri.parse('https://mail.google.com'),
+        mode: LaunchMode.externalApplication);
   }
 
   @override
