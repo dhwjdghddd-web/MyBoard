@@ -74,7 +74,7 @@ class GmailSyncJobService : JobService() {
         fun executeSyncInternal(context: Context) {
             Log.d(TAG, "executeSyncInternal: start")
             var token = readToken(context)
-            Log.d(TAG, "token from prefs: ${if (token.isNullOrEmpty()) "NULL/EMPTY" else "OK (len=${token!!.length})"}")
+            Log.d(TAG, "token from prefs: ${if (token.isNullOrEmpty()) "NULL/EMPTY" else "OK"}")
             if (token.isNullOrEmpty()) {
                 Log.d(TAG, "fetching fresh token via GoogleAuthUtil...")
                 token = freshToken(context)

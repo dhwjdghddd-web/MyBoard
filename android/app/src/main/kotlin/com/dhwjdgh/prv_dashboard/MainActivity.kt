@@ -132,10 +132,11 @@ class MainActivity : FlutterActivity() {
 
     private fun saveAttachment(filename: String, mimeType: String, base64Data: String, result: io.flutter.plugin.common.MethodChannel.Result) {
         try {
+            val safeFilename = filename.replace("/", "_").replace("\\", "_").replace("..", "_")
             val normalized = base64Data.replace("\n", "").replace(" ", "")
                 .replace("-", "+").replace("_", "/")
             val bytes = android.util.Base64.decode(normalized, android.util.Base64.DEFAULT)
-            val file  = java.io.File(downloadsDir(), filename)
+            val file  = java.io.File(downloadsDir(), safeFilename)
             file.writeBytes(bytes)
             result.success(file.absolutePath)
         } catch (e: Exception) {

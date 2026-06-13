@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'widget_service.dart';
 
 const _scopes = [
   'https://www.googleapis.com/auth/tasks',
@@ -68,6 +69,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
     await _googleSignIn.signOut();
     await _storage.delete(key: 'access_token');
     await _storage.delete(key: 'access_token_cached_at');
+    await WidgetService.clearAllData();
     state = const AsyncValue.data(null);
   }
 

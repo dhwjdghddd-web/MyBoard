@@ -178,6 +178,31 @@ class WidgetService {
     }
   }
 
+  static Future<void> clearAllData() async {
+    try {
+      final futures = <Future>[];
+      futures.add(HomeWidget.saveWidgetData<String>('task_count', '0'));
+      for (var i = 0; i < 100; i++) {
+        futures.add(HomeWidget.saveWidgetData<String>('task_$i', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_id', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_done', 'false'));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_due', ''));
+      }
+      futures.add(HomeWidget.saveWidgetData<int>('gmail_count', 0));
+      for (var i = 0; i < 25; i++) {
+        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread', 'false'));
+        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id', ''));
+      }
+      await Future.wait(futures);
+      await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
+    } catch (e, st) {
+      debugPrint('WidgetService.clearAllData error: $e\n$st');
+    }
+  }
+
   static Future<List<String>> getPendingCompletions() async {
     try {
       final raw = await HomeWidget.getWidgetData<String>('pending_completions', defaultValue: '');
