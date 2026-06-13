@@ -1122,7 +1122,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             for (id in ids) {
                 val isTablet = resolveIsTablet(prefs, id, context)
-                val isCover = resolveIsCover(context, prefs, id, 300)
+                val widgetOpts = mgr.getAppWidgetOptions(id)
+                val isCover = resolveIsCover(context, prefs, id, widgetOpts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 300))
                 val layoutId = when {
                     isTablet -> R.layout.tablet_widget_layout
                     isCover  -> R.layout.cover_widget_layout

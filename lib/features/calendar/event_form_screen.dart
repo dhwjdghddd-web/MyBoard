@@ -128,6 +128,12 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
 
     setState(() => _saving = true);
     try {
+      final calState = ref.read(calendarProvider);
+      final displayCalendars = calState.calendars.where((c) => c.isWritable).toList();
+      if (displayCalendars.isNotEmpty && !displayCalendars.any((c) => c.id == _calendarId)) {
+        _calendarId = displayCalendars.first.id;
+      }
+
       final guests = _guestsCtrl.text.trim();
       final attendees = guests.isNotEmpty
           ? guests.split(',').map((e) => e.trim()).where((e) => e.contains('@')).toList()

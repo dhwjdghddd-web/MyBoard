@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -27,8 +28,16 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
     _init();
   }
 
+  StreamSubscription<GoogleSignInAccount?>? _sub;
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
   Future<void> _init() async {
-    _googleSignIn.onCurrentUserChanged.listen((user) async {
+    _sub = _googleSignIn.onCurrentUserChanged.listen((user) async {
       state = AsyncValue.data(user);
       if (user != null) await _cacheToken(user);
     });

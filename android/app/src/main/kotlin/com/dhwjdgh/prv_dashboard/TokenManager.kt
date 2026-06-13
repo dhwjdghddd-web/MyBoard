@@ -16,16 +16,26 @@ object TokenManager {
     private const val SECURE_PREFS_NAME = "FlutterSecureStorage"
     private const val TOKEN_KEY = "VGtWcmJHbHVaMjl1_access_token"
 
+    @Volatile private var espInstance: android.content.SharedPreferences? = null
+
+    private fun getEsp(context: Context): android.content.SharedPreferences {
+        return espInstance ?: synchronized(this) {
+            espInstance ?: run {
+                val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+                EncryptedSharedPreferences.create(
+                    SECURE_PREFS_NAME, alias, context.applicationContext,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                ).also { espInstance = it }
+            }
+        }
+    }
+
     /**
      * EncryptedSharedPreferences에서 캐시된 액세스 토큰을 읽습니다.
      */
     fun readCachedToken(context: Context): String? = runCatching {
-        val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-        EncryptedSharedPreferences.create(
-            SECURE_PREFS_NAME, alias, context,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        ).getString(TOKEN_KEY, null)
+        getEsp(context).getString(TOKEN_KEY, null)
     }.onFailure { Log.w(TAG, "readCachedToken failed", it) }.getOrNull()
 
     /**
@@ -43,12 +53,7 @@ object TokenManager {
      */
     fun writeCachedToken(context: Context, token: String) {
         runCatching {
-            val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-            EncryptedSharedPreferences.create(
-                SECURE_PREFS_NAME, alias, context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            ).edit().putString(TOKEN_KEY, token).apply()
+            getEsp(context).edit().putString(TOKEN_KEY, token).apply()
         }.onFailure { Log.w(TAG, "writeCachedToken failed", it) }
     }
 
