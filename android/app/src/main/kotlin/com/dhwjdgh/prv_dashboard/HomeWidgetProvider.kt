@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
@@ -331,7 +332,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 views.setTextColor(viewId, textColor)
             } else {
                 views.setInt(viewId, "setBackgroundResource", R.drawable.event_chip_bg)
-                views.setColorStateList(viewId, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(item.color))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    views.setColorStateList(viewId, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(item.color))
+                } else {
+                    views.setInt(viewId, "setBackgroundColor", item.color)
+                }
                 
                 val ssb = SpannableStringBuilder(item.title)
                 ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

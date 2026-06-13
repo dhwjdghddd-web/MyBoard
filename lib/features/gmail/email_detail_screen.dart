@@ -10,24 +10,30 @@ import 'gmail_service.dart';
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
 String _sanitizeHtml(String html) {
-  // 위험한 태그 제거: script, iframe, object, embed, form, applet, base
-  var sanitized = html;
-  sanitized = sanitized.replaceAll(RegExp(r'<script[^>]*>[\s\S]*?</script>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<script[^>]*/>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<iframe[^>]*>[\s\S]*?</iframe>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<iframe[^>]*/>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<object[^>]*>[\s\S]*?</object>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<embed[^>]*/?>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<form[^>]*>[\s\S]*?</form>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<applet[^>]*>[\s\S]*?</applet>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<base[^>]*/?>', caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'<link[^>]*stylesheet[^>]*/?>', caseSensitive: false), '');
-  // 인라인 이벤트 핸들러 제거 (on으로 시작하는 속성)
-  sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*"[^"]*"',
-      caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r"\s+on\w+\s*=\s*'[^']*'", caseSensitive: false), '');
-  sanitized = sanitized.replaceAll(RegExp(r'\s+on\w+\s*=\s*\S+', caseSensitive: false), '');
-  return sanitized;
+  var s = html;
+  // 위험 태그 제거
+  s = s.replaceAll(RegExp(r'<script[\s\S]*?</script>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<script[^>]*/>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<iframe[\s\S]*?</iframe>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<iframe[^>]*/>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<object[\s\S]*?</object>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<embed[^>]*/?>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<form[\s\S]*?</form>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<applet[\s\S]*?</applet>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<base[^>]*/?>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<link[^>]*stylesheet[^>]*/?>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<svg[\s\S]*?</svg>', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'<math[\s\S]*?</math>', caseSensitive: false), '');
+  // 인라인 이벤트 핸들러 제거
+  s = s.replaceAll(RegExp(r'\s+on\w+\s*=\s*"[^"]*"', caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r"""\s+on\w+\s*=\s*'[^']*'""", caseSensitive: false), '');
+  s = s.replaceAll(RegExp(r'\s+on\w+\s*=\s*\S+', caseSensitive: false), '');
+  // javascript: URI 제거
+  s = s.replaceAll(RegExp(r'href\s*=\s*"javascript:[^"]*"', caseSensitive: false), 'href="#"');
+  s = s.replaceAll(RegExp(r"href\s*=\s*'javascript:[^']*'", caseSensitive: false), "href='#'");
+  // style 속성의 expression() 제거
+  s = s.replaceAll(RegExp(r'expression\s*\(', caseSensitive: false), '');
+  return s;
 }
 
 String _wrapHtml(String body, bool isDark) {

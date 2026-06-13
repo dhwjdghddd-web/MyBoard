@@ -119,7 +119,7 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
     }
 
     override fun hasStableIds(): Boolean {
-        return true
+        return false
     }
 
     private fun loadData() {

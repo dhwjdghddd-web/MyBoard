@@ -348,7 +348,14 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
     }
     if (isAllDay) {
       body['start'] = {'date': startDate};
-      body['end'] = {'date': startDate};
+      // Google Calendar API: end.date는 exclusive → 반드시 다음 날
+      final parts = startDate!.split('-');
+      final nextDay = DateTime(
+        int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]),
+      ).add(const Duration(days: 1));
+      final endDate =
+          '${nextDay.year}-${nextDay.month.toString().padLeft(2, '0')}-${nextDay.day.toString().padLeft(2, '0')}';
+      body['end'] = {'date': endDate};
     } else {
       body['start'] = {'dateTime': toRfc3339(startDt!)};
       body['end'] = {'dateTime': toRfc3339(endDt!)};

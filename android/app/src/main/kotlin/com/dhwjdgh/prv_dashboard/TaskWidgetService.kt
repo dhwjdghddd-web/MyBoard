@@ -31,7 +31,7 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
     override fun getLoadingView(): RemoteViews? = null
     override fun getViewTypeCount(): Int = 1
     override fun getItemId(position: Int): Long = position.toLong()
-    override fun hasStableIds(): Boolean = true
+    override fun hasStableIds(): Boolean = false
 
     private val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 
