@@ -29,6 +29,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // 적응형 아이콘과 동일한 색상 체계
+    final iconBg = isDark ? const Color(0xFF1A2C42) : const Color(0xFFF1F3F6);
+    final iconColor = isDark ? Colors.white : const Color(0xFF1A73E8);
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -37,19 +43,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 앱 아이콘 영역
                 Container(
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: scheme.primary,
+                    color: iconBg,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Icon(Icons.dashboard, color: Colors.white, size: 44),
+                  child: Icon(Icons.dashboard, color: iconColor, size: 44),
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Google Dashboard',
+                  'MyBoard',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -85,8 +90,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 }
 
 class _GoogleSignInButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _GoogleSignInButton({required this.onTap});
+  final VoidCallback? onTap;
+  const _GoogleSignInButton({this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -95,44 +100,48 @@ class _GoogleSignInButton extends StatelessWidget {
     final btnBorder = isDark ? const Color(0xFF8E918F) : const Color(0xFFDADCE0);
     final txtColor = isDark ? Colors.white : const Color(0xFF3C4043);
 
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: btnBg,
-          side: BorderSide(color: btnBorder),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          elevation: 1,
-          shadowColor: Colors.black12,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            RichText(
-              text: const TextSpan(
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                children: [
-                  TextSpan(text: 'G', style: TextStyle(color: Color(0xFF4285F4))),
-                  TextSpan(text: 'o', style: TextStyle(color: Color(0xFFEA4335))),
-                  TextSpan(text: 'o', style: TextStyle(color: Color(0xFFFBBC05))),
-                  TextSpan(text: 'g', style: TextStyle(color: Color(0xFF4285F4))),
-                  TextSpan(text: 'l', style: TextStyle(color: Color(0xFF34A853))),
-                  TextSpan(text: 'e', style: TextStyle(color: Color(0xFFEA4335))),
-                ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 380),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: onTap,
+          style: OutlinedButton.styleFrom(
+            backgroundColor: btnBg,
+            side: BorderSide(color: btnBorder),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            elevation: 1,
+            shadowColor: Colors.black12,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RichText(
+                text: const TextSpan(
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(text: 'G', style: TextStyle(color: Color(0xFF4285F4))),
+                    TextSpan(text: 'o', style: TextStyle(color: Color(0xFFEA4335))),
+                    TextSpan(text: 'o', style: TextStyle(color: Color(0xFFFBBC05))),
+                    TextSpan(text: 'g', style: TextStyle(color: Color(0xFF4285F4))),
+                    TextSpan(text: 'l', style: TextStyle(color: Color(0xFF34A853))),
+                    TextSpan(text: 'e', style: TextStyle(color: Color(0xFFEA4335))),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              '계정으로 로그인',
-              style: TextStyle(
-                color: txtColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+              const SizedBox(width: 12),
+              Text(
+                '계정으로 로그인',
+                style: TextStyle(
+                  color: txtColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
