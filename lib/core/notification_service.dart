@@ -2,7 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
-  static void Function(int id, String? payload)? _onTap;
+  static void Function(int? id, String? payload)? _onTap;
   static int _nextId = 1;
 
   static Future<void> init() async {
@@ -16,7 +16,7 @@ class NotificationService {
     );
   }
 
-  static void setOnTapCallback(void Function(int id, String? payload) callback) {
+  static void setOnTapCallback(void Function(int? id, String? payload) callback) {
     _onTap = callback;
   }
 
