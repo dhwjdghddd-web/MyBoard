@@ -38,13 +38,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 앱 아이콘 — 실제 런처 이미지 사용
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'assets/ic_launcher.png',
-                    width: 80,
-                    height: 80,
+                // 앱 아이콘 — adaptive icon foreground + 런처 배경색
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF9BCBE3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/ic_launcher_foreground.png',
+                      width: 80,
+                      height: 80,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
