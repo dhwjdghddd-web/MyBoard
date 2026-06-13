@@ -87,21 +87,13 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
         views.setTextColor(R.id.gmail_item_sender, if (item.isUnread) unreadSender else readSender)
         views.setTextColor(R.id.gmail_item_subject, if (item.isUnread) unreadSubject else readSubject)
         views.setTextColor(R.id.gmail_item_time, timeColor)
-        views.setTextColor(R.id.gmail_item_delete, if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#8C8275"))
-        
+
         val openIntent = Intent().apply {
             putExtra("gmail_item_action", "open")
             putExtra("tab", 2)
             if (item.emailId.isNotEmpty()) putExtra("email_id", item.emailId)
         }
         views.setOnClickFillInIntent(R.id.gmail_item_root, openIntent)
-
-        val deleteIntent = Intent().apply {
-            putExtra("gmail_item_action", "delete")
-            putExtra("email_id", item.emailId)
-            putExtra("email_idx", position)
-        }
-        views.setOnClickFillInIntent(R.id.gmail_item_delete, deleteIntent)
         
         return views
     }
