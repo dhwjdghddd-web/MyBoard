@@ -252,19 +252,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             ACTION_GMAIL_ITEM -> {
                 when (intent.getStringExtra("gmail_item_action")) {
                     "delete" -> {
-                        val emailId = intent.getStringExtra("email_id") ?: ""
-                        val idx     = intent.getIntExtra("email_idx", -1)
-                        deleteGmailItemLocal(context, prefs, idx)
-                        redraw(context)
-                        if (emailId.isNotEmpty()) {
-                            val pendingResult = goAsync()
-                            GmailSyncJobService.executeTrash(context, emailId) {
-                                android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    MainActivity.activeChannel?.invokeMethod("gmailDeleted", emailId)
-                                }
-                                pendingResult.finish()
-                            }
-                        }
+                        // gmail.readonly scope: 삭제 기능 비활성화
                     }
                     else -> {
                         val emailId = intent.getStringExtra("email_id") ?: ""

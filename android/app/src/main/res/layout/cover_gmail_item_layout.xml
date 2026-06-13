@@ -9,25 +9,18 @@
     android:paddingEnd="8dp"
     android:background="@drawable/widget_list_item_ripple">
 
-    <!-- 삭제 버튼 (우측 고정) -->
+    <!-- 삭제 버튼 숨김 (gmail.readonly: 쓰기 불가) -->
     <TextView
         android:id="@+id/gmail_item_delete"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:text="✕"
-        android:textSize="18sp"
-        android:textColor="#8C8275"
-        android:gravity="center"
-        android:background="@drawable/widget_icon_ripple" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
-    <!-- 텍스트 영역 (삭제 버튼 좌측에 맞춰 남은 공간 차지) -->
+    <!-- 텍스트 영역 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@id/gmail_item_delete"
         android:layout_centerVertical="true"
         android:orientation="vertical"
         android:paddingEnd="8dp">
