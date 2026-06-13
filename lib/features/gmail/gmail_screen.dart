@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'email_detail_screen.dart';
-import 'gmail_compose_screen.dart';
 import 'gmail_service.dart';
 import '../settings/widget_settings_screen.dart';
 
@@ -58,57 +58,11 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
     if (q.isNotEmpty) ref.read(gmailProvider.notifier).loadMessages(query: q);
   }
 
-  Future<void> _batchDelete() async {
-    final ids = ref.read(gmailProvider).selectedIds.toList();
-    try {
-      await ref.read(gmailProvider.notifier).batchDelete(ids);
-    } catch (e) {
-      debugPrint('일괄 삭제 실패: $e');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('이미 휴지통에 있습니다. 30일 후 자동 삭제됩니다.'),
-      ));
-    }
-  }
-
-  Future<void> _confirmEmptyTrash() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('휴지통 비우기'),
-        content: const Text('모든 메일을 영구 삭제할까요?\n복구할 수 없습니다.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('비우기'),
-          ),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
-    try {
-      await ref.read(gmailProvider.notifier).emptyTrash();
-    } catch (e) {
-      debugPrint('휴지통 비우기 실패: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('휴지통 비우기는 추가 권한이 필요합니다. Gmail 앱을 이용해주세요.'),
-        ));
-      }
-    }
-  }
-
   void _openEmail(GmailMessage msg) {
-    if (msg.isUnread) ref.read(gmailProvider.notifier).markRead(msg.id);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EmailDetailScreen(
-          messageId: msg.id,
-          isInTrash: ref.read(gmailProvider).isInTrash,
-        ),
+        builder: (_) => EmailDetailScreen(messageId: msg.id),
       ),
     );
   }
@@ -152,15 +106,6 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
               },
             ),
           ] else ...[
-            if (gmail.isInTrash)
-              TextButton(
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  foregroundColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
-                ),
-                onPressed: _confirmEmptyTrash,
-                child: const Text('비우기'),
-              ),
             IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -188,8 +133,7 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const GmailComposeScreen())),
+        onPressed: () => launchUrl(Uri.parse('mailto:'), mode: LaunchMode.externalApplication),
         icon: const Icon(Icons.edit_outlined),
         label: const Text('작성'),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
@@ -202,16 +146,6 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
           labelCounts: gmail.labelCounts,
           onSelect: (l) => ref.read(gmailProvider.notifier).selectLabel(l),
         ),
-
-        // 일괄 선택 바
-        if (gmail.hasSelection)
-          _BatchBar(
-            count: gmail.selectedIds.length,
-            isInTrash: gmail.isInTrash,
-            onDelete: _batchDelete,
-            onRead: () => ref.read(gmailProvider.notifier).batchMarkRead(gmail.selectedIds.toList()),
-            onClear: () => ref.read(gmailProvider.notifier).clearSelection(),
-          ),
 
         // 메시지 목록
         Expanded(
@@ -246,7 +180,6 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                                   _MessageTile(
                                     message: msg,
                                     selected: selected,
-                                    isInTrash: gmail.isInTrash,
                                     onTap: () {
                                       if (gmail.hasSelection) {
                                         ref.read(gmailProvider.notifier).toggleSelect(msg.id);
@@ -255,16 +188,6 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                                       }
                                     },
                                     onLongPress: () => ref.read(gmailProvider.notifier).toggleSelect(msg.id),
-                                    onDismissDelete: () {
-                                      if (gmail.isInTrash) {
-                                        ref.read(gmailProvider.notifier).removeMessageLocal(msg.id);
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          content: Text('이미 휴지통에 있습니다. 30일 후 자동 삭제됩니다.'),
-                                        ));
-                                      } else {
-                                        ref.read(gmailProvider.notifier).trashMessage(msg.id);
-                                      }
-                                    },
                                   ),
                                   if (i < gmail.messages.length - 1)
                                     Divider(
@@ -332,52 +255,17 @@ class _LabelStrip extends StatelessWidget {
   }
 }
 
-// ── 일괄 작업 바 ─────────────────────────────────────────────────────────
-
-class _BatchBar extends StatelessWidget {
-  const _BatchBar({required this.count, required this.isInTrash, required this.onDelete, required this.onRead, required this.onClear});
-  final int count;
-  final bool isInTrash;
-  final VoidCallback onDelete, onRead, onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Row(children: [
-        Text('$count개 선택', style: const TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(width: 12),
-        TextButton.icon(
-          icon: const Icon(Icons.delete, size: 16),
-          label: Text(isInTrash ? '영구삭제 불가' : '삭제'),
-          onPressed: onDelete,
-          style: TextButton.styleFrom(foregroundColor: Colors.red[700]),
-        ),
-        TextButton.icon(
-          icon: const Icon(Icons.mark_email_read, size: 16),
-          label: const Text('읽음'),
-          onPressed: onRead,
-        ),
-        const Spacer(),
-        IconButton(icon: const Icon(Icons.close, size: 20), onPressed: onClear),
-      ]),
-    );
-  }
-}
-
 // ── 메시지 타일 ───────────────────────────────────────────────────────────
 
 class _MessageTile extends StatelessWidget {
   const _MessageTile({
-    required this.message, required this.selected, required this.isInTrash,
+    required this.message, required this.selected,
     required this.onTap, required this.onLongPress,
-    required this.onDismissDelete,
   });
 
   final GmailMessage message;
-  final bool selected, isInTrash;
-  final VoidCallback onTap, onLongPress, onDismissDelete;
+  final bool selected;
+  final VoidCallback onTap, onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -386,17 +274,7 @@ class _MessageTile extends StatelessWidget {
     final avatarColor = _avatarColor(initial);
     final isUnread = message.isUnread;
 
-    return Dismissible(
-      key: ValueKey(message.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: Colors.red[100],
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        child: const Icon(Icons.delete, color: Colors.red),
-      ),
-      onDismissed: (_) => onDismissDelete(),
-      child: InkWell(
+    return InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
         child: Container(
@@ -475,7 +353,6 @@ class _MessageTile extends StatelessWidget {
               ),
           ]),
         ),
-      ),
     );
   }
 }

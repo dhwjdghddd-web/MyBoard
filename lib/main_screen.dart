@@ -11,9 +11,9 @@ import 'features/calendar/calendar_screen.dart';
 import 'features/calendar/calendar_service.dart';
 import 'features/calendar/event_form_screen.dart';
 import 'features/calendar/event_detail_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'features/gmail/gmail_screen.dart';
 import 'features/gmail/gmail_service.dart';
-import 'features/gmail/gmail_compose_screen.dart';
 import 'features/gmail/email_detail_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -67,7 +67,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
         await Future.delayed(const Duration(milliseconds: 300));
         if (mounted) {
           Navigator.push(context,
-              MaterialPageRoute(builder: (_) => EmailDetailScreen(messageId: emailId, isInTrash: false)));
+              MaterialPageRoute(builder: (_) => EmailDetailScreen(messageId: emailId, )));
         }
         return;
       }
@@ -93,9 +93,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
           final dateKey = await _channel.invokeMethod<String>('getInitialDateKey') ?? '';
           _showCreateEventScreen(dateKey: dateKey.isNotEmpty ? dateKey : null);
         } else if (action == 'compose_email') {
-          setState(() => _index = 2);
-          await Future.delayed(const Duration(milliseconds: 300));
-          _showComposeScreen();
+          await launchUrl(Uri.parse('mailto:'), mode: LaunchMode.externalApplication);
         }
         return;
       }
@@ -127,9 +125,8 @@ class _MainScreenState extends ConsumerState<MainScreen>
           ref.read(gmailProvider.notifier).loadLabelCounts();
         }
       case 'gmailDeleted':
-        final emailId = call.arguments as String;
         if (mounted) {
-          ref.read(gmailProvider.notifier).removeMessageLocal(emailId);
+          ref.read(gmailProvider.notifier).loadMessages();
           ref.read(gmailProvider.notifier).loadLabelCounts();
         }
       case 'taskCompleted':
@@ -153,7 +150,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
           await Future.delayed(const Duration(milliseconds: 200));
           if (mounted) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (_) => EmailDetailScreen(messageId: emailId, isInTrash: false)));
+                MaterialPageRoute(builder: (_) => EmailDetailScreen(messageId: emailId, )));
           }
         }
 
@@ -184,11 +181,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
         }
 
       case 'openComposeEmail':
-        if (mounted) {
-          setState(() => _index = 2);
-          await Future.delayed(const Duration(milliseconds: 200));
-          _showComposeScreen();
-        }
+        await launchUrl(Uri.parse('mailto:'), mode: LaunchMode.externalApplication);
     }
   }
 
@@ -212,12 +205,6 @@ class _MainScreenState extends ConsumerState<MainScreen>
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (_) => const AddTaskSheet(),
     );
-  }
-
-  void _showComposeScreen() {
-    if (!mounted) return;
-    Navigator.push(context,
-        MaterialPageRoute(builder: (_) => const GmailComposeScreen()));
   }
 
   void _showCreateEventScreen({String? dateKey}) {

@@ -79,11 +79,9 @@ class EmailDetailScreen extends ConsumerStatefulWidget {
   const EmailDetailScreen({
     super.key,
     required this.messageId,
-    required this.isInTrash,
   });
 
   final String messageId;
-  final bool isInTrash;
 
   @override
   ConsumerState<EmailDetailScreen> createState() => _EmailDetailScreenState();
@@ -228,55 +226,12 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
             orElse: () => {'value': ''})['value'] as String;
   }
 
-  List<String> get _labelIds => (_full?['labelIds'] as List?)?.cast<String>() ?? [];
-  bool get _isSpam => _labelIds.contains('SPAM');
-  bool get _isStarred => _labelIds.contains('STARRED');
-
-  Future<void> _delete() async {
-    if (widget.isInTrash) {
-      await showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('영구 삭제 불가'),
-          content: const Text('이미 휴지통에 있습니다.\n30일 후 자동으로 영구 삭제됩니다.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('확인'))],
-        ),
-      );
-      return;
-    }
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('메일 삭제'),
-        content: const Text('휴지통으로 이동할까요?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제')),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
-    await ref.read(gmailProvider.notifier).trashMessage(widget.messageId);
-    if (mounted) Navigator.pop(context);
-  }
-
-  Future<void> _spam() async {
-    if (_isSpam) {
-      await ref.read(gmailProvider.notifier).unmarkSpam(widget.messageId);
+  Future<void> _openGmailApp() async {
+    final uri = Uri.parse('googlegmail://');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     } else {
-      await ref.read(gmailProvider.notifier).markSpam(widget.messageId);
-    }
-    if (mounted) Navigator.pop(context);
-  }
-
-  Future<void> _star() async {
-    await ref.read(gmailProvider.notifier).toggleStar(widget.messageId, _isStarred);
-    if (mounted) {
-      setState(() {
-        final labels = List<String>.from(_labelIds);
-        if (_isStarred) { labels.remove('STARRED'); } else { labels.add('STARRED'); }
-        _full = {...?_full, 'labelIds': labels};
-      });
+      await launchUrl(Uri.parse('https://mail.google.com'), mode: LaunchMode.externalApplication);
     }
   }
 
@@ -322,27 +277,15 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                           _InfoRow('받는사람', _header('To')),
                           _InfoRow('날짜', formatEmailDate(_header('Date'))),
                           const SizedBox(height: 10),
-                          Row(children: [
-                            Expanded(child: _ActionBtn(
-                              icon: Icons.delete_outline,
-                              label: widget.isInTrash ? '영구삭제 불가' : '삭제',
-                              onTap: _delete,
-                              color: Colors.red[400],
-                            )),
-                            const SizedBox(width: 8),
-                            Expanded(child: _ActionBtn(
-                              icon: _isSpam ? Icons.check_circle_outline : Icons.block,
-                              label: _isSpam ? '스팸 해제' : '스팸',
-                              onTap: _spam,
-                            )),
-                            const SizedBox(width: 8),
-                            Expanded(child: _ActionBtn(
-                              icon: _isStarred ? Icons.star : Icons.star_border,
-                              label: _isStarred ? '중요 해제' : '중요',
-                              onTap: _star,
-                              color: _isStarred ? Colors.amber : null,
-                            )),
-                          ]),
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.open_in_new, size: 16),
+                            label: const Text('Gmail 앱 열기'),
+                            onPressed: _openGmailApp,
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 38),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
                         ]),
                       ),
                     ),
@@ -381,28 +324,6 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _ActionBtn extends StatelessWidget {
-  const _ActionBtn({required this.icon, required this.label, required this.onTap, this.color});
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      icon: Icon(icon, size: 16, color: color),
-      label: Text(label, style: TextStyle(fontSize: 12, color: color)),
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        minimumSize: const Size(double.infinity, 0),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        side: BorderSide(color: color ?? Theme.of(context).colorScheme.outline),
-      ),
-    );
-  }
-}
 
 class _AttachmentBar extends StatelessWidget {
   const _AttachmentBar({
