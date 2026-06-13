@@ -62,22 +62,20 @@ class _GmailComposeScreenState extends ConsumerState<GmailComposeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C2733),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF253340),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white70),
+          icon: const Icon(Icons.close),
           onPressed: _sending ? null : () => Navigator.pop(context),
         ),
-        title: const Text('새 메일', style: TextStyle(color: Colors.white, fontSize: 16)),
+        title: const Text('새 메일', style: TextStyle(fontSize: 16)),
         actions: [
           if (_sending)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Center(child: SizedBox(
                 width: 20, height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+                child: CircularProgressIndicator(strokeWidth: 2),
               )),
             )
           else
@@ -97,14 +95,14 @@ class _GmailComposeScreenState extends ConsumerState<GmailComposeScreen> {
             autofocus: widget.initialTo.isEmpty,
             enabled: !_sending,
           ),
-          const Divider(color: Color(0xFF2E3E50), height: 1),
+          const Divider(height: 1),
           _FieldRow(
             label: '제목',
             controller: _subjectCtrl,
             autofocus: widget.initialTo.isNotEmpty,
             enabled: !_sending,
           ),
-          const Divider(color: Color(0xFF2E3E50), height: 1),
+          const Divider(height: 1),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -114,10 +112,9 @@ class _GmailComposeScreenState extends ConsumerState<GmailComposeScreen> {
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(fontSize: 14),
                 decoration: const InputDecoration(
                   hintText: '내용을 입력하세요',
-                  hintStyle: TextStyle(color: Color(0xFF6080A0)),
                   border: InputBorder.none,
                 ),
               ),
@@ -153,7 +150,7 @@ class _FieldRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 72,
-            child: Text(label, style: const TextStyle(color: Color(0xFF8090A8), fontSize: 13)),
+            child: Text(label, style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ),
           Expanded(
             child: TextField(
@@ -161,7 +158,7 @@ class _FieldRow extends StatelessWidget {
               enabled: enabled,
               autofocus: autofocus,
               keyboardType: keyboardType,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: const TextStyle(fontSize: 14),
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 isDense: true,

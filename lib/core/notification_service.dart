@@ -2,11 +2,22 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
+  static void Function(int id, String? payload)? _onTap;
+  static int _nextId = 1;
 
   static Future<void> init() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const settings = InitializationSettings(android: androidSettings);
-    await _plugin.initialize(settings);
+    final settings = InitializationSettings(android: androidSettings);
+    await _plugin.initialize(
+      settings,
+      onDidReceiveNotificationResponse: (response) {
+        _onTap?.call(response.id, response.payload);
+      },
+    );
+  }
+
+  static void setOnTapCallback(void Function(int id, String? payload) callback) {
+    _onTap = callback;
   }
 
   static Future<void> requestPermission() async {
@@ -28,10 +39,11 @@ class NotificationService {
       showWhen: true,
     );
     await _plugin.show(
-      0,
+      _nextId++,
       '새 메일 $newCount통',
       from,
       const NotificationDetails(android: details),
+      payload: 'mail',
     );
   }
 }

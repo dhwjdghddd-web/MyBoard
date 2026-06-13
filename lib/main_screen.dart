@@ -43,6 +43,9 @@ class _MainScreenState extends ConsumerState<MainScreen>
     _channel.setMethodCallHandler(_handleMethodCall);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await NotificationService.requestPermission();
+      NotificationService.setOnTapCallback((id, payload) {
+        if (mounted) setState(() => _index = 2);
+      });
       _poller = MailPoller(
         ref.read(apiClientProvider),
         onNewMail: () async {

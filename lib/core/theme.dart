@@ -89,12 +89,15 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 
   Future<void> toggle() async {
     final prefs = await SharedPreferences.getInstance();
-    if (state == ThemeMode.dark) {
-      state = ThemeMode.light;
-      await prefs.setString('g-theme', 'light');
-    } else {
+    if (state == ThemeMode.light) {
       state = ThemeMode.dark;
       await prefs.setString('g-theme', 'dark');
+    } else if (state == ThemeMode.dark) {
+      state = ThemeMode.system;
+      await prefs.remove('g-theme');
+    } else {
+      state = ThemeMode.light;
+      await prefs.setString('g-theme', 'light');
     }
   }
 }
@@ -106,12 +109,16 @@ class ThemeToggleButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(themeModeProvider);
-    final isDark = mode == ThemeMode.dark;
+    final (icon, tooltip) = switch (mode) {
+      ThemeMode.light  => (Icons.dark_mode_outlined,    '다크 모드'),
+      ThemeMode.dark   => (Icons.brightness_auto,       '시스템 모드'),
+      ThemeMode.system => (Icons.light_mode_outlined,   '라이트 모드'),
+    };
     return IconButton(
       padding: compact ? EdgeInsets.zero : null,
-      constraints: compact ? const BoxConstraints(minWidth: 36, minHeight: 36) : null,
-      icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
-      tooltip: isDark ? '라이트 모드' : '다크 모드',
+      constraints: compact ? const BoxConstraints(minWidth: 48, minHeight: 48) : null,
+      icon: Icon(icon),
+      tooltip: tooltip,
       onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
     );
   }

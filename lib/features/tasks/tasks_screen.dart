@@ -18,13 +18,13 @@ class TasksScreen extends ConsumerWidget {
         actions: [
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(taskServiceProvider.notifier).loadTasks(),
           ),
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(Icons.settings),
             tooltip: '설정',
             onPressed: () => Navigator.push(context,
@@ -110,10 +110,22 @@ class _TaskItem extends ConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
-        ref.read(taskServiceProvider.notifier).deleteTask(task.id);
+        final notifier = ref.read(taskServiceProvider.notifier);
+        notifier.deleteTaskLocal(task.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${task.title}" 삭제됨'), duration: const Duration(seconds: 2)),
-        );
+          SnackBar(
+            content: Text('"${task.title}" 삭제됨'),
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: '취소',
+              onPressed: () => notifier.loadTasks(),
+            ),
+          ),
+        ).closed.then((reason) {
+          if (reason != SnackBarClosedReason.action) {
+            notifier.deleteTask(task.id);
+          }
+        });
       },
       child: ListTile(
         leading: Transform.scale(

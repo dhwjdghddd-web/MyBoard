@@ -14,7 +14,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _signIn() async {
     setState(() => _loading = true);
-    await ref.read(authServiceProvider.notifier).signIn();
+    try {
+      await ref.read(authServiceProvider.notifier).signIn();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그인 실패. 다시 시도해주세요.')),
+        );
+      }
+    }
     if (mounted) setState(() => _loading = false);
   }
 
@@ -82,13 +90,18 @@ class _GoogleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final btnBg = isDark ? const Color(0xFF131314) : Colors.white;
+    final btnBorder = isDark ? const Color(0xFF8E918F) : const Color(0xFFDADCE0);
+    final txtColor = isDark ? Colors.white : const Color(0xFF3C4043);
+
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white,
-          side: const BorderSide(color: Color(0xFFDADCE0)),
+          backgroundColor: btnBg,
+          side: BorderSide(color: btnBorder),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           padding: const EdgeInsets.symmetric(vertical: 14),
           elevation: 1,
@@ -97,7 +110,6 @@ class _GoogleSignInButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Google "G" 로고 (컬러 텍스트)
             RichText(
               text: const TextSpan(
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -112,10 +124,10 @@ class _GoogleSignInButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
+            Text(
               '계정으로 로그인',
               style: TextStyle(
-                color: Color(0xFF3C4043),
+                color: txtColor,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),

@@ -131,9 +131,11 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                   ),
                   const Spacer(),
                   if (_dueDate != null)
-                    GestureDetector(
-                      onTap: () => setState(() => _dueDate = null),
-                      child: Icon(Icons.close, size: 16, color: scheme.onSurfaceVariant),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      icon: Icon(Icons.close, size: 16, color: scheme.onSurfaceVariant),
+                      onPressed: () => setState(() => _dueDate = null),
                     ),
                 ],
               ),
