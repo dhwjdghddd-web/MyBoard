@@ -62,7 +62,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   String? _listId;
 
   Future<void> loadTasks() async {
-    state = const AsyncValue.loading();
+    state = const AsyncValue<List<Task>>.loading().copyWithPrevious(state);
     try {
       final lists = await _api.get('$_base/users/@me/lists');
       final items = lists['items'] as List?;
@@ -114,8 +114,9 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
       final sorted = _sorted([newTask, ...current]);
       state = AsyncValue.data(sorted);
       await WidgetService.updateTasks(sorted);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+    } catch (e) {
+      debugPrint('addTask 실패: $e');
+      rethrow;
     }
   }
 

@@ -48,12 +48,21 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
       return;
     }
     setState(() => _saving = true);
-    await ref.read(taskServiceProvider.notifier).addTask(
-          title,
-          due: _dueDate,
-          notes: _notesCtrl.text.trim(),
+    try {
+      await ref.read(taskServiceProvider.notifier).addTask(
+            title,
+            due: _dueDate,
+            notes: _notesCtrl.text.trim(),
+          );
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('태스크 추가에 실패했습니다. 다시 시도해주세요.')),
         );
-    if (mounted) Navigator.pop(context);
+      }
+    }
   }
 
   @override

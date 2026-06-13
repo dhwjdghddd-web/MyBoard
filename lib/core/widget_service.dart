@@ -18,22 +18,17 @@ class WidgetService {
       final active = tasks.where((t) => !t.isCompleted).toList();
       final display = [...active, ...tasks.where((t) => t.isCompleted)];
 
-      await HomeWidget.saveWidgetData<String>('task_count', '${display.length}');
+      final futures = <Future>[
+        HomeWidget.saveWidgetData<String>('task_count', '${display.length}'),
+      ];
       for (var i = 0; i < display.length; i++) {
-        await HomeWidget.saveWidgetData<String>('task_$i', display[i].title);
-        await HomeWidget.saveWidgetData<String>('task_${i}_id', display[i].id);
-        await HomeWidget.saveWidgetData<String>('task_${i}_done', display[i].isCompleted ? 'true' : 'false');
-        await HomeWidget.saveWidgetData<String>('task_${i}_due', display[i].due != null ? display[i].due!.toIso8601String() : '');
+        futures.add(HomeWidget.saveWidgetData<String>('task_$i', display[i].title));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_id', display[i].id));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_done', display[i].isCompleted ? 'true' : 'false'));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_due', display[i].due != null ? display[i].due!.toIso8601String() : ''));
       }
-      // 이전 동기화에서 남은 슬롯 제거
-      for (var i = display.length; i < display.length + 30; i++) {
-        final old = await HomeWidget.getWidgetData<String>('task_$i', defaultValue: '');
-        if (old == null || old.isEmpty) break;
-        await HomeWidget.saveWidgetData<String>('task_$i', '');
-        await HomeWidget.saveWidgetData<String>('task_${i}_id', '');
-        await HomeWidget.saveWidgetData<String>('task_${i}_done', 'false');
-        await HomeWidget.saveWidgetData<String>('task_${i}_due', '');
-      }
+      // task_count를 신뢰하므로 별도 tail 정리 불필요 — 위젯은 0..task_count-1만 읽음
+      await Future.wait(futures);
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
     } catch (e, st) {
       debugPrint('WidgetService.updateTasks error: $e\n$st');
@@ -97,6 +92,7 @@ class WidgetService {
           byDay.putIfAbsent(dayKey, () => []).add(e);
         }
       }
+      final dayFutures = <Future>[];
       for (final entry in byDay.entries) {
         final key = entry.key;
         final evList = entry.value;
@@ -123,11 +119,12 @@ class WidgetService {
           final hex = e.color.toARGB32().toRadixString(16).padLeft(8, '0');
           return '#$hex';
         }).join('|');
-        await HomeWidget.saveWidgetData<String>('cal_day_${key}_titles', titles);
-        await HomeWidget.saveWidgetData<String>('cal_day_${key}_times',  times);
-        await HomeWidget.saveWidgetData<String>('cal_day_${key}_ids',    ids);
-        await HomeWidget.saveWidgetData<String>('cal_day_${key}_colors', colors);
+        dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_titles', titles));
+        dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_times',  times));
+        dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_ids',    ids));
+        dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_colors', colors));
       }
+      await Future.wait(dayFutures);
 
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
     } catch (e, st) {
@@ -145,33 +142,31 @@ class WidgetService {
       });
 
       final unread = sorted.where((m) => m.isUnread).length;
-      await HomeWidget.saveWidgetData<String>('gmail_unread', '$unread');
-
       final gmailCount = sorted.length < 25 ? sorted.length : 25;
-      await HomeWidget.saveWidgetData<int>('gmail_count', gmailCount);
-
+      final gmailFutures = <Future>[
+        HomeWidget.saveWidgetData<String>('gmail_unread', '$unread'),
+        HomeWidget.saveWidgetData<int>('gmail_count', gmailCount),
+      ];
       for (var i = 0; i < 25; i++) {
         if (i < sorted.length) {
           final m = sorted[i];
-          // 발신자 표시 이름
           final sender = m.displayName.isNotEmpty ? m.displayName : m.from;
-          // 시간: gmail_service의 formatEmailDate 사용
           final timeStr = formatEmailDate(m.date);
-          // subject
           final subjectLine = m.subject.isNotEmpty ? m.subject : '(제목 없음)';
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  sender);
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_time',    timeStr);
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_subject', subjectLine);
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_unread',  m.isUnread ? 'true' : 'false');
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_id',      m.id);
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  sender));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time',    timeStr));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', subjectLine));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread',  m.isUnread ? 'true' : 'false'));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id',      m.id));
         } else {
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  '');
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_time',    '');
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_subject', '');
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_unread',  'false');
-          await HomeWidget.saveWidgetData<String>('gmail_${i}_id',      '');
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  ''));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time',    ''));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', ''));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread',  'false'));
+          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id',      ''));
         }
       }
+      await Future.wait(gmailFutures);
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
     } catch (e, st) {
       debugPrint('WidgetService.updateGmail error: $e\n$st');

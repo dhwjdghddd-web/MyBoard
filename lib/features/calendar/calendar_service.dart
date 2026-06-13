@@ -251,25 +251,33 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
           ? state.calendars
           : [const CalendarInfo(id: 'primary', summary: '', color: Color(0xFF4285F4))];
 
-      final events = <CalendarEvent>[];
-      for (final cal in sources) {
-        if (state.hiddenCalendars.contains(cal.id)) continue;
-        try {
-          final data = await _api.get(
-            'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(cal.id)}/events',
-            params: {
-              'timeMin': from, 'timeMax': to,
-              'singleEvents': 'true', 'orderBy': 'startTime', 'maxResults': '100',
-            },
-          );
-          for (final item in (data['items'] as List?) ?? []) {
-            events.add(CalendarEvent.fromJson(
-              item as Map<String, dynamic>,
-              calendarId: cal.id, calendarName: cal.summary,
-              calColor: cal.color, eventColorMap: state.eventColorMap,
-            ));
+      final visibleSources = sources.where((cal) => !state.hiddenCalendars.contains(cal.id)).toList();
+      final calResults = await Future.wait(
+        visibleSources.map((cal) async {
+          try {
+            final data = await _api.get(
+              'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(cal.id)}/events',
+              params: {
+                'timeMin': from, 'timeMax': to,
+                'singleEvents': 'true', 'orderBy': 'startTime', 'maxResults': '100',
+              },
+            );
+            return (cal, (data['items'] as List?) ?? []);
+          } catch (e) {
+            debugPrint('캘린더 이벤트 로드 실패 (${cal.id}): $e');
+            return (cal, <dynamic>[]);
           }
-        } catch (e) { debugPrint('캘린더 이벤트 로드 실패 (${cal.id}): $e'); }
+        }),
+      );
+      final events = <CalendarEvent>[];
+      for (final (cal, items) in calResults) {
+        for (final item in items) {
+          events.add(CalendarEvent.fromJson(
+            item as Map<String, dynamic>,
+            calendarId: cal.id, calendarName: cal.summary,
+            calColor: cal.color, eventColorMap: state.eventColorMap,
+          ));
+        }
       }
 
       events.sort((a, b) {
@@ -385,11 +393,16 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
   }
 
   Future<void> deleteEvent(String calendarId, String eventId) async {
-    await _api.delete(
-      'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(calendarId)}/events/${Uri.encodeComponent(eventId)}',
-    );
-    final updatedEvents = state.events.where((e) => e.id != eventId).toList();
-    state = state.copyWith(events: updatedEvents);
-    await WidgetService.updateCalendar(updatedEvents);
+    try {
+      await _api.delete(
+        'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(calendarId)}/events/${Uri.encodeComponent(eventId)}',
+      );
+      final updatedEvents = state.events.where((e) => e.id != eventId).toList();
+      state = state.copyWith(events: updatedEvents);
+      await WidgetService.updateCalendar(updatedEvents);
+    } catch (e) {
+      debugPrint('deleteEvent 실패: $e');
+      rethrow;
+    }
   }
 }

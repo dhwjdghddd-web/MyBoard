@@ -17,13 +17,19 @@ class EventDetailSheet extends ConsumerStatefulWidget {
 }
 
 class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
+  static DateTime? _lastLoadTime;
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(calendarProvider.notifier).loadEvents();
-      ref.read(taskServiceProvider.notifier).loadTasks();
-    });
+    final now = DateTime.now();
+    if (_lastLoadTime == null || now.difference(_lastLoadTime!).inSeconds > 30) {
+      _lastLoadTime = now;
+      Future.microtask(() {
+        ref.read(calendarProvider.notifier).loadEvents();
+        ref.read(taskServiceProvider.notifier).loadTasks();
+      });
+    }
   }
 
   String _dateLabel() {

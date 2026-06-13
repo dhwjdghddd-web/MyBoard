@@ -130,22 +130,22 @@ class _MainScreenState extends ConsumerState<MainScreen>
           ref.read(gmailProvider.notifier).loadLabelCounts();
         }
       case 'taskCompleted':
-        final taskId = call.arguments as String;
-        if (mounted) {
+        final taskId = call.arguments as String?;
+        if (taskId != null && mounted) {
           ref.read(taskServiceProvider.notifier).markTaskCompletedLocal(taskId);
         }
       case 'taskDeleted':
-        final taskId = call.arguments as String;
-        if (mounted) {
+        final taskId = call.arguments as String?;
+        if (taskId != null && mounted) {
           ref.read(taskServiceProvider.notifier).deleteTaskLocal(taskId);
         }
       case 'switchTab':
-        final tab = call.arguments as int;
-        if (mounted) setState(() => _index = tab);
+        final tab = call.arguments as int?;
+        if (tab != null && tab >= 0 && tab < 3 && mounted) setState(() => _index = tab);
 
       case 'openEmail':
-        final emailId = call.arguments as String;
-        if (mounted) {
+        final emailId = call.arguments as String?;
+        if (emailId != null && emailId.isNotEmpty && mounted) {
           setState(() => _index = 2);
           await Future.delayed(const Duration(milliseconds: 200));
           if (mounted) {
@@ -155,9 +155,10 @@ class _MainScreenState extends ConsumerState<MainScreen>
         }
 
       case 'openCalendarDate':
-        final args = call.arguments as Map;
-        final eventId = args['eventId'] as String;
-        final dateKey = args['dateKey'] as String;
+        final args = call.arguments as Map?;
+        if (args == null) break;
+        final eventId = args['eventId'] as String? ?? '';
+        final dateKey = args['dateKey'] as String? ?? '';
         if (mounted) {
           setState(() => _index = 1);
           await Future.delayed(const Duration(milliseconds: 200));
@@ -227,8 +228,11 @@ class _MainScreenState extends ConsumerState<MainScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _poller?.start();
       ref.read(taskServiceProvider.notifier).syncPendingFromWidget();
       ref.read(gmailProvider.notifier).loadLabelCounts();
+    } else if (state == AppLifecycleState.paused) {
+      _poller?.stop();
     }
   }
 
