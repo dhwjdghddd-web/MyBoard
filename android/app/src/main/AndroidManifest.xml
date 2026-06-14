@@ -49,6 +49,15 @@
             android:excludeFromRecents="true"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
+        <!-- 부팅 완료 시 위젯 데이터 갱신 -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- 홈화면 위젯 -->
         <receiver
             android:name=".HomeWidgetProvider"
