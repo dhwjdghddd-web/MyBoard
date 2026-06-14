@@ -9,6 +9,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         initWorkManagerSafely()
+        MailNotificationWorker.schedule(applicationContext)
     }
 
     private fun initWorkManagerSafely() {

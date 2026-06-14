@@ -5,8 +5,7 @@ import 'notification_service.dart';
 
 const _gmailBase = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
-// 포그라운드 전용 폴러. 앱이 paused 되면 stop()되므로 백그라운드 메일 도착 알림은 발송되지 않음.
-// 네이티브 GmailSyncJobService는 위젯 데이터 동기화만 담당하며 알림을 보내지 않음 — 별도 구현 필요.
+// 포그라운드 전용 폴러 (60초 간격). 백그라운드 알림은 MailNotificationWorker(15분)가 담당.
 class MailPoller {
   MailPoller(this._api, {this.onNewMail});
 

@@ -18,6 +18,7 @@ class BootReceiver : BroadcastReceiver() {
         TasksSyncJobService.executeSync(context)
         GmailSyncJobService.executeSync(context)
         CalendarSyncJobService.executeSync(context, year, month)
+        MailNotificationWorker.schedule(context)
 
         val mgr = AppWidgetManager.getInstance(context)
         val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
