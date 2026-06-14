@@ -3,7 +3,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static void Function(int? id, String? payload)? _onTap;
-  static int _nextId = 1;
 
   static Future<void> init() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -38,8 +37,10 @@ class NotificationService {
       priority: Priority.high,
       showWhen: true,
     );
+    // 타임스탬프 기반 ID — 재시작 후에도 이전 알림과 충돌 없음 (32비트 범위 내)
+    final id = DateTime.now().millisecondsSinceEpoch & 0x7FFFFFFF;
     await _plugin.show(
-      _nextId++,
+      id,
       '새 메일 $newCount통',
       from,
       const NotificationDetails(android: details),

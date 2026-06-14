@@ -7,6 +7,7 @@ import 'auth_service.dart';
 final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
     getToken: () => ref.read(authServiceProvider.notifier).getAccessToken(),
+    refreshToken: () => ref.read(authServiceProvider.notifier).getAccessToken(forceRefresh: true),
     onAuthError: () => ref.read(authServiceProvider.notifier).signOut(),
   );
 });
@@ -17,6 +18,7 @@ class ApiClient {
 
   ApiClient({
     required Future<String?> Function() getToken,
+    required Future<String?> Function() refreshToken,
     required VoidCallback onAuthError,
   }) {
     _dio = Dio(BaseOptions(
@@ -47,10 +49,10 @@ class ApiClient {
                 newToken = null;
               }
             } else {
-              // 첫 번째 401 — 토큰 갱신 시작
+              // 첫 번째 401 — 캐시 무효화 후 강제 갱신
               _refreshCompleter = Completer<String?>();
               try {
-                newToken = await getToken();
+                newToken = await refreshToken();
                 _refreshCompleter!.complete(newToken);
               } catch (e) {
                 debugPrint('토큰 갱신 요청 실패: $e');

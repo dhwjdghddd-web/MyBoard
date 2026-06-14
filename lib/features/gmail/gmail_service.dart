@@ -23,7 +23,24 @@ DateTime? parseEmailDate(String raw) {
     final year = int.parse(parts[2]);
     final t = parts[3].split(':');
     if (month == null) return null;
-    return DateTime(year, month, day, int.tryParse(t[0]) ?? 0, int.tryParse(t.length > 1 ? t[1] : '0') ?? 0);
+    final hour = int.tryParse(t[0]) ?? 0;
+    final minute = int.tryParse(t.length > 1 ? t[1] : '0') ?? 0;
+
+    // RFC2822 오프셋(±HHMM) 파싱해 UTC 기준으로 보정
+    if (parts.length >= 5) {
+      final tz = parts[4];
+      final sign = tz.startsWith('-') ? -1 : 1;
+      final tzDigits = tz.replaceAll(RegExp(r'[^0-9]'), '');
+      if (tzDigits.length >= 4) {
+        final tzHour = int.tryParse(tzDigits.substring(0, 2)) ?? 0;
+        final tzMin = int.tryParse(tzDigits.substring(2, 4)) ?? 0;
+        final utc = DateTime.utc(year, month, day, hour, minute)
+            .subtract(Duration(hours: sign * tzHour, minutes: sign * tzMin));
+        return utc.toLocal();
+      }
+    }
+    // 오프셋 없거나 파싱 실패 시 로컬로 해석(기존 동작 폴백)
+    return DateTime(year, month, day, hour, minute);
   } catch (e) {
     debugPrint('Gmail 날짜 파싱 실패: $e');
     return DateTime.tryParse(raw);

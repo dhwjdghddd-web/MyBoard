@@ -175,7 +175,10 @@ class WidgetService {
 
   static Future<void> clearAllData() async {
     try {
+      final now = DateTime.now();
       final futures = <Future>[];
+
+      // 태스크
       futures.add(HomeWidget.saveWidgetData<String>('task_count', '0'));
       for (var i = 0; i < 100; i++) {
         futures.add(HomeWidget.saveWidgetData<String>('task_$i', ''));
@@ -183,6 +186,8 @@ class WidgetService {
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_done', 'false'));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_due', ''));
       }
+
+      // Gmail
       futures.add(HomeWidget.saveWidgetData<int>('gmail_count', 0));
       for (var i = 0; i < 25; i++) {
         futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender', ''));
@@ -191,6 +196,23 @@ class WidgetService {
         futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread', 'false'));
         futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id', ''));
       }
+
+      // 캘린더 — updateCalendar와 동일 범위로 정리
+      futures.add(HomeWidget.saveWidgetData<String>('cal_event_days', ''));
+      for (var offset = -1; offset <= 1; offset++) {
+        final t = DateTime(now.year, now.month + offset);
+        futures.add(HomeWidget.saveWidgetData<String>('cal_ev_${t.year}_${t.month}', ''));
+      }
+      final startMonth = DateTime(now.year, now.month - 1, 1);
+      final endMonth = DateTime(now.year, now.month + 2, 0);
+      for (var d = startMonth; d.isBefore(endMonth.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
+        final key = '${d.year.toString().padLeft(4, '0')}${d.month.toString().padLeft(2, '0')}${d.day.toString().padLeft(2, '0')}';
+        futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_titles', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_times', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_ids', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_colors', ''));
+      }
+
       await Future.wait(futures);
       await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
     } catch (e, st) {

@@ -70,7 +70,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
         state = const AsyncValue.data([]);
         return;
       }
-      _listId = items[0]['id'] as String;
+      _listId = items[0]['id'] as String; // 기본 리스트(첫 번째)만 사용 — 다중 리스트 지원은 미구현
       await WidgetService.saveTaskListId(_listId!);
       final data = await _api.get(
         '$_base/lists/$_listId/tasks',

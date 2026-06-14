@@ -55,11 +55,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
       final auth = await user.authentication;
       if (auth.accessToken != null) {
         await _storage.write(key: 'access_token', value: auth.accessToken!);
-        // 토큰 캐시 시간 기록 (Google 토큰은 보통 1시간 유효)
-        await _storage.write(
-          key: 'access_token_cached_at',
-          value: DateTime.now().millisecondsSinceEpoch.toString(),
-        );
       }
     } catch (e) {
       debugPrint('토큰 캐시 실패: $e');
@@ -77,16 +72,20 @@ class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _storage.delete(key: 'access_token');
-    await _storage.delete(key: 'access_token_cached_at');
     await WidgetService.clearAllData();
     state = const AsyncValue.data(null);
   }
 
-  Future<String?> getAccessToken() async {
-    final user = _googleSignIn.currentUser;
-    if (user == null) return null;
+  Future<String?> getAccessToken({bool forceRefresh = false}) async {
+    var user = _googleSignIn.currentUser;
+    if (user == null) {
+      user = await _googleSignIn.signInSilently();
+      if (user == null) return null;
+    }
     try {
+      if (forceRefresh) await user.clearAuthCache();
       final auth = await user.authentication;
+      if (auth.accessToken != null) await _cacheToken(user);
       return auth.accessToken;
     } catch (e) {
       debugPrint('토큰 갱신 실패: $e');
