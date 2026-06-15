@@ -138,7 +138,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
       case 'taskDeleted':
         final taskId = call.arguments as String?;
         if (taskId != null && mounted) {
-          ref.read(taskServiceProvider.notifier).deleteTask(taskId);
+          ref.read(taskServiceProvider.notifier).deleteTaskLocal(taskId);
         }
       case 'switchTab':
         final tab = call.arguments as int?;

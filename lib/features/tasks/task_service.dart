@@ -60,7 +60,6 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
   final ApiClient _api;
   String? _listId;
-  final Map<String, Task> _pendingDeletionTasks = {};
 
   Future<void> loadTasks() async {
     state = const AsyncValue<List<Task>>.loading().copyWithPrevious(state);
@@ -81,9 +80,8 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
           .map((j) => Task.fromJson(j as Map<String, dynamic>))
           .toList();
       final sorted = _sorted(tasks);
-      final filtered = sorted.where((t) => !_pendingDeletionTasks.containsKey(t.id)).toList();
-      state = AsyncValue.data(filtered);
-      await WidgetService.updateTasks(filtered);
+      state = AsyncValue.data(sorted);
+      await WidgetService.updateTasks(sorted);
 
       // 위젯에서 체크한 태스크 동기화
       final pending = await WidgetService.getPendingCompletions();
@@ -193,37 +191,16 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     }
   }
 
-  void startPendingDelete(Task task) {
-    _pendingDeletionTasks[task.id] = task;
-    final current = state.value ?? [];
-    state = AsyncValue.data(current.where((t) => t.id != task.id).toList());
-  }
-
-  void cancelPendingDelete(String taskId) {
-    _pendingDeletionTasks.remove(taskId);
-  }
-
-  Future<void> confirmDelete(String taskId) async {
-    if (_listId == null) return;
-    final original = _pendingDeletionTasks.remove(taskId);
-
-    try {
-      await _api.delete('$_base/lists/$_listId/tasks/$taskId');
-      await WidgetService.updateTasks(state.value ?? []);
-    } catch (e) {
-      debugPrint('태스크 삭제 API 실패: $e');
-      if (original != null) {
-        final current = state.value ?? [];
-        state = AsyncValue.data(_sorted([...current, original]));
-      }
-    }
-  }
-
   void markTaskCompletedLocal(String taskId) {
     final current = state.value ?? [];
     state = AsyncValue.data(
       _sorted(current.map((t) => t.id == taskId ? t.copyWith(status: 'completed') : t).toList()),
     );
+  }
+
+  void deleteTaskLocal(String taskId) {
+    final current = state.value ?? [];
+    state = AsyncValue.data(current.where((t) => t.id != taskId).toList());
   }
 
   List<Task> _sorted(List<Task> tasks) {
