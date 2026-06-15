@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/app_localizations.dart';
 import 'calendar_service.dart';
 import 'event_form_screen.dart';
 import '../tasks/task_service.dart';
@@ -32,16 +33,22 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
     }
   }
 
-  String _dateLabel() {
+  String _dateLabel(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final parts = widget.dateKey.split('-');
     if (parts.length < 3) return widget.dateKey;
     final dt = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
-    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-    return '${dt.month}월 ${dt.day}일 (${weekdays[dt.weekday % 7]})';
+    // weekday % 7: Sunday=0, Mon=1, … Sat=6
+    final weekdays = [
+      l.weekdaySun, l.weekdayMon, l.weekdayTue, l.weekdayWed,
+      l.weekdayThu, l.weekdayFri, l.weekdaySat,
+    ];
+    return l.eventDateLabel(weekdays[dt.weekday % 7], dt.month, dt.day);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final cal = ref.watch(calendarProvider);
     final tasksAsync = ref.watch(taskServiceProvider);
 
@@ -62,7 +69,6 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
       builder: (_, ctrl) {
         return Column(
           children: [
-            // 핸들
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Center(
@@ -75,19 +81,18 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
                 ),
               ),
             ),
-            // 날짜 헤더
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Row(
                 children: [
                   Text(
-                    _dateLabel(),
+                    _dateLabel(context),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   FilledButton.icon(
                     icon: const Icon(Icons.add, size: 16),
-                    label: const Text('새 일정'),
+                    label: Text(l.newEventTitle),
                     onPressed: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -102,14 +107,13 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
               ),
             ),
             const Divider(height: 1),
-            // 이벤트/태스크 목록
             Expanded(
               child: (events.isEmpty && dayTasks.isEmpty)
                   ? Center(
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Icon(Icons.event_available, size: 48, color: Colors.grey[300]),
                         const SizedBox(height: 12),
-                        Text('이 날은 일정이 없어요', style: TextStyle(color: Colors.grey[500])),
+                        Text(l.noEventsForDay, style: TextStyle(color: Colors.grey[500])),
                       ]),
                     )
                   : ListView.builder(
@@ -137,7 +141,7 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
                                     event.calendarId, event.id);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('일정이 삭제되었습니다')),
+                                  SnackBar(content: Text(AppLocalizations.of(context)!.eventDeletedSnack)),
                                 );
                               }
                             },
@@ -164,8 +168,9 @@ class _EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final timeText = event.isAllDay
-        ? '종일'
+        ? l.allDay
         : '${_fmt(event.startDt)} — ${_fmt(event.endDt)}';
 
     return Container(
@@ -193,7 +198,7 @@ class _EventCard extends StatelessWidget {
           Row(children: [
             OutlinedButton.icon(
               icon: const Icon(Icons.edit, size: 14),
-              label: const Text('수정', style: TextStyle(fontSize: 12)),
+              label: Text(l.editButton, style: const TextStyle(fontSize: 12)),
               onPressed: onEdit,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -204,7 +209,7 @@ class _EventCard extends StatelessWidget {
             const SizedBox(width: 8),
             OutlinedButton.icon(
               icon: Icon(Icons.delete, size: 14, color: Colors.red[400]),
-              label: Text('삭제', style: TextStyle(fontSize: 12, color: Colors.red[400])),
+              label: Text(l.deleteButton, style: TextStyle(fontSize: 12, color: Colors.red[400])),
               onPressed: () => _confirmDelete(context),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -220,17 +225,18 @@ class _EventCard extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
+    final l = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('일정 삭제'),
-        content: Text('"${event.summary}"을 삭제할까요?'),
+        title: Text(l.eventDeleteTitle),
+        content: Text(l.eventDeleteMessage(event.summary)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l.cancelButton)),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('삭제'),
+            child: Text(l.deleteButton),
           ),
         ],
       ),
@@ -251,6 +257,7 @@ class _TaskCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       padding: const EdgeInsets.all(12),
@@ -261,7 +268,6 @@ class _TaskCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // 체크박스
           Checkbox(
             value: task.isCompleted,
             activeColor: const Color(0xFF1A73E8),
@@ -290,7 +296,7 @@ class _TaskCard extends ConsumerWidget {
                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
-                const Text('할 일', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(l.taskCardLabel, style: const TextStyle(fontSize: 12, color: Colors.grey)),
                 if (task.notes?.isNotEmpty == true)
                   Padding(
                     padding: const EdgeInsets.only(top: 2),
@@ -309,17 +315,18 @@ class _TaskCard extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('할 일 삭제'),
-        content: Text('"${task.title}"을 삭제할까요?'),
+        title: Text(l.taskDeleteTitle),
+        content: Text(l.taskDeleteMessage(task.title)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l.cancelButton)),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('삭제'),
+            child: Text(l.deleteButton),
           ),
         ],
       ),
@@ -328,7 +335,7 @@ class _TaskCard extends ConsumerWidget {
       await ref.read(taskServiceProvider.notifier).deleteTask(task.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('할 일이 삭제되었습니다')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.taskDeletedSnack)),
         );
       }
     }

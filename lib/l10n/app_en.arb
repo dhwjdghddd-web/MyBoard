@@ -1,0 +1,220 @@
+{
+  "@@locale": "en",
+
+  "settingsTitle": "Settings",
+  "retryButton": "Retry",
+  "cancelButton": "Cancel",
+  "deleteButton": "Delete",
+  "saveButton": "Save",
+  "addButton": "Add",
+  "closeButton": "Close",
+  "openButton": "Open",
+  "editButton": "Edit",
+
+  "loginError": "Login failed. Please try again.",
+  "loginButton": "Sign in with Google",
+  "loginDescription": "Sign in to access your Google\nTasks, Calendar, and Gmail.",
+
+  "navTasks": "Tasks",
+  "navCalendar": "Calendar",
+
+  "taskItemDeletedSnack": "\"{title}\" deleted",
+  "@taskItemDeletedSnack": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "taskCompletedSection": "Completed ({count})",
+  "@taskCompletedSection": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "taskDueDate": "{month}/{day}",
+  "@taskDueDate": {
+    "placeholders": { "month": { "type": "int" }, "day": { "type": "int" } }
+  },
+  "taskOverdue": "Overdue",
+  "taskEmptyTitle": "No tasks",
+  "taskEmptyHint": "Tap + to add a task",
+
+  "addTaskTitle": "New Task",
+  "titleHint": "Title (required)",
+  "dueDateHint": "Select due date (optional)",
+  "dateFormat": "{month}/{day}/{year}",
+  "@dateFormat": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
+  "memoHint": "Memo (optional)",
+  "taskAddFailed": "Failed to add task. Please try again.",
+
+  "calendarToday": "Today",
+  "calendarFilter": "Calendar Filter",
+  "calendarMonthFormat": "{year}/{month}",
+  "@calendarMonthFormat": {
+    "placeholders": { "year": { "type": "int" }, "month": { "type": "int" } }
+  },
+  "calendarMonthItemsHeader": "{year}/{month} events ({count})",
+  "@calendarMonthItemsHeader": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "count": { "type": "int" }
+    }
+  },
+  "calendarEmpty": "No events this month",
+  "allDay": "All day",
+  "taskDue": "Due",
+  "weekdaySun": "Sun",
+  "weekdayMon": "Mon",
+  "weekdayTue": "Tue",
+  "weekdayWed": "Wed",
+  "weekdayThu": "Thu",
+  "weekdayFri": "Fri",
+  "weekdaySat": "Sat",
+  "showCalendars": "Show Calendars",
+  "loginRequired": "Please sign in to use this feature",
+
+  "newEventTitle": "New Event",
+  "editEventTitle": "Edit Event",
+  "titleRequiredError": "Please enter a title",
+  "endTimeError": "End time must be after start time",
+  "eventStart": "Start",
+  "eventEnd": "End",
+  "eventRepeat": "Repeat",
+  "repeatNone": "None",
+  "repeatDaily": "Daily",
+  "repeatWeekdays": "Weekdays (Mon–Fri)",
+  "repeatWeekly": "Weekly",
+  "repeatMonthly": "Monthly",
+  "repeatYearly": "Yearly",
+  "eventLocation": "Location",
+  "eventDescription": "Description",
+  "eventGuestsHint": "Invite email (comma-separated)",
+  "eventNotification": "Notification",
+  "notifPopup": "Popup",
+  "notifEmail": "Email",
+  "minutesBefore": "min before",
+  "calendarLabel": "Calendar",
+  "eventColorLabel": "Event Color",
+  "saveFailed": "Save failed: {error}",
+  "@saveFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "dateTimeFormat": "{month}/{day}/{year} {hour}:{minute}",
+  "@dateTimeFormat": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" },
+      "hour": { "type": "String" },
+      "minute": { "type": "String" }
+    }
+  },
+
+  "eventDateLabel": "{weekday}, {month}/{day}",
+  "@eventDateLabel": {
+    "placeholders": {
+      "weekday": { "type": "String" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
+  "noEventsForDay": "No events for this day",
+  "eventDeleteTitle": "Delete Event",
+  "eventDeleteMessage": "Delete \"{summary}\"?",
+  "@eventDeleteMessage": {
+    "placeholders": { "summary": { "type": "String" } }
+  },
+  "eventDeletedSnack": "Event deleted",
+  "taskCardLabel": "Task",
+  "taskDeleteTitle": "Delete Task",
+  "taskDeleteMessage": "Delete \"{title}\"?",
+  "@taskDeleteMessage": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "taskDeletedSnack": "Task deleted",
+
+  "gmailInbox": "Inbox",
+  "gmailStarred": "Starred",
+  "gmailSent": "Sent",
+  "gmailSpam": "Spam",
+  "gmailTrash": "Trash",
+  "gmailSearchHint": "Search mail…",
+  "composeButton": "Compose",
+  "noSubject": "(No subject)",
+  "gmailEmpty": "No mail",
+  "gmailLoadError": "Could not load mail",
+
+  "emailTitle": "Mail",
+  "emailFrom": "From",
+  "emailTo": "To",
+  "emailDateHeader": "Date",
+  "emailLoadError": "Could not load email",
+  "openInGmail": "Open in Gmail",
+  "fileOpenError": "Failed to open file: {error}",
+  "@fileOpenError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "fileAlreadyDownloadedTitle": "File Already Downloaded",
+  "fileAlreadyDownloadedMessage": "\"{filename}\" is already downloaded.\nDownload again?",
+  "@fileAlreadyDownloadedMessage": {
+    "placeholders": { "filename": { "type": "String" } }
+  },
+  "openFileButton": "Open Now",
+  "redownloadButton": "Re-download",
+  "downloadCompleted": "\"{filename}\" downloaded",
+  "@downloadCompleted": {
+    "placeholders": { "filename": { "type": "String" } }
+  },
+  "downloadError": "Download failed: {error}",
+  "@downloadError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "attachmentCount": "{count} attachment(s)",
+  "@attachmentCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "themeTitle": "Display Theme",
+  "darkMode": "Dark mode",
+  "lightMode": "Light mode",
+  "widgetScreenMode": "Home Widget Screen Mode",
+  "widgetScreenModeDesc": "You can manually set each widget to cover or home screen mode.\nAuto detection judges by widget size on foldable devices.",
+  "noWidgets": "No widgets registered",
+  "appInfoSection": "App Info",
+  "openSourceLicense": "Open Source Licenses",
+  "logout": "Sign Out",
+  "logoutConfirmMessage": "Signing out will delete saved authentication data. Continue?",
+  "coverScreen": "Cover",
+  "homeScreen": "Home",
+  "tabletLabel": "Tablet",
+  "coverButton": "Cover",
+  "homeButton": "Home",
+  "autoButton": "Auto",
+  "widgetSize": "Size: {width}dp × {height}dp",
+  "@widgetSize": {
+    "placeholders": { "width": { "type": "int" }, "height": { "type": "int" } }
+  },
+  "widgetThemeSetting": "Widget Theme",
+  "widgetSystemTheme": "System",
+  "widgetLightTheme": "Light",
+  "widgetDarkTheme": "Dark",
+  "widgetOpacitySetting": "Widget Background Opacity",
+
+  "privacyPolicy": "Privacy Policy",
+  "privacyPolicyTitle": "MyBoard Privacy Policy",
+  "privacyPolicyLastModified": "Last Modified: June 12, 2026",
+  "privacySection1Title": "1. Information We Collect",
+  "privacySection1Body": "This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n• Gmail: View, send, and delete emails\n\nThis information is processed only on your device and is not sent to external servers.",
+  "privacySection2Title": "2. Data Storage",
+  "privacySection2Body": "• Authentication tokens: Stored in the device's encrypted storage (EncryptedSharedPreferences)\n• Widget data: Cached in the device's SharedPreferences\n• All data is stored only on the device and is not transmitted externally.",
+  "privacySection3Title": "3. Data Deletion",
+  "privacySection3Body": "Stored authentication tokens are deleted upon sign out. Uninstalling the app completely removes all local data.",
+  "privacySection4Title": "4. Third-Party Sharing",
+  "privacySection4Body": "This app does not provide or sell user data to third parties. There is no data exchange with external servers other than communication through the Google API.",
+  "privacySection5Title": "5. Google API Policy Compliance",
+  "privacySection5Body": "The use and transfer of Google user data by this app complies with the Google API Services User Data Policy (including the Limited Use requirements).",
+  "privacySection6Title": "6. Contact",
+  "privacySection6Body": "Privacy inquiries: dhwjdghddd@gmail.com"
+}

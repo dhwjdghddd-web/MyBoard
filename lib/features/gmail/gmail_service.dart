@@ -47,14 +47,14 @@ DateTime? parseEmailDate(String raw) {
   }
 }
 
-String formatEmailDate(String raw) {
+String formatEmailDate(String raw, {bool isEnglish = false}) {
   final dt = parseEmailDate(raw);
   if (dt == null) return raw.length > 6 ? raw.substring(0, 6) : raw;
   final now = DateTime.now();
   if (dt.year == now.year && dt.month == now.month && dt.day == now.day) {
     return '${dt.hour.toString().padLeft(2,'0')}:${dt.minute.toString().padLeft(2,'0')}';
   }
-  return '${dt.month}월 ${dt.day}일';
+  return isEnglish ? '${dt.month}/${dt.day}' : '${dt.month}월 ${dt.day}일';
 }
 
 // ── 이메일 본문 디코딩 ────────────────────────────────────────────────────

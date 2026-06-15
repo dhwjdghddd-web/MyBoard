@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'features/gmail/gmail_screen.dart';
 import 'features/gmail/gmail_service.dart';
 import 'features/gmail/email_detail_screen.dart';
+import 'l10n/app_localizations.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -238,6 +239,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
     final tasks = ref.watch(taskServiceProvider).value ?? [];
     final activeCount = tasks.where((t) => !t.isCompleted).length;
     final bool isTablet = MediaQuery.of(context).size.width >= 600;
+    final l = AppLocalizations.of(context)!;
 
     if (isTablet) {
       return Scaffold(
@@ -255,12 +257,12 @@ class _MainScreenState extends ConsumerState<MainScreen>
                     child: const Icon(Icons.check_circle_outline),
                   ),
                   selectedIcon: const Icon(Icons.check_circle),
-                  label: const Text('태스크'),
+                  label: Text(l.navTasks),
                 ),
-                const NavigationRailDestination(
-                  icon: Icon(Icons.calendar_today_outlined),
-                  selectedIcon: Icon(Icons.calendar_today),
-                  label: Text('캘린더'),
+                NavigationRailDestination(
+                  icon: const Icon(Icons.calendar_today_outlined),
+                  selectedIcon: const Icon(Icons.calendar_today),
+                  label: Text(l.navCalendar),
                 ),
                 const NavigationRailDestination(
                   icon: Icon(Icons.email_outlined),
@@ -291,12 +293,12 @@ class _MainScreenState extends ConsumerState<MainScreen>
               child: const Icon(Icons.check_circle_outline),
             ),
             selectedIcon: const Icon(Icons.check_circle),
-            label: '태스크',
+            label: l.navTasks,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
-            label: '캘린더',
+          NavigationDestination(
+            icon: const Icon(Icons.calendar_today_outlined),
+            selectedIcon: const Icon(Icons.calendar_today),
+            label: l.navCalendar,
           ),
           const NavigationDestination(
             icon: Icon(Icons.email_outlined),

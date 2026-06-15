@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/auth_service.dart';
 import '../../core/theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class WidgetSettingsScreen extends ConsumerStatefulWidget {
   const WidgetSettingsScreen({super.key});
@@ -58,55 +59,47 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
   }
 
   void _showPrivacyPolicy(BuildContext context, bool isDark) {
+    final l = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('개인정보 처리방침'),
+        title: Text(l.privacyPolicy),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('마이보드 개인정보 처리방침', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              SizedBox(height: 12),
-              Text('최종 수정일: 2026년 6월 12일', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              SizedBox(height: 16),
-              Text('1. 수집하는 정보', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 4),
-              Text('본 앱은 Google 계정을 통해 다음 정보에 접근합니다:\n'
-                   '• Google Tasks: 할 일 목록 조회 및 관리\n'
-                   '• Google Calendar: 일정 조회 및 관리\n'
-                   '• Gmail: 이메일 조회, 전송, 삭제\n\n'
-                   '이 정보는 기기에서만 처리되며, 외부 서버로 전송되지 않습니다.'),
-              SizedBox(height: 12),
-              Text('2. 데이터 저장', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 4),
-              Text('• 인증 토큰: 기기의 암호화된 저장소(EncryptedSharedPreferences)에 저장\n'
-                   '• 위젯 데이터: 기기의 SharedPreferences에 캐시\n'
-                   '• 모든 데이터는 기기에만 저장되며 외부로 전송되지 않습니다.'),
-              SizedBox(height: 12),
-              Text('3. 데이터 삭제', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 4),
-              Text('로그아웃 시 저장된 인증 토큰이 삭제됩니다. '
-                   '앱을 삭제하면 모든 로컬 데이터가 완전히 제거됩니다.'),
-              SizedBox(height: 12),
-              Text('4. 제3자 제공', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 4),
-              Text('본 앱은 사용자 데이터를 제3자에게 제공하거나 판매하지 않습니다. '
-                   'Google API를 통한 통신 외에 외부 서버와의 데이터 교환은 없습니다.'),
-              SizedBox(height: 12),
-              Text('5. Google API 정책 준수', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 4),
-              Text('본 앱의 Google 사용자 데이터 사용 및 전송은 '
-                   'Google API Services User Data Policy(제한적 사용 요건 포함)를 준수합니다.'),
-              SizedBox(height: 12),
-              Text('6. 문의', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 4),
-              Text('개인정보 관련 문의: dhwjdghddd@gmail.com'),
+            children: [
+              Text(l.privacyPolicyTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 12),
+              Text(l.privacyPolicyLastModified, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              const SizedBox(height: 16),
+              Text(l.privacySection1Title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(l.privacySection1Body),
+              const SizedBox(height: 12),
+              Text(l.privacySection2Title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(l.privacySection2Body),
+              const SizedBox(height: 12),
+              Text(l.privacySection3Title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(l.privacySection3Body),
+              const SizedBox(height: 12),
+              Text(l.privacySection4Title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(l.privacySection4Body),
+              const SizedBox(height: 12),
+              Text(l.privacySection5Title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(l.privacySection5Body),
+              const SizedBox(height: 12),
+              Text(l.privacySection6Title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(l.privacySection6Body),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('닫기')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l.closeButton)),
         ],
       ),
     );
@@ -116,7 +109,8 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+    final l = AppLocalizations.of(context)!;
+
     final themeBg = theme.scaffoldBackgroundColor;
     final themeSurface = theme.cardColor;
     final accentColor = theme.colorScheme.primary;
@@ -132,7 +126,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
           statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
           statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
-        title: const Text('설정'),
+        title: Text(l.settingsTitle),
         actions: [
           IconButton(
             padding: EdgeInsets.zero,
@@ -145,7 +139,6 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // 화면 테마
           Card(
             color: themeSurface,
             shape: RoundedRectangleBorder(
@@ -158,8 +151,8 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                 isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
                 color: isDark ? accentColor : null,
               ),
-              title: const Text('화면 테마'),
-              subtitle: Text(isDark ? '다크 모드' : '라이트 모드'),
+              title: Text(l.themeTitle),
+              subtitle: Text(isDark ? l.darkMode : l.lightMode),
               trailing: Switch(
                 value: isDark,
                 activeThumbColor: accentColor,
@@ -167,11 +160,10 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
               ),
             ),
           ),
-          // 위젯 화면 설정
           Padding(
             padding: const EdgeInsets.only(bottom: 8, left: 4),
             child: Text(
-              '홈 위젯 화면 모드',
+              l.widgetScreenMode,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
@@ -182,8 +174,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16, left: 4),
             child: Text(
-              '위젯마다 커버화면/홈화면 여부를 수동으로 지정할 수 있어요.\n'
-              '자동 감지는 폴더블 기기에서 위젯 크기로 판단해요.',
+              l.widgetScreenModeDesc,
               style: TextStyle(color: secondaryTextColor, fontSize: 13, height: 1.4),
             ),
           ),
@@ -194,7 +185,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 32),
                 child: Text(
-                  '등록된 위젯이 없습니다',
+                  l.noWidgets,
                   style: TextStyle(color: secondaryTextColor),
                 ),
               ),
@@ -215,11 +206,10 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                   onOpacityChanged: (opacity) => _setOpacity(w['id'] as int, opacity),
                 )),
           const SizedBox(height: 24),
-          // 앱 정보 & 법적 고지
           Padding(
             padding: const EdgeInsets.only(bottom: 8, left: 4),
             child: Text(
-              '앱 정보',
+              l.appInfoSection,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
@@ -238,34 +228,34 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
               children: [
                 ListTile(
                   leading: Icon(Icons.privacy_tip_outlined, color: isDark ? accentColor : null),
-                  title: const Text('개인정보 처리방침'),
+                  title: Text(l.privacyPolicy),
                   trailing: const Icon(Icons.open_in_new, size: 18),
                   onTap: () => _showPrivacyPolicy(context, isDark),
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withAlpha(80)),
                 ListTile(
                   leading: Icon(Icons.description_outlined, color: isDark ? accentColor : null),
-                  title: const Text('오픈소스 라이선스'),
+                  title: Text(l.openSourceLicense),
                   trailing: const Icon(Icons.chevron_right, size: 18),
                   onTap: () => showLicensePage(
                     context: context,
-                    applicationName: '마이보드',
+                    applicationName: 'MyBoard',
                     applicationVersion: '1.0.0',
                   ),
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withAlpha(80)),
                 ListTile(
-                  leading: Icon(Icons.logout, color: Colors.redAccent),
-                  title: const Text('로그아웃'),
+                  leading: const Icon(Icons.logout, color: Colors.redAccent),
+                  title: Text(l.logout),
                   onTap: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: const Text('로그아웃'),
-                        content: const Text('로그아웃하면 저장된 인증 정보가 삭제됩니다. 계속할까요?'),
+                        title: Text(l.logout),
+                        content: Text(l.logoutConfirmMessage),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('로그아웃')),
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l.cancelButton)),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(l.logout)),
                         ],
                       ),
                     );
@@ -337,9 +327,12 @@ class _WidgetCardState extends State<_WidgetCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
     final themeSurface = theme.cardColor;
     final accentColor = theme.colorScheme.primary;
     final secondaryTextColor = theme.colorScheme.onSurfaceVariant;
+
+    final screenLabel = widget.isCover ? l.coverScreen : (widget.isTablet ? l.tabletLabel : l.homeScreen);
 
     return Card(
       color: themeSurface,
@@ -377,7 +370,7 @@ class _WidgetCardState extends State<_WidgetCard> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    widget.isCover ? '커버화면' : (widget.isTablet ? '태블릿' : '홈화면'),
+                    screenLabel,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -389,18 +382,18 @@ class _WidgetCardState extends State<_WidgetCard> {
             ),
             const SizedBox(height: 4),
             Text(
-              '크기: ${widget.width}dp × ${widget.height}dp',
+              l.widgetSize(widget.width, widget.height),
               style: TextStyle(color: secondaryTextColor, fontSize: 12),
             ),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'cover', label: Text('커버'), icon: Icon(Icons.phone_android, size: 14)),
-                  ButtonSegment(value: 'home',  label: Text('홈'),   icon: Icon(Icons.home, size: 14)),
-                  ButtonSegment(value: 'tablet', label: Text('태블릿'), icon: Icon(Icons.tablet, size: 14)),
-                  ButtonSegment(value: 'auto',  label: Text('자동'),     icon: Icon(Icons.auto_fix_high, size: 14)),
+                segments: [
+                  ButtonSegment(value: 'cover',  label: Text(l.coverButton),  icon: const Icon(Icons.phone_android, size: 14)),
+                  ButtonSegment(value: 'home',   label: Text(l.homeButton),   icon: const Icon(Icons.home, size: 14)),
+                  ButtonSegment(value: 'tablet', label: Text(l.tabletLabel),  icon: const Icon(Icons.tablet, size: 14)),
+                  ButtonSegment(value: 'auto',   label: Text(l.autoButton),   icon: const Icon(Icons.auto_fix_high, size: 14)),
                 ],
                 selected: {widget.manual},
                 onSelectionChanged: (s) => widget.onChanged(s.first),
@@ -414,7 +407,7 @@ class _WidgetCardState extends State<_WidgetCard> {
             ),
             const SizedBox(height: 16),
             Text(
-              '위젯 테마 설정',
+              l.widgetThemeSetting,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -425,10 +418,10 @@ class _WidgetCardState extends State<_WidgetCard> {
             SizedBox(
               width: double.infinity,
               child: SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'system', label: Text('시스템'), icon: Icon(Icons.settings_suggest, size: 14)),
-                  ButtonSegment(value: 'light',  label: Text('라이트'), icon: Icon(Icons.light_mode, size: 14)),
-                  ButtonSegment(value: 'dark',   label: Text('다크'),   icon: Icon(Icons.dark_mode, size: 14)),
+                segments: [
+                  ButtonSegment(value: 'system', label: Text(l.widgetSystemTheme), icon: const Icon(Icons.settings_suggest, size: 14)),
+                  ButtonSegment(value: 'light',  label: Text(l.widgetLightTheme),  icon: const Icon(Icons.light_mode, size: 14)),
+                  ButtonSegment(value: 'dark',   label: Text(l.widgetDarkTheme),   icon: const Icon(Icons.dark_mode, size: 14)),
                 ],
                 selected: {widget.widgetTheme},
                 onSelectionChanged: (s) => widget.onThemeChanged(s.first),
@@ -445,7 +438,7 @@ class _WidgetCardState extends State<_WidgetCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '위젯 배경 투명도 설정',
+                  l.widgetOpacitySetting,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

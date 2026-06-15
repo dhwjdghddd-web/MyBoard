@@ -5,13 +5,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/api_client.dart';
 import '../../core/theme.dart';
+import '../../l10n/app_localizations.dart';
 import 'gmail_service.dart';
 
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
 String _sanitizeHtml(String html) {
   var s = html;
-  // 위험 태그 제거
   s = s.replaceAll(RegExp(r'<script[\s\S]*?</script>', caseSensitive: false), '');
   s = s.replaceAll(RegExp(r'<script[^>]*/>', caseSensitive: false), '');
   s = s.replaceAll(RegExp(r'<iframe[\s\S]*?</iframe>', caseSensitive: false), '');
@@ -24,14 +24,11 @@ String _sanitizeHtml(String html) {
   s = s.replaceAll(RegExp(r'<link[^>]*stylesheet[^>]*/?>', caseSensitive: false), '');
   s = s.replaceAll(RegExp(r'<svg[\s\S]*?</svg>', caseSensitive: false), '');
   s = s.replaceAll(RegExp(r'<math[\s\S]*?</math>', caseSensitive: false), '');
-  // 인라인 이벤트 핸들러 제거
   s = s.replaceAll(RegExp(r'\s+on\w+\s*=\s*"[^"]*"', caseSensitive: false), '');
   s = s.replaceAll(RegExp(r"""\s+on\w+\s*=\s*'[^']*'""", caseSensitive: false), '');
   s = s.replaceAll(RegExp(r'\s+on\w+\s*=\s*\S+', caseSensitive: false), '');
-  // javascript: URI 제거
   s = s.replaceAll(RegExp(r'href\s*=\s*"javascript:[^"]*"', caseSensitive: false), 'href="#"');
   s = s.replaceAll(RegExp(r"href\s*=\s*'javascript:[^']*'", caseSensitive: false), "href='#'");
-  // style 속성의 expression() 제거
   s = s.replaceAll(RegExp(r'expression\s*\(', caseSensitive: false), '');
   return s;
 }
@@ -126,7 +123,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       );
       final full = data as Map<String, dynamic>;
       final payload = full['payload'] as Map<String, dynamic>? ?? {};
-      final body = getEmailBody(payload) ?? '<p style="padding:16px;color:#999">본문이 없습니다</p>';
+      final body = getEmailBody(payload) ?? '<p style="padding:16px;color:#999">No content</p>';
       final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
       setState(() {
         _full = full;
@@ -146,37 +143,37 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         'mimeType': mimeType,
       });
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('파일 열기 실패: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.fileOpenError(e.toString()))));
     }
   }
 
   Future<void> _downloadAttachment(Attachment att) async {
     if (_downloading.contains(att.attachmentId)) return;
 
-    // 기존 파일 존재 여부 확인
     final existingUri = await _saveChannel.invokeMethod<String>(
       'findExistingDownload', att.filename,
     );
     if (existingUri != null && mounted) {
+      final l = AppLocalizations.of(context)!;
       final messenger = ScaffoldMessenger.of(context);
       final redownload = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('이미 다운로드된 파일'),
-          content: Text('"${att.filename}"이 이미 다운로드되어 있어요.\n다시 받을까요?'),
+          title: Text(l.fileAlreadyDownloadedTitle),
+          content: Text(l.fileAlreadyDownloadedMessage(att.filename)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('바로 열기'),
+              child: Text(l.openFileButton),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('다시 받기'),
+              child: Text(l.redownloadButton),
             ),
           ],
         ),
       );
-      if (redownload == null) return; // 취소
+      if (redownload == null) return;
       if (redownload == false) {
         await _openFile(existingUri, att.mimeType, messenger);
         return;
@@ -195,13 +192,14 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         'data': data,
       });
       if (mounted) {
+        final l = AppLocalizations.of(context)!;
         final messenger = ScaffoldMessenger.of(context);
         messenger.showSnackBar(
           SnackBar(
-            content: Text('"${att.filename}" 다운로드 완료'),
+            content: Text(l.downloadCompleted(att.filename)),
             action: uri != null
                 ? SnackBarAction(
-                    label: '열기',
+                    label: l.openButton,
                     onPressed: () => _openFile(uri, att.mimeType, messenger),
                   )
                 : null,
@@ -211,7 +209,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('다운로드 실패: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.downloadError(e.toString()))),
         );
       }
     } finally {
@@ -237,9 +235,12 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('메일'),
+        title: Text(l.emailTitle),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _loadFull),
         ],
@@ -250,12 +251,11 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
               ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
                   const SizedBox(height: 16),
-                  Text('메일을 불러올 수 없어요', style: TextStyle(color: Colors.grey[600])),
+                  Text(l.emailLoadError, style: TextStyle(color: Colors.grey[600])),
                   const SizedBox(height: 16),
-                  FilledButton(onPressed: _loadFull, child: const Text('다시 시도')),
+                  FilledButton(onPressed: _loadFull, child: Text(l.retryButton)),
                 ]))
               : Column(children: [
-                  // 헤더: 수신자가 많아도 스크롤 가능하도록 최대 높이 제한
                   ConstrainedBox(
                     constraints: BoxConstraints(
                       maxHeight: MediaQuery.of(context).size.height * 0.28,
@@ -269,17 +269,17 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
                         ),
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(
-                            _header('Subject').isEmpty ? '(제목 없음)' : _header('Subject'),
+                            _header('Subject').isEmpty ? l.noSubject : _header('Subject'),
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
-                          _InfoRow('보낸사람', _header('From')),
-                          _InfoRow('받는사람', _header('To')),
-                          _InfoRow('날짜', formatEmailDate(_header('Date'))),
+                          _InfoRow(l.emailFrom, _header('From')),
+                          _InfoRow(l.emailTo, _header('To')),
+                          _InfoRow(l.emailDateHeader, formatEmailDate(_header('Date'), isEnglish: isEnglish)),
                           const SizedBox(height: 10),
                           OutlinedButton.icon(
                             icon: const Icon(Icons.open_in_new, size: 16),
-                            label: const Text('Gmail 앱 열기'),
+                            label: Text(l.openInGmail),
                             onPressed: _openGmailApp,
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 38),
@@ -355,6 +355,7 @@ class _AttachmentBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
     final outline = Theme.of(context).colorScheme.outlineVariant;
     return Container(
@@ -371,7 +372,7 @@ class _AttachmentBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '첨부파일 ${attachments.length}개',
+            l.attachmentCount(attachments.length),
             style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 6),

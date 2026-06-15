@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/app_localizations.dart';
 import 'email_detail_screen.dart';
 import 'gmail_service.dart';
 import '../settings/widget_settings_screen.dart';
@@ -13,12 +14,12 @@ const _avatarColors = [
 Color _avatarColor(String initial) =>
     _avatarColors[initial.codeUnitAt(0) % _avatarColors.length];
 
-const _labels = [
-  ('INBOX', '📥', '받은편지함'),
-  ('STARRED', '⭐', '중요'),
-  ('SENT', '📤', '보낸편지함'),
-  ('SPAM', '🚫', '스팸'),
-  ('TRASH', '🗑️', '휴지통'),
+List<(String, String, String)> _labelsList(AppLocalizations l) => [
+  ('INBOX',   '📥', l.gmailInbox),
+  ('STARRED', '⭐', l.gmailStarred),
+  ('SENT',    '📤', l.gmailSent),
+  ('SPAM',    '🚫', l.gmailSpam),
+  ('TRASH',   '🗑️', l.gmailTrash),
 ];
 
 class GmailScreen extends ConsumerStatefulWidget {
@@ -71,6 +72,11 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
   Widget build(BuildContext context) {
     final gmail = ref.watch(gmailProvider);
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
+    final labels = _labelsList(l);
+
+    String labelName(String label) =>
+        labels.firstWhere((x) => x.$1 == label, orElse: () => (label, '', label)).$3;
 
     return Scaffold(
       appBar: AppBar(
@@ -80,13 +86,13 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                 autofocus: true,
                 style: TextStyle(color: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white),
                 decoration: InputDecoration(
-                  hintText: '메일 검색…',
+                  hintText: l.gmailSearchHint,
                   hintStyle: TextStyle(color: (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white).withValues(alpha: 0.7)),
                   border: InputBorder.none,
                 ),
                 onSubmitted: (_) => _search(),
               )
-            : Text(_labelName(gmail.label)),
+            : Text(labelName(gmail.label)),
         actions: [
           if (_searching) ...[
             IconButton(
@@ -125,7 +131,7 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: const Icon(Icons.settings),
-              tooltip: '설정',
+              tooltip: l.settingsTitle,
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
             ),
@@ -135,19 +141,18 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => launchUrl(Uri.parse('mailto:'), mode: LaunchMode.externalApplication),
         icon: const Icon(Icons.edit_outlined),
-        label: const Text('작성'),
+        label: Text(l.composeButton),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
       ),
       body: Column(children: [
-        // 라벨 선택 스트립
         _LabelStrip(
           currentLabel: gmail.label,
           labelCounts: gmail.labelCounts,
-          onSelect: (l) => ref.read(gmailProvider.notifier).selectLabel(l),
+          labels: labels,
+          onSelect: (label) => ref.read(gmailProvider.notifier).selectLabel(label),
         ),
 
-        // 메시지 목록
         Expanded(
           child: gmail.loading
               ? const Center(child: CircularProgressIndicator())
@@ -204,18 +209,20 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
       ]),
     );
   }
-
-  String _labelName(String label) {
-    return _labels.firstWhere((l) => l.$1 == label, orElse: () => (label, '', label)).$3;
-  }
 }
 
 // ── 라벨 스트립 ───────────────────────────────────────────────────────────
 
 class _LabelStrip extends StatelessWidget {
-  const _LabelStrip({required this.currentLabel, required this.labelCounts, required this.onSelect});
+  const _LabelStrip({
+    required this.currentLabel,
+    required this.labelCounts,
+    required this.labels,
+    required this.onSelect,
+  });
   final String currentLabel;
   final Map<String, int> labelCounts;
+  final List<(String, String, String)> labels;
   final void Function(String) onSelect;
 
   @override
@@ -227,7 +234,7 @@ class _LabelStrip extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        children: _labels.map((l) {
+        children: labels.map((l) {
           final selected = l.$1 == currentLabel;
           final count = labelCounts[l.$1] ?? 0;
           return Padding(
@@ -270,9 +277,11 @@ class _MessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     final initial = message.initial;
     final avatarColor = _avatarColor(initial);
     final isUnread = message.isUnread;
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
 
     return InkWell(
         onTap: onTap,
@@ -283,7 +292,6 @@ class _MessageTile extends StatelessWidget {
               : (isUnread ? scheme.primaryContainer.withAlpha(30) : null),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // 아바타
             GestureDetector(
               onTap: onLongPress,
               child: CircleAvatar(
@@ -295,7 +303,6 @@ class _MessageTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            // 본문
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
@@ -313,7 +320,7 @@ class _MessageTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    formatEmailDate(message.date),
+                    formatEmailDate(message.date, isEnglish: isEnglish),
                     style: TextStyle(
                       fontSize: 11,
                       color: isUnread ? scheme.primary : scheme.onSurfaceVariant,
@@ -327,7 +334,7 @@ class _MessageTile extends StatelessWidget {
                 ]),
                 const SizedBox(height: 1),
                 Text(
-                  message.subject.isEmpty ? '(제목 없음)' : message.subject,
+                  message.subject.isEmpty ? l.noSubject : message.subject,
                   style: TextStyle(
                     fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 13,
@@ -345,7 +352,6 @@ class _MessageTile extends StatelessWidget {
                   ),
               ]),
             ),
-            // 별표
             if (message.isStarred)
               Padding(
                 padding: const EdgeInsets.only(left: 4, top: 2),
@@ -363,11 +369,12 @@ class _EmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(Icons.mail_outline, size: 64, color: scheme.outlineVariant),
         const SizedBox(height: 16),
-        Text('메일이 없어요', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16)),
+        Text(l.gmailEmpty, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16)),
       ]),
     );
   }
@@ -380,13 +387,14 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(Icons.wifi_off, size: 48, color: scheme.outline),
         const SizedBox(height: 16),
-        Text('메일을 불러올 수 없어요', style: TextStyle(color: scheme.onSurfaceVariant)),
+        Text(l.gmailLoadError, style: TextStyle(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 16),
-        FilledButton(onPressed: onRetry, child: const Text('다시 시도')),
+        FilledButton(onPressed: onRetry, child: Text(l.retryButton)),
       ]),
     );
   }

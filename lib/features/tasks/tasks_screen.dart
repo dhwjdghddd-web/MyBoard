@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
+import '../../l10n/app_localizations.dart';
 import 'add_task_sheet.dart';
 import 'task_service.dart';
 import '../settings/widget_settings_screen.dart';
@@ -11,10 +12,11 @@ class TasksScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksAsync = ref.watch(taskServiceProvider);
+    final l = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('태스크'),
+        title: Text(l.navTasks),
         actions: [
           IconButton(
             padding: EdgeInsets.zero,
@@ -26,7 +28,7 @@ class TasksScreen extends ConsumerWidget {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(Icons.settings),
-            tooltip: '설정',
+            tooltip: l.settingsTitle,
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
           ),
@@ -63,6 +65,8 @@ class _TaskListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
+
     if (tasks.isEmpty) {
       return const _EmptyView();
     }
@@ -78,7 +82,7 @@ class _TaskListView extends ConsumerWidget {
             _TaskItem(task: task),
 
           if (done.isNotEmpty) ...[
-            _SectionHeader('완료 (${done.length})'),
+            _SectionHeader(l.taskCompletedSection(done.length)),
             for (final task in done)
               _TaskItem(task: task),
           ],
@@ -99,6 +103,7 @@ class _TaskItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
 
     return Dismissible(
       key: ValueKey(task.id),
@@ -114,10 +119,10 @@ class _TaskItem extends ConsumerWidget {
         notifier.deleteTaskLocal(task.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('"${task.title}" 삭제됨'),
+            content: Text(l.taskItemDeletedSnack(task.title)),
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
-              label: '취소',
+              label: l.cancelButton,
               onPressed: () => notifier.loadTasks(),
             ),
           ),
@@ -145,18 +150,19 @@ class _TaskItem extends ConsumerWidget {
             fontSize: 14,
           ),
         ),
-        subtitle: _buildSubtitle(task),
+        subtitle: _buildSubtitle(task, context),
         onTap: () => ref.read(taskServiceProvider.notifier).toggleComplete(task),
       ),
     );
   }
 
-  Widget? _buildSubtitle(Task task) {
+  Widget? _buildSubtitle(Task task, BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final parts = <Widget>[];
 
     if (task.due != null) {
       final due = task.due!.toLocal();
-      final label = '${due.month}월 ${due.day}일';
+      final label = l.taskDueDate(due.month, due.day);
       final overdue = task.isOverdue;
       parts.add(Builder(builder: (ctx) {
         final muted = Theme.of(ctx).colorScheme.onSurfaceVariant;
@@ -164,7 +170,7 @@ class _TaskItem extends ConsumerWidget {
           Icon(Icons.calendar_today, size: 11, color: overdue ? Colors.red : muted),
           const SizedBox(width: 3),
           Text(
-            overdue ? '$label (기한 초과)' : label,
+            overdue ? '$label (${l.taskOverdue})' : label,
             style: TextStyle(fontSize: 12, color: overdue ? Colors.red : muted),
           ),
         ]);
@@ -229,13 +235,14 @@ class _EmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(Icons.checklist, size: 64, color: scheme.outlineVariant),
         const SizedBox(height: 16),
-        Text('태스크가 없어요', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16)),
+        Text(l.taskEmptyTitle, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16)),
         const SizedBox(height: 8),
-        Text('+ 버튼으로 추가해보세요', style: TextStyle(color: scheme.outline, fontSize: 13)),
+        Text(l.taskEmptyHint, style: TextStyle(color: scheme.outline, fontSize: 13)),
       ]),
     );
   }
@@ -249,13 +256,14 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(Icons.wifi_off, size: 48, color: scheme.outline),
         const SizedBox(height: 16),
         Text(message, style: TextStyle(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 16),
-        FilledButton(onPressed: onRetry, child: const Text('다시 시도')),
+        FilledButton(onPressed: onRetry, child: Text(l.retryButton)),
       ]),
     );
   }

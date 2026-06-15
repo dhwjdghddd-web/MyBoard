@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/app_localizations.dart';
 import '../tasks/task_service.dart';
 import 'calendar_service.dart';
 import 'event_detail_sheet.dart';
@@ -20,8 +21,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   Widget build(BuildContext context) {
     final cal = ref.watch(calendarProvider);
     final tasks = ref.watch(taskServiceProvider).value ?? [];
+    final l = AppLocalizations.of(context)!;
 
-    // 태스크 마감일 → dateKey 맵
     final tasksByDate = <String, List<Task>>{};
     for (final t in tasks) {
       if (t.due != null && !t.isCompleted) {
@@ -31,16 +32,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       }
     }
 
-    // 이번 달 일정 정렬 (태스크 포함)
     final allMonthItems = <_MonthItem>[];
     for (final e in cal.events) {
-      allMonthItems.add(_MonthItem.fromEvent(e));
+      allMonthItems.add(_MonthItem.fromEvent(e, allDayLabel: l.allDay));
     }
     for (final entry in tasksByDate.entries) {
-      // 이번 달 태스크만
       if (entry.key.startsWith('${cal.year}-${cal.month.toString().padLeft(2,'0')}')) {
         for (final t in entry.value) {
-          allMonthItems.add(_MonthItem.fromTask(t, entry.key));
+          allMonthItems.add(_MonthItem.fromTask(t, entry.key, dueLabel: l.taskDue));
         }
       }
     }
@@ -57,7 +56,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               foregroundColor: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
             ),
             onPressed: () => ref.read(calendarProvider.notifier).goToday(),
-            child: const Text('오늘'),
+            child: Text(l.calendarToday),
           ),
           IconButton(
             padding: EdgeInsets.zero,
@@ -72,13 +71,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.filter_list),
             onPressed: () => setState(() => _showFilter = !_showFilter),
-            tooltip: '캘린더 필터',
+            tooltip: l.calendarFilter,
           ),
           IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.settings),
-            tooltip: '설정',
+            tooltip: l.settingsTitle,
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const WidgetSettingsScreen())),
           ),
@@ -91,7 +90,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 좌측 60%: 달력 그리드
                     Expanded(
                       flex: 6,
                       child: SingleChildScrollView(
@@ -108,7 +106,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       ),
                     ),
                     const VerticalDivider(width: 1, thickness: 1),
-                    // 우측 40%: 이달 일정 목록
                     Expanded(
                       flex: 4,
                       child: Column(children: [
@@ -116,7 +113,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
+                            l.calendarMonthItemsHeader(cal.year, cal.month, allMonthItems.length),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -131,7 +128,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(32),
                                     child: Text(
-                                      '이번 달 일정이 없어요',
+                                      l.calendarEmpty,
                                       style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     ),
                                   ),
@@ -153,9 +150,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               : SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(children: [
-                    // 요일 헤더
                     _DowHeader(),
-                    // 달력 그리드 (자연 높이)
                     _CalendarGrid(
                       year: cal.year,
                       month: cal.month,
@@ -163,12 +158,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       tasksByDate: tasksByDate,
                     ),
                     const Divider(height: 1),
-                    // 이달 일정 목록 헤더
                     Container(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '${cal.year}년 ${cal.month}월 일정 (${allMonthItems.length})',
+                        l.calendarMonthItemsHeader(cal.year, cal.month, allMonthItems.length),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -177,13 +171,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                         ),
                       ),
                     ),
-                    // 이달 일정 리스트
                     allMonthItems.isEmpty
                         ? Center(
                             child: Padding(
                               padding: const EdgeInsets.all(32),
                               child: Text(
-                                '이번 달 일정이 없어요',
+                                l.calendarEmpty,
                                 style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                               ),
                             ),
@@ -202,7 +195,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ]),
                 ),
         ),
-        // 캘린더 필터 패널
         if (_showFilter)
           GestureDetector(
             onTap: () => setState(() => _showFilter = false),
@@ -252,9 +244,9 @@ class _MonthItem {
     required this.timeLabel,
   });
 
-  factory _MonthItem.fromEvent(CalendarEvent e) {
+  factory _MonthItem.fromEvent(CalendarEvent e, {required String allDayLabel}) {
     final time = e.isAllDay
-        ? '종일'
+        ? allDayLabel
         : (e.startDt != null
             ? '${e.startDt!.toLocal().hour.toString().padLeft(2,'0')}:${e.startDt!.toLocal().minute.toString().padLeft(2,'0')}'
             : '');
@@ -270,7 +262,7 @@ class _MonthItem {
     );
   }
 
-  factory _MonthItem.fromTask(Task t, String dateKey) {
+  factory _MonthItem.fromTask(Task t, String dateKey, {required String dueLabel}) {
     return _MonthItem(
       dateKey: dateKey,
       sortKey: '${dateKey}T00:00',
@@ -278,18 +270,18 @@ class _MonthItem {
       color: const Color(0xFF1A73E8),
       isTask: true,
       isAllDay: true,
-      timeLabel: '마감',
+      timeLabel: dueLabel,
     );
   }
 
-  String get displayDate {
+  // weekdayNames: index 0=Mon(weekday==1) … 6=Sun(weekday==7)
+  String displayDate(List<String> weekdayNames) {
     final parts = dateKey.split('-');
     if (parts.length < 3) return dateKey;
     final m = int.tryParse(parts[1]) ?? 0;
     final d = int.tryParse(parts[2]) ?? 0;
     final dt = DateTime.tryParse('${dateKey}T00:00:00');
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final wd = dt != null ? weekdays[dt.weekday - 1] : '';
+    final wd = dt != null ? weekdayNames[dt.weekday - 1] : '';
     return '$m/$d($wd)';
   }
 }
@@ -304,6 +296,11 @@ class _MonthItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
+    // weekday 1=Mon … 7=Sun
+    final weekdayNames = [
+      l.weekdayMon, l.weekdayTue, l.weekdayWed, l.weekdayThu, l.weekdayFri, l.weekdaySat, l.weekdaySun,
+    ];
     final isToday = item.dateKey == todayKey;
 
     return Container(
@@ -330,7 +327,6 @@ class _MonthItemTile extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(children: [
-            // 날짜 열
             Container(
               width: 50,
               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
@@ -341,7 +337,7 @@ class _MonthItemTile extends StatelessWidget {
                     )
                   : null,
               child: Text(
-                item.displayDate,
+                item.displayDate(weekdayNames),
                 style: TextStyle(
                   fontSize: 10.5,
                   color: isToday ? Colors.white : scheme.onSurfaceVariant,
@@ -351,12 +347,10 @@ class _MonthItemTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            // 색상 점 / 태스크 아이콘
             item.isTask
                 ? Icon(Icons.check_box_outline_blank, size: 14, color: item.color)
                 : Container(width: 8, height: 8, decoration: BoxDecoration(color: item.color, shape: BoxShape.circle)),
             const SizedBox(width: 8),
-            // 제목
             Expanded(
               child: Text(
                 item.title,
@@ -371,7 +365,6 @@ class _MonthItemTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // 시간
             if (item.timeLabel.isNotEmpty)
               Text(
                 item.timeLabel,
@@ -397,6 +390,7 @@ class _MonthNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Row(mainAxisSize: MainAxisSize.min, children: [
       IconButton(
         padding: EdgeInsets.zero,
@@ -408,7 +402,7 @@ class _MonthNav extends StatelessWidget {
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            '${cal.year}년 ${cal.month}월',
+            l.calendarMonthFormat(cal.year, cal.month),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
@@ -426,10 +420,13 @@ class _MonthNav extends StatelessWidget {
 // ── 요일 헤더 ────────────────────────────────────────────────────────────
 
 class _DowHeader extends StatelessWidget {
-  static const _days = ['일', '월', '화', '수', '목', '금', '토'];
-
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    // Sun=0, Mon=1, … Sat=6
+    final days = [
+      l.weekdaySun, l.weekdayMon, l.weekdayTue, l.weekdayWed, l.weekdayThu, l.weekdayFri, l.weekdaySat,
+    ];
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return Container(
       color: Theme.of(context).colorScheme.surface,
@@ -439,7 +436,7 @@ class _DowHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 5),
             alignment: Alignment.center,
             child: Text(
-              _days[i],
+              days[i],
               style: TextStyle(
                 fontSize: 12, fontWeight: FontWeight.w700,
                 color: i == 0 ? Colors.red[400] : (i == 6 ? Colors.blue[400] : muted),
@@ -677,6 +674,7 @@ class _CalendarFilterPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     return Material(
       elevation: 8,
       borderRadius: BorderRadius.circular(12),
@@ -692,7 +690,7 @@ class _CalendarFilterPanel extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 8, 6),
             child: Row(children: [
-              Text('캘린더 표시', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant)),
+              Text(l.showCalendars, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant)),
               const Spacer(),
               IconButton(icon: const Icon(Icons.close, size: 16), onPressed: onClose, padding: EdgeInsets.zero),
             ]),
@@ -701,7 +699,7 @@ class _CalendarFilterPanel extends StatelessWidget {
           if (calendars.isEmpty)
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('로그인 후 이용 가능해요', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              child: Text(l.loginRequired, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
             )
           else
             Flexible(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/auth_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -19,7 +20,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그인 실패. 다시 시도해주세요.')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.loginError)),
         );
       }
     }
@@ -29,6 +30,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -67,10 +69,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 56),
                 _loading
                     ? CircularProgressIndicator(color: scheme.primary)
-                    : _GoogleSignInButton(onTap: _signIn),
+                    : _GoogleSignInButton(label: l.loginButton, onTap: _signIn),
                 const SizedBox(height: 16),
                 Text(
-                  '로그인하면 Google 계정의 Tasks,\nCalendar, Gmail에 접근합니다.',
+                  l.loginDescription,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant, height: 1.5),
                 ),
@@ -84,8 +86,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 }
 
 class _GoogleSignInButton extends StatelessWidget {
+  final String label;
   final VoidCallback? onTap;
-  const _GoogleSignInButton({this.onTap});
+  const _GoogleSignInButton({required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +115,10 @@ class _GoogleSignInButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 구글 G 아이콘
               _GoogleGIcon(),
               const SizedBox(width: 12),
               Text(
-                'Google로 로그인',
+                label,
                 style: TextStyle(
                   color: txtColor,
                   fontSize: 15,
@@ -155,23 +157,18 @@ class _GoogleGPainter extends CustomPainter {
 
     final paint = Paint()..style = PaintingStyle.stroke..strokeWidth = r * 0.32;
 
-    // 파란 호 (왼쪽 하단 ~ 오른쪽 상단, 약 210°)
     paint.color = const Color(0xFF4285F4);
     canvas.drawArc(rect, _deg(127), _deg(283), false, paint);
 
-    // 빨간 호 (오른쪽 상단 ~ 오른쪽, 약 47°)
     paint.color = const Color(0xFFEA4335);
     canvas.drawArc(rect, _deg(50), _deg(77), false, paint);
 
-    // 노란 호 (왼쪽 ~ 왼쪽 하단, 약 38°)
     paint.color = const Color(0xFFFBBC05);
     canvas.drawArc(rect, _deg(195), _deg(57), false, paint);
 
-    // 초록 호 (오른쪽 ~ 오른쪽 하단, 약 38°)
     paint.color = const Color(0xFF34A853);
     canvas.drawArc(rect, _deg(90), _deg(37), false, paint);
 
-    // 오른쪽 수평 막대 (G의 가로획)
     paint
       ..style = PaintingStyle.fill
       ..color = const Color(0xFF4285F4);
