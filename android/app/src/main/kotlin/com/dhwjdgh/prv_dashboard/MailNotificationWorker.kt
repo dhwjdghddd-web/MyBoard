@@ -73,7 +73,7 @@ class MailNotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ct
 
             if (unread > lastUnread) {
                 val newCount = unread - lastUnread
-                val from = fetchLatestSender(token) ?: "새 메일이 도착했습니다"
+                val from = fetchLatestSender(token) ?: WidgetStrings.mailNotificationDefaultSender
                 sendNotification(ctx, newCount, from)
             }
             prefs.edit().putInt(PREFS_KEY, unread).apply()
@@ -112,8 +112,8 @@ class MailNotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ct
         // Flutter NotificationService가 채널을 만들기 전에 워커가 먼저 실행될 수 있으므로 여기서도 생성
         if (nm.getNotificationChannel(CHANNEL_ID) == null) {
             nm.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "새 메일 알림", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "새 Gmail 메일 도착 시 알림"
+                NotificationChannel(CHANNEL_ID, WidgetStrings.mailChannelName, NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = WidgetStrings.mailChannelDesc
                 }
             )
         }
@@ -129,7 +129,7 @@ class MailNotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ct
 
         val notification = NotificationCompat.Builder(ctx, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_email)
-            .setContentTitle("새 메일 ${newCount}통")
+            .setContentTitle(WidgetStrings.mailNotificationTitle(newCount))
             .setContentText(from)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pi)

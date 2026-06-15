@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
+import 'l10n_helper.dart';
 import '../features/tasks/task_service.dart';
 import '../features/calendar/calendar_service.dart';
 import '../features/gmail/gmail_service.dart';
@@ -38,6 +39,7 @@ class WidgetService {
   static Future<void> updateCalendar(List<CalendarEvent> events) async {
     try {
       final now = DateTime.now();
+      final allDayLabel = appL10n().allDay;
 
       // 월별 이벤트 날짜 집합 저장 (현재 달 ±1개월)
       for (var offset = -1; offset <= 1; offset++) {
@@ -107,7 +109,7 @@ class WidgetService {
         final take = evList.take(25).toList();
         final titles = take.map((e) => e.summary).join('|');
         final times  = take.map((e) {
-          if (e.isAllDay) return '종일';
+          if (e.isAllDay) return allDayLabel;
           if (e.startDt != null) {
             final d = e.startDt!.toLocal();
             return '${d.hour.toString().padLeft(2,'0')}:${d.minute.toString().padLeft(2,'0')}';
@@ -134,6 +136,7 @@ class WidgetService {
 
   static Future<void> updateGmail(List<GmailMessage> messages) async {
     try {
+      final noSubject = appL10n().noSubject;
       final sorted = List<GmailMessage>.from(messages);
       sorted.sort((a, b) {
         final valA = int.tryParse(a.internalDate) ?? 0;
@@ -152,7 +155,7 @@ class WidgetService {
           final m = sorted[i];
           final sender = m.displayName.isNotEmpty ? m.displayName : m.from;
           final timeStr = formatEmailDate(m.date);
-          final subjectLine = m.subject.isNotEmpty ? m.subject : '(제목 없음)';
+          final subjectLine = m.subject.isNotEmpty ? m.subject : noSubject;
           gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  sender));
           gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time',    timeStr));
           gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', subjectLine));

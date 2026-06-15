@@ -48,11 +48,11 @@ class QuickAddTaskActivity : AppCompatActivity() {
 
     private fun addTask() {
         val title = taskInput.text.toString().trim()
-        if (title.isEmpty()) { taskInput.error = "이름을 입력해주세요"; return }
+        if (title.isEmpty()) { taskInput.error = WidgetStrings.taskNameRequired; return }
 
         btnAdd.isEnabled    = false
         btnCancel.isEnabled = false
-        btnAdd.text         = "추가 중…"
+        btnAdd.text         = WidgetStrings.taskAdding
 
         Thread {
             val success = tryApiCall(title)
@@ -65,7 +65,7 @@ class QuickAddTaskActivity : AppCompatActivity() {
             runOnUiThread {
                 Toast.makeText(
                     this,
-                    if (success) "태스크가 추가됐어요 ✓" else "태스크가 추가됐어요 (대기 중) ✓",
+                    if (success) WidgetStrings.taskAdded else WidgetStrings.taskAddedPending,
                     Toast.LENGTH_SHORT
                 ).show()
                 finish()

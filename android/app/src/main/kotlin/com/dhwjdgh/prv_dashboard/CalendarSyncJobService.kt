@@ -166,8 +166,8 @@ class CalendarSyncJobService : JobService() {
 
             for ((key, events) in byDay) {
                 events.sortWith(Comparator { a, b ->
-                    val aAllDay = a.time == "종일"
-                    val bAllDay = b.time == "종일"
+                    val aAllDay = WidgetStrings.isAllDayTime(a.time)
+                    val bAllDay = WidgetStrings.isAllDayTime(b.time)
                     if (aAllDay && !bAllDay) return@Comparator -1
                     if (!aAllDay && bAllDay) return@Comparator 1
                     a.time.compareTo(b.time)
@@ -247,7 +247,7 @@ class CalendarSyncJobService : JobService() {
             for (i in 0 until items.length()) {
                 val item    = items.getJSONObject(i)
                 val id      = item.optString("id", "")
-                val summary = item.optString("summary", "(제목 없음)")
+                val summary = item.optString("summary", "").ifEmpty { WidgetStrings.noSubject }
                 val colorId = item.optString("colorId", "")
                 val color   = if (colorId.isNotEmpty()) EVENT_COLORS[colorId] ?: calColor else calColor
 
@@ -262,7 +262,7 @@ class CalendarSyncJobService : JobService() {
                         val k = "%04d%02d%02d".format(local.year, local.monthValue, local.dayOfMonth)
                         Pair(k, "%02d:%02d".format(local.hour, local.minute))
                     }.getOrNull() ?: continue
-                    dateStr.length >= 10 -> Pair(dateStr.replace("-", "").substring(0, 8), "종일")
+                    dateStr.length >= 10 -> Pair(dateStr.replace("-", "").substring(0, 8), WidgetStrings.allDay)
                     else -> continue
                 }
                 result.add(EventItem(dayKey, summary, time, id, color))

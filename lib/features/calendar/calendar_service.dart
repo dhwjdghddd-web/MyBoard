@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_client.dart';
+import '../../core/l10n_helper.dart';
 import '../../core/widget_service.dart';
 
 // ── 유틸 ──────────────────────────────────────────────────────────────────
@@ -106,7 +107,7 @@ class CalendarEvent {
       id: j['id'] as String,
       calendarId: calendarId,
       calendarName: calendarName,
-      summary: (j['summary'] as String?) ?? '(제목 없음)',
+      summary: (j['summary'] as String?) ?? appL10n().noSubject,
       isAllDay: startDtStr == null,
       startDt: startDtStr != null ? DateTime.tryParse(startDtStr) : null,
       endDt: endDtStr != null ? DateTime.tryParse(endDtStr) : null,

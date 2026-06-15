@@ -72,9 +72,9 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
 
         val item = emailsList[position]
         
-        val sender = item.sender.ifEmpty { "(이름 없음)" }
+        val sender = item.sender.ifEmpty { WidgetStrings.noSender }
         views.setTextViewText(R.id.gmail_item_sender, sender)
-        views.setTextViewText(R.id.gmail_item_subject, item.subject.ifEmpty { "(제목 없음)" })
+        views.setTextViewText(R.id.gmail_item_subject, item.subject.ifEmpty { WidgetStrings.noSubject })
         views.setTextViewText(R.id.gmail_item_time, item.time)
 
         val isDark = resolveIsDark()
