@@ -116,19 +116,22 @@ class _TaskItem extends ConsumerWidget {
       ),
       onDismissed: (_) {
         final notifier = ref.read(taskServiceProvider.notifier);
-        notifier.deleteTaskLocal(task.id);
+        notifier.startPendingDelete(task);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l.taskItemDeletedSnack(task.title)),
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
               label: l.cancelButton,
-              onPressed: () => notifier.loadTasks(),
+              onPressed: () {
+                notifier.cancelPendingDelete(task.id);
+                notifier.loadTasks();
+              },
             ),
           ),
         ).closed.then((reason) {
           if (reason != SnackBarClosedReason.action) {
-            notifier.deleteTask(task.id);
+            notifier.confirmDelete(task.id);
           }
         });
       },
