@@ -79,12 +79,12 @@ class _TaskListView extends ConsumerWidget {
       child: ListView(
         children: [
           for (final task in active)
-            _TaskItem(task: task),
+            _TaskItem(key: ValueKey(task.id), task: task),
 
           if (done.isNotEmpty) ...[
             _SectionHeader(l.taskCompletedSection(done.length)),
             for (final task in done)
-              _TaskItem(task: task),
+              _TaskItem(key: ValueKey(task.id), task: task),
           ],
 
           const SizedBox(height: 80),
@@ -97,7 +97,7 @@ class _TaskListView extends ConsumerWidget {
 // ── 태스크 아이템 ────────────────────────────────────────────────────────
 
 class _TaskItem extends ConsumerWidget {
-  const _TaskItem({required this.task});
+  const _TaskItem({super.key, required this.task});
   final Task task;
 
   @override
@@ -115,24 +115,27 @@ class _TaskItem extends ConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
+        const undoDuration = Duration(seconds: 3);
         final notifier = ref.read(taskServiceProvider.notifier);
         notifier.startPendingDelete(task);
+
+        bool cancelled = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l.taskItemDeletedSnack(task.title)),
-            duration: const Duration(seconds: 3),
+            duration: undoDuration,
             action: SnackBarAction(
               label: l.cancelButton,
               onPressed: () {
+                cancelled = true;
                 notifier.cancelPendingDelete(task.id);
                 notifier.loadTasks();
               },
             ),
           ),
-        ).closed.then((reason) {
-          if (reason != SnackBarClosedReason.action) {
-            notifier.confirmDelete(task.id);
-          }
+        );
+        Future.delayed(undoDuration, () {
+          if (!cancelled) notifier.confirmDelete(task.id);
         });
       },
       child: ListTile(
