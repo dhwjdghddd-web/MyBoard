@@ -1,4 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">마이보드</string>
+
+    <!-- Widget: Tasks section -->
+    <string name="widget_tasks_title">할 일 목록</string>
+    <string name="widget_tasks_empty">태스크 없음</string>
+    <string name="widget_add_task">＋  할 일 추가</string>
+    <string name="widget_task_label">할 일</string>
+
+    <!-- Widget: Calendar DOW headers -->
+    <string name="widget_dow_sun">일</string>
+    <string name="widget_dow_mon">월</string>
+    <string name="widget_dow_tue">화</string>
+    <string name="widget_dow_wed">수</string>
+    <string name="widget_dow_thu">목</string>
+    <string name="widget_dow_fri">금</string>
+    <string name="widget_dow_sat">토</string>
+    <string name="widget_cal_day_empty">이 날 일정이 없어요</string>
+
+    <!-- Widget: Gmail section -->
+    <string name="widget_gmail_title">받은편지함</string>
+    <string name="widget_gmail_empty">새 메일 없음</string>
+
+    <!-- Widget: Tab labels -->
+    <string name="widget_tab_tasks">할 일</string>
+    <string name="widget_tab_calendar">캘린더</string>
+
+    <!-- Widget: Configure dialog -->
+    <string name="widget_configure_title">위젯 화면 설정</string>
+    <string name="widget_btn_cover">커버화면 위젯으로 설정</string>
+    <string name="widget_btn_home">홈화면 위젯으로 설정</string>
+    <string name="widget_btn_tablet">태블릿 위젯으로 설정</string>
+    <string name="widget_btn_auto">화면 자동 감지 (권장)</string>
+    <string name="widget_hint_cover">현재 설정: 커버화면 위젯</string>
+    <string name="widget_hint_home">현재 설정: 홈화면 위젯</string>
+    <string name="widget_hint_tablet">현재 설정: 태블릿 위젯</string>
+    <string name="widget_hint_foldable">폴더블 기기 감지됨 — 화면 자동 감지 작동 중</string>
+    <string name="widget_hint_auto">화면 자동 감지 작동 중</string>
+
+    <!-- Quick Add Task dialog -->
+    <string name="quick_add_title">태스크 추가</string>
+    <string name="quick_add_hint">태스크 이름</string>
+    <string name="quick_add_cancel">취소</string>
+    <string name="quick_add_add">추가</string>
 </resources>

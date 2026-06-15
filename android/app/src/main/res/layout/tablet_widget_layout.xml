@@ -93,19 +93,19 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="1dp">
                         <TextView android:id="@+id/cal_dow_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="일" android:textSize="11sp" android:textColor="#FF8A80" android:gravity="center"/>
+                            android:text="@string/widget_dow_sun" android:textSize="11sp" android:textColor="#FF8A80" android:gravity="center"/>
                         <TextView android:id="@+id/cal_dow_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="월" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
+                            android:text="@string/widget_dow_mon" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                         <TextView android:id="@+id/cal_dow_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="화" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
+                            android:text="@string/widget_dow_tue" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                         <TextView android:id="@+id/cal_dow_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="수" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
+                            android:text="@string/widget_dow_wed" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                         <TextView android:id="@+id/cal_dow_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="목" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
+                            android:text="@string/widget_dow_thu" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                         <TextView android:id="@+id/cal_dow_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="금" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
+                            android:text="@string/widget_dow_fri" android:textSize="11sp" android:textColor="@color/widget_text_secondary" android:gravity="center"/>
                         <TextView android:id="@+id/cal_dow_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="토" android:textSize="11sp" android:textColor="#82B1FF" android:gravity="center"/>
+                            android:text="@string/widget_dow_sat" android:textSize="11sp" android:textColor="#82B1FF" android:gravity="center"/>
                     </LinearLayout>
 
             <!-- 주 0 -->
@@ -2877,7 +2877,7 @@
 
                     <TextView android:id="@+id/cal_day_empty"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:text="이 날 일정이 없어요" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
+                        android:text="@string/widget_cal_day_empty" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
                         android:gravity="center" android:paddingTop="16dp" android:visibility="gone"/>
                     <!-- 빈 공간: 오른쪽 스와이프 → 월 달력으로 이동 -->
                     <FrameLayout android:id="@+id/cal_day_swipe_back"
@@ -2911,7 +2911,7 @@
                         android:padding="3dp">
                         <TextView android:id="@+id/task_header_title"
                             android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="할 일 목록" android:textSize="16sp" android:textStyle="bold"
+                            android:text="@string/widget_tasks_title" android:textSize="16sp" android:textStyle="bold"
                             android:textColor="@color/widget_text_primary"/>
                         <ImageView android:id="@+id/task_launch_btn"
                             android:layout_width="36dp" android:layout_height="36dp"
@@ -2933,12 +2933,12 @@
 
                     <TextView android:id="@+id/task_empty"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:text="태스크 없음" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
+                        android:text="@string/widget_tasks_empty" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
                         android:gravity="center" android:paddingTop="12dp" android:visibility="gone"/>
 
                     <TextView android:id="@+id/task_add_btn"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:text="＋  할 일 추가" android:textSize="12sp" android:textColor="#82B1FF"
+                        android:text="@string/widget_add_task" android:textSize="12sp" android:textColor="#82B1FF"
                         android:gravity="center"
                         android:paddingTop="10dp" android:paddingBottom="10dp"
                         android:layout_marginTop="10dp" android:layout_marginBottom="6dp"
@@ -2967,7 +2967,7 @@
                         android:padding="3dp">
                         <TextView android:id="@+id/gmail_header_title"
                             android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="받은편지함" android:textSize="16sp" android:textStyle="bold"
+                            android:text="@string/widget_gmail_title" android:textSize="16sp" android:textStyle="bold"
                             android:textColor="@color/widget_text_primary"/>
                         <ImageView android:id="@+id/gmail_launch_btn"
                             android:layout_width="36dp" android:layout_height="36dp"
@@ -2992,7 +2992,7 @@
 
                     <TextView android:id="@+id/gmail_empty"
                         android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-                        android:text="새 메일 없음" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
+                        android:text="@string/widget_gmail_empty" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
                         android:gravity="center" android:visibility="gone"/>
                 </LinearLayout>
 

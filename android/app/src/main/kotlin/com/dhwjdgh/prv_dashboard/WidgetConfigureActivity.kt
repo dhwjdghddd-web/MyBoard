@@ -37,11 +37,11 @@ class WidgetConfigureActivity : AppCompatActivity() {
 
         val hint = findViewById<TextView>(R.id.configure_hint)
         hint.text = when {
-            existing == "cover"  -> "현재 설정: 커버화면 위젯"
-            existing == "home"   -> "현재 설정: 홈화면 위젯"
-            existing == "tablet" -> "현재 설정: 태블릿 위젯"
-            HomeWidgetProvider.isFoldableDevice(this) -> "폴더블 기기 감지됨 — 화면 자동 감지 작동 중"
-            else -> "화면 자동 감지 작동 중"
+            existing == "cover"  -> getString(R.string.widget_hint_cover)
+            existing == "home"   -> getString(R.string.widget_hint_home)
+            existing == "tablet" -> getString(R.string.widget_hint_tablet)
+            HomeWidgetProvider.isFoldableDevice(this) -> getString(R.string.widget_hint_foldable)
+            else -> getString(R.string.widget_hint_auto)
         }
 
         val btnCover = findViewById<Button>(R.id.btn_cover)

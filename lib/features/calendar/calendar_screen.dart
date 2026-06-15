@@ -282,7 +282,7 @@ class _MonthItem {
     final d = int.tryParse(parts[2]) ?? 0;
     final dt = DateTime.tryParse('${dateKey}T00:00:00');
     final wd = dt != null ? weekdayNames[dt.weekday - 1] : '';
-    return '$m/$d($wd)';
+    return '$m/$d\n$wd';
   }
 }
 

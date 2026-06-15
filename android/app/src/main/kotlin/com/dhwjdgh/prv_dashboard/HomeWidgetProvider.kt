@@ -589,8 +589,19 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 }
             }
 
-            val monthNames = arrayOf("","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
-            views.setTextViewText(R.id.cal_month_label, "${dispYear}년 ${monthNames[dispMonth]}")
+            val locale = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                context.resources.configuration.locales[0]
+            } else {
+                @Suppress("DEPRECATION")
+                context.resources.configuration.locale
+            }
+            val cal2 = java.util.Calendar.getInstance().apply { set(dispYear, dispMonth - 1, 1) }
+            val monthLabel = if (locale.language == "ko") {
+                "${dispYear}년 ${dispMonth}월"
+            } else {
+                java.text.SimpleDateFormat("MMMM yyyy", locale).format(cal2.time)
+            }
+            views.setTextViewText(R.id.cal_month_label, monthLabel)
             val monthLabelSp = if (isCover) 20f
                                else if (isTablet) 12f
                                else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
@@ -813,12 +824,18 @@ class HomeWidgetProvider : AppWidgetProvider() {
             val label = if (dateKey.length >= 10) {
                 val m = dateKey.substring(5, 7).trimStart('0')
                 val d = dateKey.substring(8, 10).trimStart('0')
+                val locale = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    context.resources.configuration.locales[0]
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.resources.configuration.locale
+                }
                 val dName = try {
                     val cal = java.util.Calendar.getInstance()
                     cal.set(dateKey.substring(0, 4).toInt(), dateKey.substring(5, 7).toInt() - 1, d.toInt())
-                    arrayOf("일", "월", "화", "수", "목", "금", "토")[cal.get(java.util.Calendar.DAY_OF_WEEK) - 1]
+                    java.text.DateFormatSymbols(locale).shortWeekdays[cal.get(java.util.Calendar.DAY_OF_WEEK)]
                 } catch (_: Exception) { "" }
-                "${m}월 ${d}일 ($dName)"
+                if (locale.language == "ko") "${m}월 ${d}일 ($dName)" else "$m/$d ($dName)"
             } else ""
             views.setTextViewText(R.id.cal_day_label, label)
             val dayLabelSp = if (isCover) 16f
@@ -904,7 +921,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 displayItems.add(DayDisplayItem(t, timeStr, evId, eventColor, isTask = false))
             }
             for (t in dayTasks) {
-                displayItems.add(DayDisplayItem(t, "할 일", "", Color.parseColor("#4285F4"), isTask = true))
+                displayItems.add(DayDisplayItem(t, context.getString(R.string.widget_task_label), "", Color.parseColor("#4285F4"), isTask = true))
             }
 
             data class DayRow(val row: Int, val time: Int, val title: Int, val colorBar: Int)
@@ -927,7 +944,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     views.setTextColor(r.time, secondaryColor)
                     
                     if (item.isTask) {
-                        views.setTextViewText(r.time, "할 일")
+                        views.setTextViewText(r.time, context.getString(R.string.widget_task_label))
                         val ssb = SpannableStringBuilder("● ${item.title}")
                         ssb.setSpan(ForegroundColorSpan(Color.parseColor("#4285F4")), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

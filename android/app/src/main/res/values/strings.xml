@@ -1,4 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MyBoard</string>
+
+    <!-- Widget: Tasks section -->
+    <string name="widget_tasks_title">Tasks</string>
+    <string name="widget_tasks_empty">No tasks</string>
+    <string name="widget_add_task">＋  Add task</string>
+    <string name="widget_task_label">Task</string>
+
+    <!-- Widget: Calendar DOW headers -->
+    <string name="widget_dow_sun">S</string>
+    <string name="widget_dow_mon">M</string>
+    <string name="widget_dow_tue">T</string>
+    <string name="widget_dow_wed">W</string>
+    <string name="widget_dow_thu">T</string>
+    <string name="widget_dow_fri">F</string>
+    <string name="widget_dow_sat">S</string>
+    <string name="widget_cal_day_empty">No events today</string>
+
+    <!-- Widget: Gmail section -->
+    <string name="widget_gmail_title">Inbox</string>
+    <string name="widget_gmail_empty">No new email</string>
+
+    <!-- Widget: Tab labels -->
+    <string name="widget_tab_tasks">Tasks</string>
+    <string name="widget_tab_calendar">Calendar</string>
+
+    <!-- Widget: Configure dialog -->
+    <string name="widget_configure_title">Widget Screen Setup</string>
+    <string name="widget_btn_cover">Set as Cover Screen Widget</string>
+    <string name="widget_btn_home">Set as Home Screen Widget</string>
+    <string name="widget_btn_tablet">Set as Tablet Widget</string>
+    <string name="widget_btn_auto">Auto Detect (Recommended)</string>
+    <string name="widget_hint_cover">Current: Cover screen widget</string>
+    <string name="widget_hint_home">Current: Home screen widget</string>
+    <string name="widget_hint_tablet">Current: Tablet widget</string>
+    <string name="widget_hint_foldable">Foldable device detected — Auto detect active</string>
+    <string name="widget_hint_auto">Auto detect active</string>
+
+    <!-- Quick Add Task dialog -->
+    <string name="quick_add_title">Add Task</string>
+    <string name="quick_add_hint">Task name</string>
+    <string name="quick_add_cancel">Cancel</string>
+    <string name="quick_add_add">Add</string>
 </resources>
