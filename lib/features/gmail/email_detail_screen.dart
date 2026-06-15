@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/api_client.dart';
+import '../../core/snackbar_helper.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import 'gmail_service.dart';
@@ -144,7 +145,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         'mimeType': mimeType,
       });
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(l.fileOpenError(e.toString()))));
+      messenger.showAutoDismissSnackBar(SnackBar(content: Text(l.fileOpenError(e.toString()))));
     }
   }
 
@@ -195,7 +196,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       if (mounted) {
         final l = AppLocalizations.of(context)!;
         final messenger = ScaffoldMessenger.of(context);
-        messenger.showSnackBar(
+        messenger.showAutoDismissSnackBar(
           SnackBar(
             content: Text(l.downloadCompleted(att.filename)),
             action: uri != null
@@ -209,7 +210,7 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showAutoDismissSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.downloadError(e.toString()))),
         );
       }

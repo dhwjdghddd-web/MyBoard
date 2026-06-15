@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/snackbar_helper.dart';
 import '../../l10n/app_localizations.dart';
 import 'calendar_service.dart';
 import 'event_form_screen.dart';
@@ -140,7 +141,7 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
                               await ref.read(calendarProvider.notifier).deleteEvent(
                                     event.calendarId, event.id);
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                ScaffoldMessenger.of(context).showAutoDismissSnackBar(
                                   SnackBar(content: Text(AppLocalizations.of(context)!.eventDeletedSnack)),
                                 );
                               }
@@ -334,7 +335,7 @@ class _TaskCard extends ConsumerWidget {
     if (ok == true) {
       await ref.read(taskServiceProvider.notifier).deleteTask(task.id);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showAutoDismissSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.taskDeletedSnack)),
         );
       }

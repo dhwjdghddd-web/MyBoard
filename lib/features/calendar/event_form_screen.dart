@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/snackbar_helper.dart';
 import '../../l10n/app_localizations.dart';
 import 'calendar_service.dart';
 
@@ -120,11 +121,11 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     final l = AppLocalizations.of(context)!;
     final title = _titleCtrl.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.titleRequiredError)));
+      ScaffoldMessenger.of(context).showAutoDismissSnackBar(SnackBar(content: Text(l.titleRequiredError)));
       return;
     }
     if (!_allDay && !_endDt.isAfter(_startDt)) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.endTimeError)));
+      ScaffoldMessenger.of(context).showAutoDismissSnackBar(SnackBar(content: Text(l.endTimeError)));
       return;
     }
 
@@ -164,7 +165,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     } catch (e) {
       if (mounted) {
         final l2 = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l2.saveFailed(e.toString()))));
+        ScaffoldMessenger.of(context).showAutoDismissSnackBar(SnackBar(content: Text(l2.saveFailed(e.toString()))));
       }
     } finally {
       if (mounted) setState(() => _saving = false);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/snackbar_helper.dart';
 import '../../l10n/app_localizations.dart';
 import 'task_service.dart';
 
@@ -59,7 +60,7 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
     } catch (e) {
       if (mounted) {
         setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showAutoDismissSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.taskAddFailed)),
         );
       }
