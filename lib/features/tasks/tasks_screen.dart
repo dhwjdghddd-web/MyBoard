@@ -115,20 +115,38 @@ class _TaskItem extends ConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
+        const showDuration = Duration(seconds: 3);
         final notifier = ref.read(taskServiceProvider.notifier);
+        final messenger = ScaffoldMessenger.of(context);
         notifier.deleteTaskLocal(task.id);
-        ScaffoldMessenger.of(context).showSnackBar(
+
+        bool closed = false;
+        final controller = messenger.showSnackBar(
           SnackBar(
             content: Text(l.taskItemDeletedSnack(task.title)),
-            duration: const Duration(seconds: 3),
+            duration: showDuration,
             action: SnackBarAction(
               label: l.cancelButton,
-              onPressed: () => notifier.loadTasks(),
+              onPressed: () {}, // 닫힘 사유(action)로 분기하므로 비워둠
             ),
           ),
-        ).closed.then((reason) {
-          if (reason != SnackBarClosedReason.action) {
+        );
+        controller.closed.then((reason) {
+          closed = true;
+          if (reason == SnackBarClosedReason.action) {
+            notifier.loadTasks(); // 실행취소
+          } else {
             notifier.deleteTask(task.id);
+          }
+        });
+
+        // 일부 기기(One UI 등)에서 ScaffoldMessenger 의 SnackBar 자동 닫힘 타이머가
+        // 발동하지 않아 스낵바가 계속 떠 있는 현상이 있다. 표시 시간이 지나면 직접
+        // 제거한다. removeCurrentSnackBar 는 애니메이션 타이머에 의존하지 않고
+        // 컨트롤러 값을 직접 0으로 만들어 즉시 닫는다.
+        Future.delayed(showDuration + const Duration(milliseconds: 300), () {
+          if (!closed) {
+            messenger.removeCurrentSnackBar(reason: SnackBarClosedReason.hide);
           }
         });
       },
