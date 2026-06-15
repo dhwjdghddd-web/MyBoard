@@ -6,6 +6,12 @@ import '../features/calendar/calendar_service.dart';
 import '../features/gmail/gmail_service.dart';
 
 class WidgetService {
+  // 위젯 프로바이더의 정규화된 클래스명. 코틀린 네임스페이스(namespace)는
+  // applicationId(com.dhwjdgh.myboard[.debug])와 다르므로, home_widget 플러그인이
+  // ${packageName}.HomeWidgetProvider 로 클래스를 찾으면 ClassNotFoundException 이
+  // 발생해 위젯 갱신 브로드캐스트가 실패한다. 정확한 FQN 을 직접 지정한다.
+  static const _providerClass = 'com.dhwjdgh.prv_dashboard.HomeWidgetProvider';
+
   static Future<void> saveTaskListId(String listId) async {
     try {
       await HomeWidget.saveWidgetData<String>('task_list_id', listId);
@@ -30,7 +36,7 @@ class WidgetService {
       }
       // task_count를 신뢰하므로 별도 tail 정리 불필요 — 위젯은 0..task_count-1만 읽음
       await Future.wait(futures);
-      await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
+      await HomeWidget.updateWidget(qualifiedAndroidName: _providerClass);
     } catch (e, st) {
       debugPrint('WidgetService.updateTasks error: $e\n$st');
     }
@@ -128,7 +134,7 @@ class WidgetService {
       }
       await Future.wait(dayFutures);
 
-      await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
+      await HomeWidget.updateWidget(qualifiedAndroidName: _providerClass);
     } catch (e, st) {
       debugPrint('WidgetService.updateCalendar error: $e\n$st');
     }
@@ -170,7 +176,7 @@ class WidgetService {
         }
       }
       await Future.wait(gmailFutures);
-      await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
+      await HomeWidget.updateWidget(qualifiedAndroidName: _providerClass);
     } catch (e, st) {
       debugPrint('WidgetService.updateGmail error: $e\n$st');
     }
@@ -217,7 +223,7 @@ class WidgetService {
       }
 
       await Future.wait(futures);
-      await HomeWidget.updateWidget(androidName: 'HomeWidgetProvider');
+      await HomeWidget.updateWidget(qualifiedAndroidName: _providerClass);
     } catch (e, st) {
       debugPrint('WidgetService.clearAllData error: $e\n$st');
     }
