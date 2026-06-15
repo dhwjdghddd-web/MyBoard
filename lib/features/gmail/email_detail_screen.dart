@@ -137,13 +137,14 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
   }
 
   Future<void> _openFile(String filePath, String mimeType, ScaffoldMessengerState messenger) async {
+    final l = AppLocalizations.of(context)!;
     try {
       await _saveChannel.invokeMethod<void>('openFile', {
         'uri': filePath,
         'mimeType': mimeType,
       });
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.fileOpenError(e.toString()))));
+      messenger.showSnackBar(SnackBar(content: Text(l.fileOpenError(e.toString()))));
     }
   }
 

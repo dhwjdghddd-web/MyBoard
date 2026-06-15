@@ -462,4 +462,32 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacySection6Body => '개인정보 관련 문의: dhwjdghddd@gmail.com';
+
+  @override
+  String mailNotificationTitle(int count) {
+    return '새 메일 $count통';
+  }
+
+  @override
+  String get mailNotificationDefaultSender => '새 메일이 도착했습니다';
+
+  @override
+  String get mailChannelName => '새 메일 알림';
+
+  @override
+  String get mailChannelDesc => '새 Gmail 메일 도착 시 알림';
+
+  @override
+  String get errorTimeout => '연결 시간이 초과되었습니다.';
+
+  @override
+  String get errorNetwork => '네트워크에 연결할 수 없습니다.';
+
+  @override
+  String errorHttpStatus(int status) {
+    return 'HTTP $status 오류가 발생했습니다.';
+  }
+
+  @override
+  String get errorUnknown => '알 수 없는 오류가 발생했습니다.';
 }

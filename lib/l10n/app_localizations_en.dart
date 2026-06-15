@@ -463,4 +463,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacySection6Body => 'Privacy inquiries: dhwjdghddd@gmail.com';
+
+  @override
+  String mailNotificationTitle(int count) {
+    return '$count new emails';
+  }
+
+  @override
+  String get mailNotificationDefaultSender => 'New mail arrived';
+
+  @override
+  String get mailChannelName => 'New mail';
+
+  @override
+  String get mailChannelDesc => 'Notifies when new Gmail arrives';
+
+  @override
+  String get errorTimeout => 'Connection timed out.';
+
+  @override
+  String get errorNetwork => 'Cannot connect to the network.';
+
+  @override
+  String errorHttpStatus(int status) {
+    return 'An HTTP $status error occurred.';
+  }
+
+  @override
+  String get errorUnknown => 'An unknown error occurred.';
 }

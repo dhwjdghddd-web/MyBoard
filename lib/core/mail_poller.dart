@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'api_client.dart';
+import 'l10n_helper.dart';
 import 'notification_service.dart';
 
 const _gmailBase = 'https://gmail.googleapis.com/gmail/v1/users/me';
@@ -48,7 +49,7 @@ class MailPoller {
   }
 
   Future<void> _notifyNew(int newCount) async {
-    var from = '새 메일이 도착했습니다';
+    var from = appL10n().mailNotificationDefaultSender;
     try {
       final listData = await _api.get(
         '$_gmailBase/messages',

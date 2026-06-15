@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_service.dart';
+import 'l10n_helper.dart';
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
@@ -39,7 +40,9 @@ class ApiClient {
           handler.next(options);
         },
         onError: (err, handler) async {
-          if (err.response?.statusCode == 401) {
+          // 재시도는 1회로 제한 — 갱신 후에도 401이면 무한 루프 방지
+          if (err.response?.statusCode == 401 &&
+              err.requestOptions.extra['retried'] != true) {
             String? newToken;
             if (_refreshCompleter != null) {
               // 다른 요청이 이미 토큰 갱신 중 — 완료될 때까지 대기
@@ -66,6 +69,7 @@ class ApiClient {
             if (newToken != null) {
               try {
                 err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+                err.requestOptions.extra['retried'] = true;
                 final response = await _dio.fetch(err.requestOptions);
                 handler.resolve(response);
                 return;
@@ -111,18 +115,19 @@ class ApiClient {
 
 // 서비스 레이어에서 공통으로 쓰는 에러 메시지 변환
 String apiErrorMessage(Object e) {
+  final l = appL10n();
   if (e is DioException) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.sendTimeout:
-        return '연결 시간이 초과되었습니다.';
+        return l.errorTimeout;
       case DioExceptionType.connectionError:
-        return '네트워크에 연결할 수 없습니다.';
+        return l.errorNetwork;
       default:
         final status = e.response?.statusCode;
-        if (status != null) return 'HTTP $status 오류가 발생했습니다.';
+        if (status != null) return l.errorHttpStatus(status);
     }
   }
-  return '알 수 없는 오류가 발생했습니다.';
+  return l.errorUnknown;
 }

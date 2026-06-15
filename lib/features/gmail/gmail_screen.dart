@@ -178,21 +178,12 @@ class _GmailScreenState extends ConsumerState<GmailScreen> {
                                 );
                               }
                               final msg = gmail.messages[i];
-                              final selected = gmail.selectedIds.contains(msg.id);
                               return Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   _MessageTile(
                                     message: msg,
-                                    selected: selected,
-                                    onTap: () {
-                                      if (gmail.hasSelection) {
-                                        ref.read(gmailProvider.notifier).toggleSelect(msg.id);
-                                      } else {
-                                        _openEmail(msg);
-                                      }
-                                    },
-                                    onLongPress: () => ref.read(gmailProvider.notifier).toggleSelect(msg.id),
+                                    onTap: () => _openEmail(msg),
                                   ),
                                   if (i < gmail.messages.length - 1)
                                     Divider(
@@ -266,13 +257,12 @@ class _LabelStrip extends StatelessWidget {
 
 class _MessageTile extends StatelessWidget {
   const _MessageTile({
-    required this.message, required this.selected,
-    required this.onTap, required this.onLongPress,
+    required this.message,
+    required this.onTap,
   });
 
   final GmailMessage message;
-  final bool selected;
-  final VoidCallback onTap, onLongPress;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -285,22 +275,14 @@ class _MessageTile extends StatelessWidget {
 
     return InkWell(
         onTap: onTap,
-        onLongPress: onLongPress,
         child: Container(
-          color: selected
-              ? scheme.primaryContainer.withAlpha(100)
-              : (isUnread ? scheme.primaryContainer.withAlpha(30) : null),
+          color: isUnread ? scheme.primaryContainer.withAlpha(30) : null,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            GestureDetector(
-              onTap: onLongPress,
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: selected ? scheme.primary : avatarColor,
-                child: selected
-                    ? const Icon(Icons.check, color: Colors.white, size: 18)
-                    : Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              ),
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: avatarColor,
+              child: Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
             ),
             const SizedBox(width: 10),
             Expanded(

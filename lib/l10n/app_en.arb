@@ -216,5 +216,21 @@
   "privacySection5Title": "5. Google API Policy Compliance",
   "privacySection5Body": "The use and transfer of Google user data by this app complies with the Google API Services User Data Policy (including the Limited Use requirements).",
   "privacySection6Title": "6. Contact",
-  "privacySection6Body": "Privacy inquiries: dhwjdghddd@gmail.com"
+  "privacySection6Body": "Privacy inquiries: dhwjdghddd@gmail.com",
+
+  "mailNotificationTitle": "{count} new emails",
+  "@mailNotificationTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "mailNotificationDefaultSender": "New mail arrived",
+  "mailChannelName": "New mail",
+  "mailChannelDesc": "Notifies when new Gmail arrives",
+
+  "errorTimeout": "Connection timed out.",
+  "errorNetwork": "Cannot connect to the network.",
+  "errorHttpStatus": "An HTTP {status} error occurred.",
+  "@errorHttpStatus": {
+    "placeholders": { "status": { "type": "int" } }
+  },
+  "errorUnknown": "An unknown error occurred."
 }

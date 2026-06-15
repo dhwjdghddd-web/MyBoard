@@ -101,25 +101,3 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     }
   }
 }
-
-class ThemeToggleButton extends ConsumerWidget {
-  const ThemeToggleButton({super.key, this.compact = true});
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
-    final (icon, tooltip) = switch (mode) {
-      ThemeMode.light  => (Icons.dark_mode_outlined,    '다크 모드'),
-      ThemeMode.dark   => (Icons.brightness_auto,       '시스템 모드'),
-      ThemeMode.system => (Icons.light_mode_outlined,   '라이트 모드'),
-    };
-    return IconButton(
-      padding: compact ? EdgeInsets.zero : null,
-      constraints: compact ? const BoxConstraints(minWidth: 48, minHeight: 48) : null,
-      icon: Icon(icon),
-      tooltip: tooltip,
-      onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-    );
-  }
-}

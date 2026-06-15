@@ -216,5 +216,21 @@
   "privacySection5Title": "5. Google API 정책 준수",
   "privacySection5Body": "본 앱의 Google 사용자 데이터 사용 및 전송은 Google API Services User Data Policy(제한적 사용 요건 포함)를 준수합니다.",
   "privacySection6Title": "6. 문의",
-  "privacySection6Body": "개인정보 관련 문의: dhwjdghddd@gmail.com"
+  "privacySection6Body": "개인정보 관련 문의: dhwjdghddd@gmail.com",
+
+  "mailNotificationTitle": "새 메일 {count}통",
+  "@mailNotificationTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "mailNotificationDefaultSender": "새 메일이 도착했습니다",
+  "mailChannelName": "새 메일 알림",
+  "mailChannelDesc": "새 Gmail 메일 도착 시 알림",
+
+  "errorTimeout": "연결 시간이 초과되었습니다.",
+  "errorNetwork": "네트워크에 연결할 수 없습니다.",
+  "errorHttpStatus": "HTTP {status} 오류가 발생했습니다.",
+  "@errorHttpStatus": {
+    "placeholders": { "status": { "type": "int" } }
+  },
+  "errorUnknown": "알 수 없는 오류가 발생했습니다."
 }

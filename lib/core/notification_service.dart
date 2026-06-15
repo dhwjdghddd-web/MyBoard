@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'l10n_helper.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -29,10 +30,11 @@ class NotificationService {
     required int newCount,
     required String from,
   }) async {
-    const details = AndroidNotificationDetails(
+    final l = appL10n();
+    final details = AndroidNotificationDetails(
       'mail_channel',
-      '새 메일 알림',
-      channelDescription: '새 Gmail 메일 도착 시 알림',
+      l.mailChannelName,
+      channelDescription: l.mailChannelDesc,
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
@@ -41,9 +43,9 @@ class NotificationService {
     final id = DateTime.now().millisecondsSinceEpoch & 0x7FFFFFFF;
     await _plugin.show(
       id,
-      '새 메일 $newCount통',
+      l.mailNotificationTitle(newCount),
       from,
-      const NotificationDetails(android: details),
+      NotificationDetails(android: details),
       payload: 'mail',
     );
   }

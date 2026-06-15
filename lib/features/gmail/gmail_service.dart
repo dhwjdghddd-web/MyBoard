@@ -159,7 +159,6 @@ class GmailMessage {
 
   bool get isUnread => labelIds.contains('UNREAD');
   bool get isStarred => labelIds.contains('STARRED');
-  bool get isSpam => labelIds.contains('SPAM');
 
   String get displayName {
     final match = RegExp(r'^"?([^"<]+)"?\s*<').firstMatch(from);
@@ -171,10 +170,6 @@ class GmailMessage {
     final name = displayName;
     return name.isNotEmpty ? name[0].toUpperCase() : '?';
   }
-
-  GmailMessage copyWith({List<String>? labelIds}) =>
-      GmailMessage(id: id, from: from, subject: subject, date: date, snippet: snippet,
-          labelIds: labelIds ?? this.labelIds, internalDate: internalDate);
 
   factory GmailMessage.fromJson(Map<String, dynamic> j) {
     String header(String name) {
@@ -201,7 +196,6 @@ class GmailState {
   final String label;
   final List<GmailMessage> messages;
   final Map<String, int> labelCounts;
-  final Set<String> selectedIds;
   final bool loading;
   final bool loadingMore;
   final String? nextPageToken;
@@ -211,25 +205,20 @@ class GmailState {
     this.label = 'INBOX',
     this.messages = const [],
     this.labelCounts = const {},
-    this.selectedIds = const {},
     this.loading = false,
     this.loadingMore = false,
     this.nextPageToken,
     this.error,
   });
 
-  bool get hasSelection => selectedIds.isNotEmpty;
-  bool get isInTrash => label == 'TRASH';
-
   GmailState copyWith({
     String? label, List<GmailMessage>? messages,
-    Map<String, int>? labelCounts, Set<String>? selectedIds,
+    Map<String, int>? labelCounts,
     bool? loading, bool? loadingMore, String? nextPageToken, String? error,
   }) => GmailState(
     label: label ?? this.label,
     messages: messages ?? this.messages,
     labelCounts: labelCounts ?? this.labelCounts,
-    selectedIds: selectedIds ?? this.selectedIds,
     loading: loading ?? this.loading,
     loadingMore: loadingMore ?? this.loadingMore,
     nextPageToken: nextPageToken ?? this.nextPageToken,
@@ -255,7 +244,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
   final ApiClient _api;
 
   Future<void> loadMessages({String? query}) async {
-    state = state.copyWith(loading: true, error: null, selectedIds: {}, nextPageToken: null);
+    state = state.copyWith(loading: true, error: null, nextPageToken: null);
     try {
       final params = <String, String>{'maxResults': '10'};
       if (query != null && query.isNotEmpty) {
@@ -338,34 +327,21 @@ class GmailNotifier extends StateNotifier<GmailState> {
   }
 
   Future<void> selectLabel(String label) async {
-    state = state.copyWith(label: label, selectedIds: {});
+    state = state.copyWith(label: label);
     await loadMessages();
   }
 
   Future<void> loadLabelCounts() async {
     const labels = ['INBOX', 'STARRED', 'SENT', 'SPAM', 'TRASH'];
-    final counts = <String, int>{};
-    for (final lbl in labels) {
+    final results = await Future.wait(labels.map((lbl) async {
       try {
         final data = await _api.get('$_base/labels/$lbl');
-        counts[lbl] = (data['messagesUnread'] as int?) ?? 0;
-      } catch (e) { debugPrint('라벨 카운트 로드 실패 ($lbl): $e'); }
-    }
-    state = state.copyWith(labelCounts: counts);
+        return MapEntry(lbl, (data['messagesUnread'] as int?) ?? 0);
+      } catch (e) {
+        debugPrint('라벨 카운트 로드 실패 ($lbl): $e');
+        return MapEntry(lbl, 0);
+      }
+    }));
+    state = state.copyWith(labelCounts: Map.fromEntries(results));
   }
-
-  // 선택 관리
-  void toggleSelect(String id) {
-    final s = Set<String>.from(state.selectedIds);
-    if (s.contains(id)) { s.remove(id); } else { s.add(id); }
-    state = state.copyWith(selectedIds: s);
-  }
-
-  void selectAll() {
-    final all = state.messages.map((m) => m.id).toSet();
-    state = state.copyWith(selectedIds: all);
-  }
-
-  void clearSelection() => state = state.copyWith(selectedIds: {});
-
 }

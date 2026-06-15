@@ -919,6 +919,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy inquiries: dhwjdghddd@gmail.com'**
   String get privacySection6Body;
+
+  /// No description provided for @mailNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new emails'**
+  String mailNotificationTitle(int count);
+
+  /// No description provided for @mailNotificationDefaultSender.
+  ///
+  /// In en, this message translates to:
+  /// **'New mail arrived'**
+  String get mailNotificationDefaultSender;
+
+  /// No description provided for @mailChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'New mail'**
+  String get mailChannelName;
+
+  /// No description provided for @mailChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifies when new Gmail arrives'**
+  String get mailChannelDesc;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out.'**
+  String get errorTimeout;
+
+  /// No description provided for @errorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot connect to the network.'**
+  String get errorNetwork;
+
+  /// No description provided for @errorHttpStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'An HTTP {status} error occurred.'**
+  String errorHttpStatus(int status);
+
+  /// No description provided for @errorUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'An unknown error occurred.'**
+  String get errorUnknown;
 }
 
 class _AppLocalizationsDelegate
