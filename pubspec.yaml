@@ -45,7 +45,7 @@ dependencies:
   dio: ^5.8.0+1
 
   # 홈화면 위젯
-  home_widget: ^0.7.0
+  home_widget: ^0.9.3
 
   # 로컬 저장
   shared_preferences: ^2.3.3
