@@ -69,7 +69,7 @@
                             android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                         <TextView android:id="@+id/cal_month_label"
                             android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                            android:text="6월" android:textSize="16sp" android:textStyle="bold"
+                            android:text="" android:textSize="16sp" android:textStyle="bold"
                             android:textColor="@color/widget_text_primary" android:gravity="center"/>
                         <ImageView android:id="@+id/cal_next"
                             android:layout_width="36dp" android:layout_height="36dp"
