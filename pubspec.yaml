@@ -61,6 +61,8 @@ dependencies:
 
   # Gmail 앱 열기
   url_launcher: ^6.3.1
+  firebase_core: ^4.10.0
+  firebase_crashlytics: ^5.2.3
 
 dev_dependencies:
   flutter_test:

@@ -21,6 +21,10 @@ plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
     id("com.android.application") version "9.0.1" apply false
     id("org.jetbrains.kotlin.android") version "2.3.20" apply false
+    // Firebase (Crashlytics): google-services.json 처리용
+    id("com.google.gms.google-services") version "4.4.2" apply false
+    // Crashlytics Gradle 플러그인 (네이티브 심볼/난독화 매핑 업로드)
+    id("com.google.firebase.crashlytics") version "3.0.7" apply false
 }
 
 include(":app")
