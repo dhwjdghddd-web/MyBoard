@@ -9,7 +9,6 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
     getToken: () => ref.read(authServiceProvider.notifier).getAccessToken(),
     refreshToken: () => ref.read(authServiceProvider.notifier).getAccessToken(forceRefresh: true),
-    onAuthError: () => ref.read(authServiceProvider.notifier).signOut(),
   );
 });
 
@@ -20,7 +19,6 @@ class ApiClient {
   ApiClient({
     required Future<String?> Function() getToken,
     required Future<String?> Function() refreshToken,
-    required VoidCallback onAuthError,
   }) {
     _dio = Dio(BaseOptions(
       connectTimeout: const Duration(seconds: 15),
@@ -77,9 +75,11 @@ class ApiClient {
                 debugPrint('재시도 요청 실패: $e');
               }
             }
-            // 갱신 실패 → 로그아웃 유도
-            debugPrint('인증 토큰 갱신 실패 — 자동 로그아웃');
-            onAuthError();
+            // 갱신 실패 시 자동 로그아웃하지 않는다. 로그인 직후 토큰이 준비되기 전
+            // 구간의 일시적 401 이 자동 로그아웃 → provider 재생성 → 재요청 → 401 의
+            // 무한 폭주(로그인 튕김)를 유발했기 때문. 해당 요청만 실패 처리하고,
+            // 토큰이 준비되면 이후 요청/재시도로 자연 복구된다.
+            debugPrint('토큰 갱신 실패 — 요청 실패 처리(자동 로그아웃 안 함)');
           }
           handler.next(err);
         },

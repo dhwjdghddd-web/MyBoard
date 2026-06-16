@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
+import '../../core/auth_service.dart';
 import '../../core/widget_service.dart';
 
 const _base = 'https://tasks.googleapis.com/tasks/v1';
@@ -48,6 +49,7 @@ class Task {
 
 final taskServiceProvider =
     StateNotifierProvider<TaskNotifier, AsyncValue<List<Task>>>((ref) {
+  ref.watch(authUserIdProvider); // 계정 변경 시 재생성
   return TaskNotifier(ref.watch(apiClientProvider));
 });
 
@@ -65,6 +67,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     state = const AsyncValue<List<Task>>.loading().copyWithPrevious(state);
     try {
       final lists = await _api.get('$_base/users/@me/lists');
+      if (!mounted) return;
       final items = lists['items'] as List?;
       if (items == null || items.isEmpty) {
         state = const AsyncValue.data([]);
@@ -80,6 +83,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
           .map((j) => Task.fromJson(j as Map<String, dynamic>))
           .toList();
       final sorted = _sorted(tasks);
+      if (!mounted) return;
       state = AsyncValue.data(sorted);
       await WidgetService.updateTasks(sorted);
 
@@ -95,6 +99,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
         }
       }
     } catch (e, st) {
+      if (!mounted) return;
       state = AsyncValue.error(e, st);
     }
   }
@@ -109,6 +114,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       final data = await _api.post('$_base/lists/$_listId/tasks', body: body);
+      if (!mounted) return;
       final newTask = Task.fromJson(data as Map<String, dynamic>);
       final current = state.value ?? [];
       final sorted = _sorted([newTask, ...current]);
@@ -134,9 +140,11 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       await _api.patch('$_base/lists/$_listId/tasks/${task.id}', body: body);
+      if (!mounted) return;
       await WidgetService.updateTasks(state.value ?? []);
     } catch (e) {
       debugPrint('태스크 상태 변경 실패: $e');
+      if (!mounted) return;
       state = AsyncValue.data(_sorted(current)); // 실패 시 원복
     }
   }
@@ -184,9 +192,11 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
     try {
       await _api.delete('$_base/lists/$_listId/tasks/$taskId');
+      if (!mounted) return;
       await WidgetService.updateTasks(state.value ?? []);
     } catch (e) {
       debugPrint('태스크 삭제 API 실패: $e');
+      if (!mounted) return;
       state = AsyncValue.data(current); // 실패 시 원복
     }
   }

@@ -23,6 +23,13 @@ final authServiceProvider =
   return AuthNotifier();
 });
 
+/// 현재 로그인 계정의 id. 데이터 provider(tasks/calendar/gmail)가 이 값을 watch 하여
+/// 계정이 바뀌면(로그아웃·전환) Riverpod 의존성 그래프가 자동으로 notifier 를 재생성
+/// → 이전 계정 데이터가 새 계정 화면에 남지 않도록 한다.
+final authUserIdProvider = Provider<String?>((ref) {
+  return ref.watch(authServiceProvider).valueOrNull?.id;
+});
+
 class AuthNotifier extends StateNotifier<AsyncValue<GoogleSignInAccount?>> {
   AuthNotifier() : super(const AsyncValue.loading()) {
     _init();

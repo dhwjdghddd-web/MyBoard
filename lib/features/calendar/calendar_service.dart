@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_client.dart';
+import '../../core/auth_service.dart';
 import '../../core/l10n_helper.dart';
 import '../../core/widget_service.dart';
 
@@ -178,6 +179,7 @@ class CalendarState {
 
 final calendarProvider =
     StateNotifierProvider<CalendarNotifier, CalendarState>((ref) {
+  ref.watch(authUserIdProvider); // 계정 변경 시 재생성
   return CalendarNotifier(ref.watch(apiClientProvider));
 });
 
@@ -196,13 +198,16 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
 
   Future<void> _init() async {
     await _loadFilter();
+    if (!mounted) return;
     await _loadColors();
+    if (!mounted) return;
     await loadEvents();
   }
 
   Future<void> _loadFilter() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList('g-cal-filter-hidden') ?? [];
+    if (!mounted) return;
     state = state.copyWith(hiddenCalendars: raw.toSet());
   }
 
@@ -241,11 +246,13 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
         );
       }).toList();
 
+      if (!mounted) return;
       state = state.copyWith(eventColorMap: eventMap, calendars: calendars);
     } catch (e) { debugPrint('캘린더 색상 로드 실패: $e'); }
   }
 
   Future<void> loadEvents() async {
+    if (!mounted) return;
     state = state.copyWith(loading: true, error: null);
     try {
       final from = DateTime(state.year, state.month, 1).toUtc().toIso8601String();
@@ -273,6 +280,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
           }
         }),
       );
+      if (!mounted) return;
       final events = <CalendarEvent>[];
       for (final (cal, items) in calResults) {
         for (final item in items) {
@@ -290,9 +298,11 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
         return ak.compareTo(bk);
       });
 
+      if (!mounted) return;
       state = state.copyWith(events: events, loading: false);
       await WidgetService.updateCalendar(events);
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(loading: false, error: e.toString());
     }
   }

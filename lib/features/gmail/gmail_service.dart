@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
+import '../../core/auth_service.dart';
 import '../../core/widget_service.dart';
 
 const _base = 'https://gmail.googleapis.com/gmail/v1/users/me';
@@ -230,6 +231,7 @@ class GmailState {
 
 final gmailProvider =
     StateNotifierProvider<GmailNotifier, GmailState>((ref) {
+  ref.watch(authUserIdProvider); // 계정 변경 시 재생성
   return GmailNotifier(ref.watch(apiClientProvider));
 });
 
@@ -256,6 +258,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
       final data = await _api.get('$_base/messages', params: params);
       final ids = (data['messages'] as List?) ?? [];
       final nextToken = data['nextPageToken'] as String?;
+      if (!mounted) return;
       if (ids.isEmpty) {
         state = state.copyWith(messages: [], loading: false, nextPageToken: null);
         return;
@@ -271,11 +274,13 @@ class GmailNotifier extends StateNotifier<GmailState> {
       final messages = details
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
           .toList();
+      if (!mounted) return;
       state = state.copyWith(messages: messages, loading: false, nextPageToken: nextToken);
       if (state.label == 'INBOX') {
         WidgetService.updateGmail(messages);
       }
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(loading: false, error: e.toString());
     }
   }
@@ -297,6 +302,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
       final data = await _api.get('$_base/messages', params: params);
       final ids = (data['messages'] as List?) ?? [];
       final nextToken = data['nextPageToken'] as String?;
+      if (!mounted) return;
       if (ids.isEmpty) {
         state = state.copyWith(loadingMore: false, nextPageToken: null);
         return;
@@ -313,6 +319,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
           .toList();
 
+      if (!mounted) return;
       final currentIds = state.messages.map((m) => m.id).toSet();
       final filteredNew = newMessages.where((m) => !currentIds.contains(m.id)).toList();
 
@@ -322,6 +329,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
         nextPageToken: nextToken,
       );
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(loadingMore: false);
     }
   }
@@ -342,6 +350,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
         return MapEntry(lbl, 0);
       }
     }));
+    if (!mounted) return;
     state = state.copyWith(labelCounts: Map.fromEntries(results));
   }
 }
