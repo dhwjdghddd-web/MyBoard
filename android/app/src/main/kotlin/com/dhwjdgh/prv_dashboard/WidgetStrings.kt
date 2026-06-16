@@ -1,5 +1,7 @@
 package com.dhwjdgh.prv_dashboard
 
+import android.content.Context
+import android.os.Build
 import java.util.Locale
 
 /**
@@ -8,8 +10,20 @@ import java.util.Locale
  * 종일/제목없음 같은 표시 문자열의 포맷을 양쪽이 동일하게 맞춘다.
  */
 object WidgetStrings {
-    private val isKorean: Boolean
-        get() = Locale.getDefault().language == "ko"
+    // Locale.getDefault() 는 프로세스 시작 시 캐시되어 런타임 시스템 언어 변경을
+    // 반영하지 못한다. 위젯/알림/액티비티 진입 시점에 updateLocale(context) 로
+    // 실제 Context 설정에서 현재 언어를 읽어 갱신한다.
+    @Volatile
+    private var isKorean: Boolean = Locale.getDefault().language == "ko"
+
+    fun updateLocale(context: Context) {
+        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]
+        } else {
+            @Suppress("DEPRECATION") context.resources.configuration.locale
+        }
+        isKorean = locale.language == "ko"
+    }
 
     // ── 위젯 ──
     val allDay: String get() = if (isKorean) "종일" else "All day"

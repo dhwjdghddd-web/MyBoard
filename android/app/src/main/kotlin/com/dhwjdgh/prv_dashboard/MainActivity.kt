@@ -80,6 +80,7 @@ class MainActivity : FlutterActivity() {
                             addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             clipData = android.content.ClipData.newRawUri("", uri)
                         }
+                        WidgetStrings.updateLocale(this)
                         val chooser = android.content.Intent.createChooser(intent, WidgetStrings.fileChooserTitle).apply {
                             addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                             addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)

@@ -39,6 +39,7 @@ class MailNotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ct
     }
 
     override fun doWork(): Result {
+        WidgetStrings.updateLocale(applicationContext)
         // 앱이 포그라운드면 MailPoller가 담당 — 중복 알림 방지
         if (MainActivity.activeChannel != null) {
             Log.d(TAG, "app in foreground — skipping (MailPoller active)")

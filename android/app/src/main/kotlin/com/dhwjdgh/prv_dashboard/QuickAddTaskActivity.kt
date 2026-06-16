@@ -25,6 +25,7 @@ class QuickAddTaskActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WidgetStrings.updateLocale(this)
         setContentView(R.layout.quick_add_task_layout)
         window.setBackgroundDrawableResource(android.R.color.transparent)
 

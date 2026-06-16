@@ -42,11 +42,13 @@ class CalendarInfo {
   final String summary;
   final Color color;
   final bool isWritable;
+  final bool isPrimary;
   const CalendarInfo({
     required this.id,
     required this.summary,
     required this.color,
     this.isWritable = true,
+    this.isPrimary = false,
   });
 }
 
@@ -235,6 +237,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
           summary: (m['summary'] as String?) ?? '',
           color: hexToColor(colorHex),
           isWritable: isWritable,
+          isPrimary: m['primary'] == true,
         );
       }).toList();
 

@@ -117,6 +117,19 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     });
   }
 
+  // 신규 일정 기본 캘린더 선택: 현재 선택값이 쓰기 가능 목록에 있으면 그대로,
+  // 아니면 주 캘린더(primary) → 숨김 아닌 쓰기 캘린더 → 첫 쓰기 캘린더 순.
+  // (쓰기 가능한 '첫 번째'를 무조건 쓰면 숨긴 보조 캘린더에 저장돼 목록/위젯에
+  //  안 보이는 문제가 있었음 — loadEvents 는 숨긴 캘린더를 조회하지 않음.)
+  String _resolveCalendarId(List<CalendarInfo> writable, Set<String> hidden) {
+    if (writable.any((c) => c.id == _calendarId)) return _calendarId;
+    final primary = writable.where((c) => c.isPrimary);
+    if (primary.isNotEmpty) return primary.first.id;
+    final visible = writable.where((c) => !hidden.contains(c.id));
+    if (visible.isNotEmpty) return visible.first.id;
+    return writable.isNotEmpty ? writable.first.id : _calendarId;
+  }
+
   Future<void> _save() async {
     final l = AppLocalizations.of(context)!;
     final title = _titleCtrl.text.trim();
@@ -132,9 +145,9 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     setState(() => _saving = true);
     try {
       final calState = ref.read(calendarProvider);
-      final displayCalendars = calState.calendars.where((c) => c.isWritable).toList();
-      if (displayCalendars.isNotEmpty && !displayCalendars.any((c) => c.id == _calendarId)) {
-        _calendarId = displayCalendars.first.id;
+      final writableCalendars = calState.calendars.where((c) => c.isWritable).toList();
+      if (writableCalendars.isNotEmpty) {
+        _calendarId = _resolveCalendarId(writableCalendars, calState.hiddenCalendars);
       }
 
       final guests = _guestsCtrl.text.trim();
@@ -351,9 +364,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
               leading: const Icon(Icons.calendar_month),
               title: Text(l.calendarLabel),
               trailing: DropdownButton<String>(
-                value: displayCalendars.any((c) => c.id == _calendarId)
-                    ? _calendarId
-                    : (displayCalendars.isNotEmpty ? displayCalendars.first.id : _calendarId),
+                value: _resolveCalendarId(displayCalendars, calState.hiddenCalendars),
                 underline: const SizedBox(),
                 items: displayCalendars.map((c) => DropdownMenuItem(
                   value: c.id,

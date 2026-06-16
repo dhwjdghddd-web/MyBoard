@@ -84,6 +84,7 @@ class CalendarSyncJobService : JobService() {
         }
 
         private fun executeSyncInternal(context: Context, year: Int, month: Int): Boolean {
+            WidgetStrings.updateLocale(context)
             Log.d(TAG, "executeSyncInternal: $year/$month")
             var token = readToken(context)
             if (token.isNullOrEmpty()) token = freshToken(context)

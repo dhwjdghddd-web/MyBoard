@@ -34,6 +34,11 @@ class HomeWidgetProvider : AppWidgetProvider() {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
         when (intent.action) {
+            Intent.ACTION_LOCALE_CHANGED -> {
+                // 시스템 언어 변경 시 위젯을 다시 그려 즉시 반영 (재설치 불필요)
+                WidgetStrings.updateLocale(context)
+                redraw(context)
+            }
             ACTION_COMPLETE_TASK -> {
                 val taskId    = intent.getStringExtra("task_id") ?: return
                 val taskIndex = intent.getIntExtra("task_index", -1)
@@ -370,8 +375,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
         }
 
         fun updateWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
+            WidgetStrings.updateLocale(context)
             val prefs     = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            
+
             val opts = manager.getAppWidgetOptions(widgetId)
             val widgetWidth  = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,  300)
             val widgetHeight = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 300)

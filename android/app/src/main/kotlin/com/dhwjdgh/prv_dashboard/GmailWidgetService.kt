@@ -31,10 +31,12 @@ class GmailWidgetFactory(private val context: Context, private val isCover: Bool
     )
 
     override fun onCreate() {
+        WidgetStrings.updateLocale(context)
         loadData()
     }
 
     override fun onDataSetChanged() {
+        WidgetStrings.updateLocale(context)
         loadData()
     }
 

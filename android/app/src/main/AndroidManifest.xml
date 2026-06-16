@@ -64,6 +64,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
                 <action android:name="com.dhwjdgh.prv_dashboard.COMPLETE_TASK" />
                 <action android:name="com.dhwjdgh.prv_dashboard.DELETE_TASK" />
                 <action android:name="com.dhwjdgh.prv_dashboard.SWITCH_WIDGET_TAB" />
