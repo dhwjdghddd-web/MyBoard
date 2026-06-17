@@ -116,7 +116,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
       final data = await _api.post('$_base/lists/$_listId/tasks', body: body);
       if (!mounted) return;
       final newTask = Task.fromJson(data as Map<String, dynamic>);
-      final current = state.value ?? [];
+      final current = state.valueOrNull ?? [];
       final sorted = _sorted([newTask, ...current]);
       state = AsyncValue.data(sorted);
       await WidgetService.updateTasks(sorted);
@@ -133,7 +133,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     if (newStatus == 'needsAction') body['completed'] = null;
 
     // 낙관적 업데이트
-    final current = state.value ?? [];
+    final current = state.valueOrNull ?? [];
     state = AsyncValue.data(
       _sorted(current.map((t) => t.id == task.id ? t.copyWith(status: newStatus) : t).toList()),
     );
@@ -141,7 +141,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     try {
       await _api.patch('$_base/lists/$_listId/tasks/${task.id}', body: body);
       if (!mounted) return;
-      await WidgetService.updateTasks(state.value ?? []);
+      await WidgetService.updateTasks(state.valueOrNull ?? []);
     } catch (e) {
       debugPrint('태스크 상태 변경 실패: $e');
       if (!mounted) return;
@@ -154,7 +154,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     final completions = await WidgetService.getPendingCompletions();
     if (completions.isNotEmpty) {
       await WidgetService.clearPendingCompletions();
-      final current = state.value ?? [];
+      final current = state.valueOrNull ?? [];
       for (final taskId in completions) {
         try {
           final task = current.firstWhere((t) => t.id == taskId && !t.isCompleted);
@@ -187,13 +187,13 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
 
   Future<void> deleteTask(String taskId) async {
     if (_listId == null) return;
-    final current = state.value ?? [];
+    final current = state.valueOrNull ?? [];
     state = AsyncValue.data(current.where((t) => t.id != taskId).toList());
 
     try {
       await _api.delete('$_base/lists/$_listId/tasks/$taskId');
       if (!mounted) return;
-      await WidgetService.updateTasks(state.value ?? []);
+      await WidgetService.updateTasks(state.valueOrNull ?? []);
     } catch (e) {
       debugPrint('태스크 삭제 API 실패: $e');
       if (!mounted) return;
@@ -202,14 +202,14 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   }
 
   void markTaskCompletedLocal(String taskId) {
-    final current = state.value ?? [];
+    final current = state.valueOrNull ?? [];
     state = AsyncValue.data(
       _sorted(current.map((t) => t.id == taskId ? t.copyWith(status: 'completed') : t).toList()),
     );
   }
 
   void deleteTaskLocal(String taskId) {
-    final current = state.value ?? [];
+    final current = state.valueOrNull ?? [];
     state = AsyncValue.data(current.where((t) => t.id != taskId).toList());
   }
 

@@ -239,7 +239,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
 
   @override
   Widget build(BuildContext context) {
-    final tasks = ref.watch(taskServiceProvider).value ?? [];
+    final tasks = ref.watch(taskServiceProvider).valueOrNull ?? [];
     final activeCount = tasks.where((t) => !t.isCompleted).length;
     final bool isTablet = MediaQuery.of(context).size.width >= 600;
     final l = AppLocalizations.of(context)!;

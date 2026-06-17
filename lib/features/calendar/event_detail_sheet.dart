@@ -54,7 +54,7 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
     final tasksAsync = ref.watch(taskServiceProvider);
 
     final events = cal.events.where((e) => e.dateKey == widget.dateKey).toList();
-    final tasks = tasksAsync.value ?? [];
+    final tasks = tasksAsync.valueOrNull ?? [];
     final dayTasks = tasks.where((t) {
       if (t.due == null || t.isCompleted) return false;
       final d = t.due!.toLocal();

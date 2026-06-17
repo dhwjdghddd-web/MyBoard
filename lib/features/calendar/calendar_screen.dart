@@ -20,7 +20,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final cal = ref.watch(calendarProvider);
-    final tasks = ref.watch(taskServiceProvider).value ?? [];
+    final tasks = ref.watch(taskServiceProvider).valueOrNull ?? [];
     final l = AppLocalizations.of(context)!;
 
     final tasksByDate = <String, List<Task>>{};
