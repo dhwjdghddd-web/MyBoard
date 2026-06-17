@@ -222,6 +222,9 @@ class _MainScreenState extends ConsumerState<MainScreen>
       _poller?.start();
       ref.read(taskServiceProvider.notifier).syncPendingFromWidget();
       ref.read(gmailProvider.notifier).loadLabelCounts();
+      // 메일 목록도 다시 로드 → 앱 목록·홈 위젯(INBOX) 갱신. resume 시 이게 빠져
+      // 있어, 백그라운드로 받은 새 메일이나 다른 곳에서 읽은 상태가 반영 안 됐음.
+      ref.read(gmailProvider.notifier).loadMessages();
     } else if (state == AppLifecycleState.paused) {
       _poller?.stop();
     }
