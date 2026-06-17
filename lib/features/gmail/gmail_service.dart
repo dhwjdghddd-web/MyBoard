@@ -307,8 +307,11 @@ class GmailNotifier extends StateNotifier<GmailState> {
   final ApiClient _api;
   // MyBoard 에서 읽은 메일 ID. readonly 권한이라 Gmail 서버는 못 바꾸므로,
   // 로컬에 기억해 앱·위젯에서 읽음으로 표시한다(영구 저장).
-  final Set<String> _readIds = {};
-  static const _readIdsKey = 'gmail_local_read_ids';
+  // MyBoard 에서 읽은 메일. readonly 권한이라 Gmail 서버는 못 바꾸므로, 읽은 메일의
+  // id→라벨(읽을 당시) 을 로컬에 영구 저장해 앱 목록·위젯·라벨 배지에 읽음을 반영한다.
+  final Map<String, List<String>> _readLabels = {};
+  Map<String, int> _serverLabelCounts = {}; // 마지막으로 받은 서버 안읽음 수(원본)
+  static const _readKey = 'gmail_local_read_v2';
 
   Future<void> _init() async {
     await _loadReadIds();
@@ -320,38 +323,59 @@ class GmailNotifier extends StateNotifier<GmailState> {
   Future<void> _loadReadIds() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      _readIds.addAll(prefs.getStringList(_readIdsKey) ?? const []);
+      final raw = prefs.getString(_readKey);
+      if (raw != null && raw.isNotEmpty) {
+        (jsonDecode(raw) as Map<String, dynamic>).forEach((k, v) {
+          _readLabels[k] = (v as List).cast<String>();
+        });
+      }
     } catch (e) {
-      debugPrint('읽음 ID 로드 실패: $e');
+      debugPrint('읽음 기록 로드 실패: $e');
     }
   }
 
   Future<void> _persistReadIds() async {
     try {
-      // 무한 증가 방지: 800 넘으면 최근 500개만 유지 (Dart Set 은 삽입순서 보존)
-      if (_readIds.length > 800) {
-        final keep = _readIds.skip(_readIds.length - 500).toList();
-        _readIds
+      // 무한 증가 방지: 800 넘으면 최근 500개만 유지 (Map 은 삽입순서 보존)
+      if (_readLabels.length > 800) {
+        final keepKeys = _readLabels.keys.skip(_readLabels.length - 500).toList();
+        final kept = {for (final k in keepKeys) k: _readLabels[k]!};
+        _readLabels
           ..clear()
-          ..addAll(keep);
+          ..addAll(kept);
       }
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList(_readIdsKey, _readIds.toList());
+      await prefs.setString(_readKey, jsonEncode(_readLabels));
     } catch (e) {
-      debugPrint('읽음 ID 저장 실패: $e');
+      debugPrint('읽음 기록 저장 실패: $e');
     }
   }
 
   List<GmailMessage> _applyReadOverlay(List<GmailMessage> list) =>
-      list.map((m) => _readIds.contains(m.id) ? m.asRead() : m).toList();
+      list.map((m) => _readLabels.containsKey(m.id) ? m.asRead() : m).toList();
 
-  // 메일을 열었을 때 호출 — 로컬 읽음 처리 + 목록/위젯 즉시 반영
-  void markRead(String id) {
-    final isNew = _readIds.add(id);
-    if (isNew) _persistReadIds();
-    final updated = state.messages.map((m) => m.id == id ? m.asRead() : m).toList();
+  // 서버 안읽음 수에서 로컬 읽음(해당 라벨 + 읽을 당시 UNREAD)을 차감한 배지 수
+  Map<String, int> _adjustedCounts() {
+    final result = <String, int>{};
+    _serverLabelCounts.forEach((label, server) {
+      final localRead = _readLabels.values
+          .where((labs) => labs.contains(label) && labs.contains('UNREAD'))
+          .length;
+      result[label] = (server - localRead).clamp(0, server);
+    });
+    return result;
+  }
+
+  // 메일을 열었을 때 호출 — 로컬 읽음 처리 + 목록/위젯/라벨 배지 즉시 반영
+  void markRead(String id, List<String> labels) {
+    _readLabels[id] = labels;
+    _persistReadIds();
     if (!mounted) return;
-    state = state.copyWith(messages: updated);
+    final updated = state.messages.map((m) => m.id == id ? m.asRead() : m).toList();
+    state = state.copyWith(
+      messages: updated,
+      labelCounts: _serverLabelCounts.isNotEmpty ? _adjustedCounts() : state.labelCounts,
+    );
     if (state.label == 'INBOX') {
       WidgetService.updateGmail(updated);
     }
@@ -463,6 +487,7 @@ class GmailNotifier extends StateNotifier<GmailState> {
       }
     }));
     if (!mounted) return;
-    state = state.copyWith(labelCounts: Map.fromEntries(results));
+    _serverLabelCounts = Map.fromEntries(results);
+    state = state.copyWith(labelCounts: _adjustedCounts());
   }
 }

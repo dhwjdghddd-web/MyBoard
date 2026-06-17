@@ -137,10 +137,11 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
         _attachments = getAttachments(payload);
         _loading = false;
       });
-      // 메일을 열면 로컬 읽음 처리 (앱 목록·위젯에 읽음으로 표시). initState 가 아닌
-      // 로드 완료(await 이후) 시점에 호출해야 "빌드 중 provider 수정" 오류가 안 난다.
+      // 메일을 열면 로컬 읽음 처리 (앱 목록·위젯·라벨 배지에 읽음으로 표시). initState 가
+      // 아닌 로드 완료(await 이후) 시점에 호출해야 "빌드 중 provider 수정" 오류가 안 난다.
       // readonly 권한이라 Gmail 서버는 그대로, MyBoard 안에서만 읽음으로 보인다.
-      ref.read(gmailProvider.notifier).markRead(widget.messageId);
+      final labels = (full['labelIds'] as List?)?.cast<String>() ?? const <String>[];
+      ref.read(gmailProvider.notifier).markRead(widget.messageId, labels);
       await _webController.loadHtmlString(_wrapHtml(body, isDark));
     } catch (e) {
       if (!mounted) return;
