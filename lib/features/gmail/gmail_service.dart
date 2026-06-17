@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_client.dart';
 import '../../core/auth_service.dart';
 import '../../core/widget_service.dart';
@@ -105,6 +106,56 @@ void _collectAttachments(Map<String, dynamic> part, List<Attachment> out) {
   }
 }
 
+// 인라인 이미지(cid:) — Content-ID 를 가진 image/* 파트 수집.
+// 본문 HTML 의 <img src="cid:..."> 를 실제 이미지 데이터로 치환할 때 사용.
+class InlineImage {
+  final String contentId; // <> 제거된 값
+  final String mimeType;
+  final String? attachmentId; // 별도 fetch 필요한 경우
+  final String? data; // 파트에 직접 포함된 base64url (작은 이미지)
+  const InlineImage({
+    required this.contentId,
+    required this.mimeType,
+    this.attachmentId,
+    this.data,
+  });
+}
+
+List<InlineImage> getInlineImages(Map<String, dynamic> payload) {
+  final result = <InlineImage>[];
+  _collectInlineImages(payload, result);
+  return result;
+}
+
+void _collectInlineImages(Map<String, dynamic> part, List<InlineImage> out) {
+  final mime = (part['mimeType'] as String?) ?? '';
+  if (mime.startsWith('image/')) {
+    final headers = (part['headers'] as List?)?.cast<Map>() ?? const [];
+    var cid = '';
+    for (final h in headers) {
+      if ((h['name'] as String? ?? '').toLowerCase() == 'content-id') {
+        cid = (h['value'] as String? ?? '').trim();
+        break;
+      }
+    }
+    if (cid.isNotEmpty) {
+      final body = part['body'] as Map<String, dynamic>?;
+      out.add(InlineImage(
+        contentId: cid.replaceAll(RegExp(r'^<|>$'), ''),
+        mimeType: mime,
+        attachmentId: body?['attachmentId'] as String?,
+        data: body?['data'] as String?,
+      ));
+    }
+  }
+  final parts = part['parts'] as List?;
+  if (parts != null) {
+    for (final p in parts) {
+      _collectInlineImages(p as Map<String, dynamic>, out);
+    }
+  }
+}
+
 String? getEmailBody(Map<String, dynamic> payload) {
   final bodyData = (payload['body'] as Map?)?['data'] as String?;
   if (bodyData != null && bodyData.isNotEmpty) return decodeBase64Body(bodyData);
@@ -160,6 +211,17 @@ class GmailMessage {
 
   bool get isUnread => labelIds.contains('UNREAD');
   bool get isStarred => labelIds.contains('STARRED');
+
+  // 로컬 읽음 처리용 — UNREAD 라벨을 제거한 사본
+  GmailMessage asRead() => GmailMessage(
+        id: id,
+        from: from,
+        subject: subject,
+        date: date,
+        snippet: snippet,
+        labelIds: labelIds.where((l) => l != 'UNREAD').toList(),
+        internalDate: internalDate,
+      );
 
   String get displayName {
     final match = RegExp(r'^"?([^"<]+)"?\s*<').firstMatch(from);
@@ -239,11 +301,61 @@ final gmailProvider =
 
 class GmailNotifier extends StateNotifier<GmailState> {
   GmailNotifier(this._api) : super(const GmailState()) {
+    _init();
+  }
+
+  final ApiClient _api;
+  // MyBoard 에서 읽은 메일 ID. readonly 권한이라 Gmail 서버는 못 바꾸므로,
+  // 로컬에 기억해 앱·위젯에서 읽음으로 표시한다(영구 저장).
+  final Set<String> _readIds = {};
+  static const _readIdsKey = 'gmail_local_read_ids';
+
+  Future<void> _init() async {
+    await _loadReadIds();
+    if (!mounted) return;
     loadMessages();
     loadLabelCounts();
   }
 
-  final ApiClient _api;
+  Future<void> _loadReadIds() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _readIds.addAll(prefs.getStringList(_readIdsKey) ?? const []);
+    } catch (e) {
+      debugPrint('읽음 ID 로드 실패: $e');
+    }
+  }
+
+  Future<void> _persistReadIds() async {
+    try {
+      // 무한 증가 방지: 800 넘으면 최근 500개만 유지 (Dart Set 은 삽입순서 보존)
+      if (_readIds.length > 800) {
+        final keep = _readIds.skip(_readIds.length - 500).toList();
+        _readIds
+          ..clear()
+          ..addAll(keep);
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_readIdsKey, _readIds.toList());
+    } catch (e) {
+      debugPrint('읽음 ID 저장 실패: $e');
+    }
+  }
+
+  List<GmailMessage> _applyReadOverlay(List<GmailMessage> list) =>
+      list.map((m) => _readIds.contains(m.id) ? m.asRead() : m).toList();
+
+  // 메일을 열었을 때 호출 — 로컬 읽음 처리 + 목록/위젯 즉시 반영
+  void markRead(String id) {
+    final isNew = _readIds.add(id);
+    if (isNew) _persistReadIds();
+    final updated = state.messages.map((m) => m.id == id ? m.asRead() : m).toList();
+    if (!mounted) return;
+    state = state.copyWith(messages: updated);
+    if (state.label == 'INBOX') {
+      WidgetService.updateGmail(updated);
+    }
+  }
 
   Future<void> loadMessages({String? query}) async {
     state = state.copyWith(loading: true, error: null, nextPageToken: null);
@@ -271,9 +383,9 @@ class GmailNotifier extends StateNotifier<GmailState> {
         )),
       );
 
-      final messages = details
+      final messages = _applyReadOverlay(details
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
-          .toList();
+          .toList());
       if (!mounted) return;
       state = state.copyWith(messages: messages, loading: false, nextPageToken: nextToken);
       if (state.label == 'INBOX') {
@@ -315,9 +427,9 @@ class GmailNotifier extends StateNotifier<GmailState> {
         )),
       );
 
-      final newMessages = details
+      final newMessages = _applyReadOverlay(details
           .map((d) => GmailMessage.fromJson(d as Map<String, dynamic>))
-          .toList();
+          .toList());
 
       if (!mounted) return;
       final currentIds = state.messages.map((m) => m.id).toSet();

@@ -124,17 +124,72 @@ class _EmailDetailScreenState extends ConsumerState<EmailDetailScreen> {
       );
       final full = data as Map<String, dynamic>;
       final payload = full['payload'] as Map<String, dynamic>? ?? {};
-      final body = getEmailBody(payload) ?? '<p style="padding:16px;color:#999">No content</p>';
+      var body = getEmailBody(payload) ?? '<p style="padding:16px;color:#999">No content</p>';
+      // 인라인 이미지(cid:) 를 실제 데이터로 치환 (로고/서명/뉴스레터 이미지)
+      body = await _inlineCidImages(body, payload);
+      // 외부 http 이미지는 cleartext 차단으로 안 보이므로 https 로 업그레이드
+      // (Gmail 도 이미지를 https 프록시로 바꿔 표시함)
+      body = _upgradeHttpImages(body);
       final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
+      if (!mounted) return;
       setState(() {
         _full = full;
         _attachments = getAttachments(payload);
         _loading = false;
       });
+      // 메일을 열면 로컬 읽음 처리 (앱 목록·위젯에 읽음으로 표시). initState 가 아닌
+      // 로드 완료(await 이후) 시점에 호출해야 "빌드 중 provider 수정" 오류가 안 난다.
+      // readonly 권한이라 Gmail 서버는 그대로, MyBoard 안에서만 읽음으로 보인다.
+      ref.read(gmailProvider.notifier).markRead(widget.messageId);
       await _webController.loadHtmlString(_wrapHtml(body, isDark));
     } catch (e) {
+      if (!mounted) return;
       setState(() { _error = e.toString(); _loading = false; });
     }
+  }
+
+  // 외부 이미지의 http:// 주소를 https:// 로 업그레이드 (img src 와 CSS url()).
+  // 앱이 cleartext(http) 를 차단해 http 이미지가 안 뜨던 문제 해결. 대부분의
+  // 이미지 호스트가 https 를 지원하므로 안전하며, 안 되는 소수는 기존과 동일(미표시).
+  String _upgradeHttpImages(String html) {
+    var s = html;
+    s = s.replaceAllMapped(
+      RegExp(r'''(src\s*=\s*["'])http://''', caseSensitive: false),
+      (m) => '${m[1]}https://',
+    );
+    s = s.replaceAllMapped(
+      RegExp(r'''(url\(\s*["']?)http://''', caseSensitive: false),
+      (m) => '${m[1]}https://',
+    );
+    return s;
+  }
+
+  // 본문 HTML 의 <img src="cid:..."> 를 data URI 로 치환한다. Gmail 첨부 데이터는
+  // base64url 이므로 -/_ → +// 로 변환해 표준 base64 data URI 로 만든다.
+  Future<String> _inlineCidImages(String body, Map<String, dynamic> payload) async {
+    if (!body.contains('cid:')) return body;
+    final images = getInlineImages(payload);
+    if (images.isEmpty) return body;
+    var result = body;
+    for (final img in images) {
+      var b64 = img.data;
+      if ((b64 == null || b64.isEmpty) && img.attachmentId != null) {
+        try {
+          final att = await ref.read(apiClientProvider).get(
+            '$_base/messages/${widget.messageId}/attachments/${img.attachmentId}',
+          );
+          b64 = (att as Map<String, dynamic>)['data'] as String?;
+        } catch (e) {
+          debugPrint('인라인 이미지 로드 실패(${img.contentId}): $e');
+        }
+      }
+      if (b64 != null && b64.isNotEmpty) {
+        final std = b64.replaceAll('-', '+').replaceAll('_', '/');
+        final dataUri = 'data:${img.mimeType};base64,$std';
+        result = result.replaceAll('cid:${img.contentId}', dataUri);
+      }
+    }
+    return result;
   }
 
   Future<void> _openFile(String filePath, String mimeType, ScaffoldMessengerState messenger) async {
