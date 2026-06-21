@@ -7,3 +7,7 @@ AppLocalizations appL10n() {
   final code = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
   return lookupAppLocalizations(Locale(code == 'ko' ? 'ko' : 'en'));
 }
+
+/// 시스템 로캘이 한국어가 아닌지 여부(지원하지 않는 언어는 영어로 취급).
+bool isEnglishLocale() =>
+    WidgetsBinding.instance.platformDispatcher.locale.languageCode != 'ko';

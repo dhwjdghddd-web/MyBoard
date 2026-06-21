@@ -160,7 +160,7 @@ class WidgetService {
         if (i < sorted.length) {
           final m = sorted[i];
           final sender = m.displayName.isNotEmpty ? m.displayName : m.from;
-          final timeStr = formatEmailDate(m.date);
+          final timeStr = formatEmailDate(m.date, isEnglish: isEnglishLocale());
           final subjectLine = m.subject.isNotEmpty ? m.subject : noSubject;
           gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  sender));
           gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time',    timeStr));

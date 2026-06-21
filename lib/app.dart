@@ -26,8 +26,8 @@ class GoogleDashboardApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('ko'),
         Locale('en'),
+        Locale('ko'),
       ],
       home: const AuthGate(),
     );
