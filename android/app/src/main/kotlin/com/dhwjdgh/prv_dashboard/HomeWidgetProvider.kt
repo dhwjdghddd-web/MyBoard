@@ -162,14 +162,13 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 val m = prefs.getInt("cal_display_month", now().get(java.util.Calendar.MONTH) + 1)
                 val pendingResult = goAsync()
                 partiallySetBtnColor(context, R.id.cal_refresh_btn, "#FFA000")
+                // 네이티브 동기화가 위젯을 이미 갱신하므로 앱으로 refreshData 재푸시는 하지 않는다.
+                // (앱이 현재 월을 다시 써서 위젯이 깜빡이던 문제 방지 — updateCalendar 중복 기록 제거)
                 CalendarSyncJobService.executeSync(context, y, m) {
                     partiallySetBtnColor(context, R.id.cal_refresh_btn, "#4CAF50")
                     android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                         partiallySetBtnColor(context, R.id.cal_refresh_btn, "#FFFFFF")
                     }, 1500)
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        MainActivity.activeChannel?.invokeMethod("refreshData", null)
-                    }
                     pendingResult.finish()
                 }
             }

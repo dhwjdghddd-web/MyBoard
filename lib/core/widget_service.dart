@@ -41,75 +41,73 @@ class WidgetService {
     }
   }
 
-  static Future<void> updateCalendar(List<CalendarEvent> events) async {
+  /// [year]/[month] 한 달치만 위젯 prefs에 반영한다.
+  /// 주의: 이 함수가 다른 달의 cal_day_* 키까지 건드리면, 네이티브 위젯
+  /// 동기화(CalendarSyncJobService)가 그 달에 써둔 데이터를 지워버린다.
+  /// 그래서 과거에 5~8월 전체를 초기화하던 로직이 "7월 일정이 사라지는" 버그의
+  /// 원인이었다. 반드시 인자로 받은 해당 월만 갱신할 것.
+  static Future<void> updateCalendar(List<CalendarEvent> events,
+      {required int year, required int month}) async {
     try {
-      final now = DateTime.now();
       final allDayLabel = appL10n().allDay;
 
-      // 월별 이벤트 날짜 집합 저장 (현재 달 ±1개월)
-      for (var offset = -1; offset <= 1; offset++) {
-        final targetMonth = DateTime(now.year, now.month + offset);
-        final ty = targetMonth.year;
-        final tm = targetMonth.month;
-        final days = events
-            .where((e) {
-              final dt = e.startDt?.toLocal();
-              if (dt != null) return dt.year == ty && dt.month == tm;
-              if (e.startDate != null && e.startDate!.length >= 10) {
-                return int.tryParse(e.startDate!.substring(0, 4)) == ty &&
-                       int.tryParse(e.startDate!.substring(5, 7)) == tm;
-              }
-              return false;
-            })
-            .map((e) {
-              if (e.startDt != null) return e.startDt!.toLocal().day;
-              if (e.startDate != null && e.startDate!.length >= 10) {
-                return int.tryParse(e.startDate!.substring(8, 10)) ?? 0;
-              }
-              return 0;
-            })
-            .where((d) => d > 0)
-            .toSet();
-        await HomeWidget.saveWidgetData<String>('cal_ev_${ty}_$tm', days.join(','));
-        // generic fallback key for current month
-        if (offset == 0) {
-          await HomeWidget.saveWidgetData<String>('cal_event_days', days.join(','));
+      bool inTargetMonth(CalendarEvent e) {
+        final dt = e.startDt?.toLocal();
+        if (dt != null) return dt.year == year && dt.month == month;
+        if (e.startDate != null && e.startDate!.length >= 10) {
+          return int.tryParse(e.startDate!.substring(0, 4)) == year &&
+                 int.tryParse(e.startDate!.substring(5, 7)) == month;
         }
+        return false;
       }
 
-      // 일별 이벤트 데이터 저장 (위젯 날짜 탭 시 상세 패널 표시용)
-      // key: cal_day_YYYYMMDD_titles / _times / _ids
-      final Map<String, List<CalendarEvent>> byDay = {};
-      final startMonth = DateTime(now.year, now.month - 1, 1);
-      final endMonth = DateTime(now.year, now.month + 2, 0);
-      for (var d = startMonth; d.isBefore(endMonth.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
-        final dayKey = '${d.year.toString().padLeft(4,'0')}${d.month.toString().padLeft(2,'0')}${d.day.toString().padLeft(2,'0')}';
-        byDay[dayKey] = [];
+      final monthEvents = events.where(inTargetMonth).toList();
+
+      int? dayOf(CalendarEvent e) {
+        if (e.startDt != null) return e.startDt!.toLocal().day;
+        if (e.startDate != null && e.startDate!.length >= 10) {
+          return int.tryParse(e.startDate!.substring(8, 10));
+        }
+        return null;
       }
 
-      for (final e in events) {
-        String? dayKey;
-        if (e.startDt != null) {
-          final d = e.startDt!.toLocal();
-          dayKey = '${d.year.toString().padLeft(4,'0')}${d.month.toString().padLeft(2,'0')}${d.day.toString().padLeft(2,'0')}';
-        } else if (e.startDate != null && e.startDate!.length >= 10) {
-          dayKey = e.startDate!.replaceAll('-', '').substring(0, 8);
+      // 네이티브 CalendarSyncJobService와 동일한 정렬 키(시작 instant epoch millis).
+      int startMs(CalendarEvent e) {
+        if (e.startDt != null) return e.startDt!.millisecondsSinceEpoch;
+        if (e.startDate != null && e.startDate!.length >= 10) {
+          final d = DateTime.tryParse(e.startDate!);
+          if (d != null) return DateTime(d.year, d.month, d.day).millisecondsSinceEpoch;
         }
-        if (dayKey != null) {
-          byDay.putIfAbsent(dayKey, () => []).add(e);
-        }
+        return 0;
       }
+
+      // 월별 이벤트 날짜 집합 (해당 월만)
+      final days = monthEvents.map(dayOf).whereType<int>().where((d) => d > 0).toSet();
+      await HomeWidget.saveWidgetData<String>('cal_ev_${year}_$month', days.join(','));
+      final now = DateTime.now();
+      if (year == now.year && month == now.month) {
+        await HomeWidget.saveWidgetData<String>('cal_event_days', days.join(','));
+      }
+
+      // 일별 데이터: 해당 월의 모든 날을 빈값으로 초기화 후 이벤트로 채운다.
+      final daysInMonth = DateTime(year, month + 1, 0).day;
+      final Map<int, List<CalendarEvent>> byDay = {
+        for (var d = 1; d <= daysInMonth; d++) d: <CalendarEvent>[],
+      };
+      for (final e in monthEvents) {
+        final day = dayOf(e);
+        if (day != null && byDay.containsKey(day)) byDay[day]!.add(e);
+      }
+
       final dayFutures = <Future>[];
       for (final entry in byDay.entries) {
-        final key = entry.key;
+        final key = '${year.toString().padLeft(4, '0')}${month.toString().padLeft(2, '0')}${entry.key.toString().padLeft(2, '0')}';
         final evList = entry.value;
         evList.sort((a, b) {
-          if (a.isAllDay && !b.isAllDay) return -1;
-          if (!a.isAllDay && b.isAllDay) return 1;
-          if (a.startDt != null && b.startDt != null) {
-            return a.startDt!.toLocal().compareTo(b.startDt!.toLocal());
-          }
-          return 0;
+          // 종일 먼저 → 실제 시작 instant → id (네이티브와 동일 순서)
+          if (a.isAllDay != b.isAllDay) return a.isAllDay ? -1 : 1;
+          final c = startMs(a).compareTo(startMs(b));
+          return c != 0 ? c : a.id.compareTo(b.id);
         });
         final take = evList.take(25).toList();
         final titles = take.map((e) => e.summary).join('|');

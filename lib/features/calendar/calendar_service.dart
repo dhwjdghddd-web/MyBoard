@@ -300,7 +300,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
 
       if (!mounted) return;
       state = state.copyWith(events: events, loading: false);
-      await WidgetService.updateCalendar(events);
+      await WidgetService.updateCalendar(events, year: state.year, month: state.month);
     } catch (e) {
       if (!mounted) return;
       state = state.copyWith(loading: false, error: e.toString());
@@ -413,7 +413,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       );
       final updatedEvents = state.events.where((e) => e.id != eventId).toList();
       state = state.copyWith(events: updatedEvents);
-      await WidgetService.updateCalendar(updatedEvents);
+      await WidgetService.updateCalendar(updatedEvents, year: state.year, month: state.month);
     } catch (e) {
       debugPrint('deleteEvent 실패: $e');
       rethrow;

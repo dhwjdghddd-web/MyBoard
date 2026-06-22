@@ -88,25 +88,33 @@ class CalendarSyncJobService : JobService() {
             Log.d(TAG, "executeSyncInternal: $year/$month")
             var token = readToken(context)
             if (token.isNullOrEmpty()) token = freshToken(context)
-            if (!token.isNullOrEmpty()) {
-                var result = runCatching { syncCalendar(context, token!!, year, month) }
-                    .onSuccess { Log.d(TAG, "syncCalendar success: fetched=$it") }
-                    .getOrNull()
-                if (result == null || !result) {
-                    Log.e(TAG, "syncCalendar failed or no data — retrying with fresh token")
-                    val freshT = freshToken(context)
-                    if (freshT != null) {
-                        result = runCatching { syncCalendar(context, freshT, year, month) }
-                            .onSuccess { Log.d(TAG, "syncCalendar retry success: fetched=$it") }
-                            .onFailure { e2 -> Log.e(TAG, "syncCalendar retry failed: $e2") }
-                            .getOrNull()
-                    }
-                }
-                return result == true
-            } else {
+            if (token.isNullOrEmpty()) {
                 Log.e(TAG, "No token available — sync skipped")
                 return false
             }
+
+            var result = runCatching { syncCalendar(context, token!!, year, month) }
+                .onSuccess { Log.d(TAG, "syncCalendar success: fetched=$it") }
+                .getOrNull()
+
+            if (result == null || !result) {
+                Log.e(TAG, "syncCalendar failed or no data — invalidating stale token & retrying")
+                // 만료된 캐시 토큰을 무효화(GoogleAuthUtil 내부 캐시에서 제거)한 뒤 새 토큰 발급
+                TokenManager.invalidateToken(context, token!!)
+                val freshT = freshToken(context)
+                if (freshT != null) {
+                    result = runCatching { syncCalendar(context, freshT, year, month) }
+                        .onSuccess { Log.d(TAG, "syncCalendar retry success: fetched=$it") }
+                        .onFailure { e2 -> Log.e(TAG, "syncCalendar retry failed: $e2") }
+                        .getOrNull()
+                    // 성공한 새 토큰을 캐시에 저장 → 다음 동기화부터 매번 401 반복하지 않음
+                    if (result == true) {
+                        TokenManager.writeCachedToken(context, freshT)
+                        Log.d(TAG, "fresh token cached for next sync")
+                    }
+                }
+            }
+            return result == true
         }
 
         private fun readHiddenCalendars(context: Context): Set<String> {
@@ -166,13 +174,9 @@ class CalendarSyncJobService : JobService() {
             }
 
             for ((key, events) in byDay) {
-                events.sortWith(Comparator { a, b ->
-                    val aAllDay = WidgetStrings.isAllDayTime(a.time)
-                    val bAllDay = WidgetStrings.isAllDayTime(b.time)
-                    if (aAllDay && !bAllDay) return@Comparator -1
-                    if (!aAllDay && bAllDay) return@Comparator 1
-                    a.time.compareTo(b.time)
-                })
+                // 정렬 키를 Flutter updateCalendar와 동일하게 맞춘다(종일 먼저 → 실제
+                // 시작 instant → id). 두 주체의 출력이 같아야 새로고침 시 깜빡임이 없다.
+                events.sortWith(compareBy({ if (it.isAllDay) 0 else 1 }, { it.startMillis }, { it.id }))
                 val take = events.take(25)
                 edit.putString("cal_day_${key}_titles", take.joinToString("|") { it.title })
                 edit.putString("cal_day_${key}_times",  take.joinToString("|") { it.time })
@@ -184,7 +188,7 @@ class CalendarSyncJobService : JobService() {
             return true
         }
 
-        private data class EventItem(val dayKey: String, val title: String, val time: String, val id: String, val color: String)
+        private data class EventItem(val dayKey: String, val title: String, val time: String, val id: String, val color: String, val isAllDay: Boolean, val startMillis: Long)
 
         private fun fetchCalendarsCached(token: String, context: Context): List<Pair<String, String>> {
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -228,12 +232,12 @@ class CalendarSyncJobService : JobService() {
         }
 
         private fun fetchEvents(token: String, calId: String, calColor: String, year: Int, month: Int): List<EventItem> {
-            val cal = java.util.Calendar.getInstance()
-            cal.set(year, month - 1, 1)
-            val lastDay = cal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
-            val ym = "%04d-%02d".format(year, month)
-            val timeMin = "${ym}-01T00:00:00Z"
-            val timeMax = "${ym}-%02dT23:59:59Z".format(lastDay)
+            // 조회 구간을 기기 로컬 타임존 기준 월 경계로 계산해 UTC instant로 변환한다.
+            // (UTC 자정으로 잡으면 KST(+9)에서 매월 1일 0~9시 일정이 누락됨 — 앱과 동일하게 맞춤)
+            val zone = ZoneId.systemDefault()
+            val monthStart = java.time.LocalDate.of(year, month, 1).atStartOfDay(zone)
+            val timeMin = monthStart.toInstant().toString()
+            val timeMax = monthStart.plusMonths(1).minusSeconds(1).toInstant().toString()
 
             val enc = java.net.URLEncoder.encode(calId, "UTF-8")
             val urlStr = "https://www.googleapis.com/calendar/v3/calendars/${enc}/events" +
@@ -256,17 +260,23 @@ class CalendarSyncJobService : JobService() {
                 val dtStr   = start.optString("dateTime", "")
                 val dateStr = start.optString("date", "")
 
-                val (dayKey, time) = when {
+                val parsed: EventItem? = when {
                     dtStr.isNotEmpty() -> runCatching {
-                        val odt   = OffsetDateTime.parse(dtStr)
-                        val local = odt.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+                        val zdt   = OffsetDateTime.parse(dtStr).atZoneSameInstant(zone)
+                        val local = zdt.toLocalDateTime()
                         val k = "%04d%02d%02d".format(local.year, local.monthValue, local.dayOfMonth)
-                        Pair(k, "%02d:%02d".format(local.hour, local.minute))
-                    }.getOrNull() ?: continue
-                    dateStr.length >= 10 -> Pair(dateStr.replace("-", "").substring(0, 8), WidgetStrings.allDay)
-                    else -> continue
+                        EventItem(k, summary, "%02d:%02d".format(local.hour, local.minute), id, color,
+                            isAllDay = false, startMillis = zdt.toInstant().toEpochMilli())
+                    }.getOrNull()
+                    dateStr.length >= 10 -> runCatching {
+                        val d = java.time.LocalDate.parse(dateStr)
+                        val k = "%04d%02d%02d".format(d.year, d.monthValue, d.dayOfMonth)
+                        EventItem(k, summary, WidgetStrings.allDay, id, color,
+                            isAllDay = true, startMillis = d.atStartOfDay(zone).toInstant().toEpochMilli())
+                    }.getOrNull()
+                    else -> null
                 }
-                result.add(EventItem(dayKey, summary, time, id, color))
+                if (parsed != null) result.add(parsed)
             }
             return result
         }
