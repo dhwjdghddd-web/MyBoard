@@ -57,7 +57,8 @@ key.properties
 PROMPT.md
 START.md
 PLAYSTORE_READINESS_REPORT.md
-index.html
+# 루트의 개발용 index.html만 무시 (docs/index.html 공개 홈페이지는 추적)
+/index.html
 
 # Flutter generated
 .metadata
