@@ -3,7 +3,6 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:label="@string/app_name"
@@ -73,8 +72,6 @@
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE" />
                 <action android:name="com.dhwjdgh.prv_dashboard.CAL_BACK" />
                 <action android:name="com.dhwjdgh.prv_dashboard.TASK_ITEM" />
-                <action android:name="com.dhwjdgh.prv_dashboard.GMAIL_ITEM" />
-                <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_GMAIL" />
                 <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_TASKS" />
                 <action android:name="com.dhwjdgh.prv_dashboard.REFRESH_CALENDAR" />
             </intent-filter>
@@ -101,22 +98,7 @@
             android:exported="false" />
 
         <service
-            android:name=".GmailWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"
-            android:exported="false" />
-
-        <service
-            android:name=".GmailWidgetServiceCover"
-            android:permission="android.permission.BIND_REMOTEVIEWS"
-            android:exported="false" />
-
-        <service
             android:name=".CalendarSyncJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
-
-        <service
-            android:name=".GmailSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true" />
 
@@ -158,11 +140,7 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- Gmail 앱 열기 -->
+        <!-- 위젯의 Gmail 바로가기 버튼이 외부 Gmail 앱을 실행하기 위한 패키지 가시성 -->
         <package android:name="com.google.android.gm"/>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="googlegmail" />
-        </intent>
     </queries>
 </manifest>

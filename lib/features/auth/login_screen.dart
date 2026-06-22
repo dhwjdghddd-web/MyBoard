@@ -60,7 +60,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tasks · Calendar · Gmail',
+                  'Tasks · Calendar',
                   style: TextStyle(
                     fontSize: 14,
                     color: scheme.onSurfaceVariant,

@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'app.dart';
-import 'core/notification_service.dart';
 
 void main() {
   runZonedGuarded(() async {
@@ -39,7 +38,6 @@ void main() {
       return true;
     };
 
-    await NotificationService.init();
     runApp(const ProviderScope(child: GoogleDashboardApp()));
   }, (error, stack) {
     debugPrint('ZoneError: $error\n$stack');

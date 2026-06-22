@@ -1498,54 +1498,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ══════════════ Gmail 섹션 ══════════════ -->
-    <LinearLayout android:id="@+id/section_gmail"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:orientation="vertical" android:visibility="gone">
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:padding="3dp">
-            <TextView android:id="@+id/gmail_header_title"
-                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="@string/widget_gmail_title" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="@color/widget_text_primary"/>
-            <ImageView android:id="@+id/gmail_launch_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_launch" android:tint="@color/widget_text_secondary" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            <ImageView android:id="@+id/gmail_refresh_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_refresh" android:tint="@color/widget_text_secondary" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-            <ImageView android:id="@+id/gmail_compose_btn"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:src="@drawable/ic_compose" android:tint="@color/widget_text_secondary" android:padding="4dp"
-                android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
-        </LinearLayout>
-
-        <!-- Gmail 리스트뷰 -->
-        <ListView android:id="@+id/gmail_list_view"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:divider="@color/widget_divider" android:dividerHeight="1dp"
-            android:scrollbars="none"
-            android:visibility="gone" />
-
-        <TextView android:id="@+id/gmail_empty"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:text="@string/widget_gmail_empty" android:textSize="12sp" android:textColor="@color/widget_text_secondary"
-            android:gravity="center" android:visibility="gone"/>
-
-        <!-- 하단 스와이프 존: 좌우로 탭 이동 -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="12dp"
-            android:orientation="horizontal">
-            <FrameLayout android:id="@+id/swipe_prev_gmail"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
-            <FrameLayout android:id="@+id/swipe_next_gmail"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
-        </LinearLayout>
-    </LinearLayout>
-
     </FrameLayout><!-- 콘텐츠 FrameLayout 종료 -->
 
     <!-- ══════════════ 하단 캡슐형 세그먼트 탭 ══════════════ -->
@@ -1576,18 +1528,20 @@
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:text="@string/widget_tab_calendar" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="@color/widget_text_secondary" android:gravity="center" />
-
-            <TextView android:id="@+id/tab_gmail"
-                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-                android:text="Gmail" android:textSize="14sp" android:textStyle="bold"
-                android:textColor="@color/widget_text_secondary" android:gravity="center" />
         </LinearLayout>
 
-        <!-- 원형 설정 버튼 단 1개만 배치 -->
+        <!-- Gmail 앱 바로가기 -->
+        <ImageView android:id="@+id/widget_gmail_btn"
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:src="@drawable/ic_email" android:tint="@color/widget_text_secondary"
+            android:padding="6dp" android:layout_marginStart="8dp"
+            android:background="@drawable/tab_active_bg" android:focusable="true"/>
+
+        <!-- 원형 설정 버튼 -->
         <ImageView android:id="@+id/widget_settings_btn"
             android:layout_width="36dp" android:layout_height="36dp"
             android:src="@drawable/ic_settings" android:tint="@color/widget_text_secondary"
-            android:padding="6dp" android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
+            android:padding="6dp" android:layout_marginStart="6dp" android:layout_marginEnd="8dp"
             android:background="@drawable/tab_active_bg"/>
             
     </LinearLayout>

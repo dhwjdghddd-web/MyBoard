@@ -42,8 +42,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loginButton => 'Google로 로그인';
 
   @override
-  String get loginDescription =>
-      '로그인하면 Google 계정의 Tasks,\nCalendar, Gmail에 접근합니다.';
+  String get loginDescription => '로그인하면 Google 계정의 Tasks,\nCalendar에 접근합니다.';
 
   @override
   String get navTasks => '태스크';
@@ -263,86 +262,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get taskDeletedSnack => '할 일이 삭제되었습니다';
 
   @override
-  String get gmailInbox => '받은편지함';
-
-  @override
-  String get gmailStarred => '중요';
-
-  @override
-  String get gmailSent => '보낸편지함';
-
-  @override
-  String get gmailSpam => '스팸';
-
-  @override
-  String get gmailTrash => '휴지통';
-
-  @override
-  String get gmailSearchHint => '메일 검색…';
-
-  @override
-  String get composeButton => '작성';
-
-  @override
   String get noSubject => '(제목 없음)';
-
-  @override
-  String get gmailEmpty => '메일이 없어요';
-
-  @override
-  String get gmailLoadError => '메일을 불러올 수 없어요';
-
-  @override
-  String get emailTitle => '메일';
-
-  @override
-  String get emailFrom => '보낸사람';
-
-  @override
-  String get emailTo => '받는사람';
-
-  @override
-  String get emailDateHeader => '날짜';
-
-  @override
-  String get emailLoadError => '메일을 불러올 수 없어요';
-
-  @override
-  String get openInGmail => 'Gmail 앱 열기';
-
-  @override
-  String fileOpenError(String error) {
-    return '파일 열기 실패: $error';
-  }
-
-  @override
-  String get fileAlreadyDownloadedTitle => '이미 다운로드된 파일';
-
-  @override
-  String fileAlreadyDownloadedMessage(String filename) {
-    return '\"$filename\"이 이미 다운로드되어 있어요.\n다시 받을까요?';
-  }
-
-  @override
-  String get openFileButton => '바로 열기';
-
-  @override
-  String get redownloadButton => '다시 받기';
-
-  @override
-  String downloadCompleted(String filename) {
-    return '\"$filename\" 다운로드 완료';
-  }
-
-  @override
-  String downloadError(String error) {
-    return '다운로드 실패: $error';
-  }
-
-  @override
-  String attachmentCount(int count) {
-    return '첨부파일 $count개';
-  }
 
   @override
   String get themeTitle => '화면 테마';
@@ -427,7 +347,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacySection1Body =>
-      '본 앱은 Google 계정을 통해 다음 정보에 접근합니다:\n• Google Tasks: 할 일 목록 조회 및 관리\n• Google Calendar: 일정 조회 및 관리\n• Gmail: 이메일 조회, 전송, 삭제\n\n이 정보는 기기에서만 처리되며, 외부 서버로 전송되지 않습니다.';
+      '본 앱은 Google 계정을 통해 다음 정보에 접근합니다:\n• Google Tasks: 할 일 목록 조회 및 관리\n• Google Calendar: 일정 조회 및 관리\n\n이 정보는 기기에서만 처리되며, 외부 서버로 전송되지 않습니다.';
 
   @override
   String get privacySection2Title => '2. 데이터 저장';
@@ -462,20 +382,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacySection6Body => '개인정보 관련 문의: dhwjdghddd@gmail.com';
-
-  @override
-  String mailNotificationTitle(int count) {
-    return '새 메일 $count통';
-  }
-
-  @override
-  String get mailNotificationDefaultSender => '새 메일이 도착했습니다';
-
-  @override
-  String get mailChannelName => '새 메일 알림';
-
-  @override
-  String get mailChannelDesc => '새 Gmail 메일 도착 시 알림';
 
   @override
   String get errorTimeout => '연결 시간이 초과되었습니다.';

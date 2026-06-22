@@ -140,26 +140,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 prefs.edit().putBoolean("cal_show_day_panel", false).apply()
                 redraw(context)
             }
-            ACTION_REFRESH_GMAIL -> {
-                Log.d("HomeWidget", "REFRESH_GMAIL received")
-                val pendingResult = goAsync()
-                prefs.edit().putBoolean("gmail_scroll_to_top", true).apply()
-                partiallySetBtnColor(context, R.id.gmail_refresh_btn, "#FFA000")
-                GmailSyncJobService.executeSync(context) {
-                    val mgr = AppWidgetManager.getInstance(context)
-                    val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
-                    Log.d("HomeWidget", "sync done → updating ${ids.size} widget(s), gmail_count=${context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt("gmail_count", -1)}")
-                    partiallySetBtnColor(context, R.id.gmail_refresh_btn, "#4CAF50")
-                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                        partiallySetBtnColor(context, R.id.gmail_refresh_btn, "#FFFFFF")
-                    }, 1500)
-                    for (id in ids) updateWidget(context, mgr, id)
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        MainActivity.activeChannel?.invokeMethod("refreshData", null)
-                    }
-                    pendingResult.finish()
-                }
-            }
             ACTION_REFRESH_TASKS -> {
                 val pendingResult = goAsync()
                 partiallySetBtnColor(context, R.id.task_refresh_btn, "#FFA000")
@@ -254,30 +234,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     }
                 }
             }
-            ACTION_GMAIL_ITEM -> {
-                when (intent.getStringExtra("gmail_item_action")) {
-                    "delete" -> {
-                        // gmail.readonly scope: 삭제 기능 비활성화
-                    }
-                    else -> {
-                        val emailId = intent.getStringExtra("email_id") ?: ""
-                        val activityIntent = Intent(context, MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            putExtra("tab", 2)
-                            if (emailId.isNotEmpty()) putExtra("email_id", emailId)
-                        }
-                        val pendingIntent = PendingIntent.getActivity(
-                            context, 351, activityIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                        try {
-                            pendingIntent.send()
-                        } catch (e: Exception) {
-                            context.startActivity(activityIntent)
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -347,8 +303,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
         const val ACTION_CAL_NEXT_MONTH  = "com.dhwjdgh.prv_dashboard.CAL_NEXT_MONTH"
         const val ACTION_CAL_SELECT_DATE = "com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE"
         const val ACTION_CAL_BACK        = "com.dhwjdgh.prv_dashboard.CAL_BACK"
-        const val ACTION_GMAIL_ITEM      = "com.dhwjdgh.prv_dashboard.GMAIL_ITEM"
-        const val ACTION_REFRESH_GMAIL   = "com.dhwjdgh.prv_dashboard.REFRESH_GMAIL"
         const val ACTION_REFRESH_TASKS   = "com.dhwjdgh.prv_dashboard.REFRESH_TASKS"
         const val ACTION_REFRESH_CALENDAR = "com.dhwjdgh.prv_dashboard.REFRESH_CALENDAR"
 
@@ -408,21 +362,18 @@ class HomeWidgetProvider : AppWidgetProvider() {
             if (isTablet) {
                 bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true, isDark = isDark, widgetId = widgetId)
                 bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true, isDark = isDark)
-                bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover = false, isTablet = true, isDark = isDark, widgetId = widgetId)
             } else {
-                val activeTab = prefs.getInt("active_widget_tab", 0)
+                val activeTab = prefs.getInt("active_widget_tab", 0).coerceIn(0, 1)
 
                 views.setViewVisibility(R.id.section_tasks,    if (activeTab == 0) View.VISIBLE else View.GONE)
                 views.setViewVisibility(R.id.section_calendar, if (activeTab == 1) View.VISIBLE else View.GONE)
-                views.setViewVisibility(R.id.section_gmail,    if (activeTab == 2) View.VISIBLE else View.GONE)
 
                 val activeColor = if (isDark) Color.WHITE else Color.parseColor("#1F2937")
                 val inactiveColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#8C8275")
 
                 views.setTextColor(R.id.tab_tasks,    if (activeTab == 0) activeColor else inactiveColor)
                 views.setTextColor(R.id.tab_calendar, if (activeTab == 1) activeColor else inactiveColor)
-                views.setTextColor(R.id.tab_gmail,    if (activeTab == 2) activeColor else inactiveColor)
-                
+
                 if (activeTab == 0) {
                     views.setInt(R.id.tab_tasks, "setBackgroundResource", R.drawable.tab_active_bg)
                 } else {
@@ -433,27 +384,19 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 } else {
                     views.setInt(R.id.tab_calendar, "setBackgroundResource", R.drawable.tab_inactive_bg)
                 }
-                if (activeTab == 2) {
-                    views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_active_bg)
-                } else {
-                    views.setInt(R.id.tab_gmail, "setBackgroundResource", R.drawable.tab_inactive_bg)
-                }
 
                 views.setOnClickPendingIntent(R.id.tab_tasks,    switchTabIntent(context, 0))
                 views.setOnClickPendingIntent(R.id.tab_calendar, switchTabIntent(context, 1))
-                views.setOnClickPendingIntent(R.id.tab_gmail,    switchTabIntent(context, 2))
 
                 // 탭 텍스트 크기 동적 조정
                 val tabSp = if (isCover) 16f
                             else         scaledSp(widgetWidth, widgetHeight, 14f, 16f)
                 views.setTextViewTextSize(R.id.tab_tasks,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
                 views.setTextViewTextSize(R.id.tab_calendar, android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
-                views.setTextViewTextSize(R.id.tab_gmail,    android.util.TypedValue.COMPLEX_UNIT_SP, tabSp)
-                
+
                 when (activeTab) {
                     0 -> bindTasks(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false, isDark = isDark, widgetId = widgetId)
                     1 -> bindCalendar(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false, isDark = isDark)
-                    2 -> bindGmail(context, views, prefs, widgetWidth, widgetHeight, isCover, isTablet = false, isDark = isDark, widgetId = widgetId)
                 }
             }
 
@@ -469,13 +412,26 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_settings_btn, configPi)
 
+            // Gmail 앱 바로가기 — 외부 앱 실행만 하므로 OAuth 스코프가 전혀 필요 없음.
+            // Gmail 앱이 설치돼 있을 때만 버튼을 노출한다.
+            views.setInt(R.id.widget_gmail_btn, "setColorFilter", cogColor)
+            val gmailLaunch = context.packageManager.getLaunchIntentForPackage("com.google.android.gm")
+            if (gmailLaunch != null) {
+                gmailLaunch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                views.setViewVisibility(R.id.widget_gmail_btn, View.VISIBLE)
+                views.setOnClickPendingIntent(R.id.widget_gmail_btn, PendingIntent.getActivity(
+                    context, 999, gmailLaunch,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                ))
+            } else {
+                views.setViewVisibility(R.id.widget_gmail_btn, View.GONE)
+            }
+
             if (isTablet) {
                 manager.notifyAppWidgetViewDataChanged(widgetId, R.id.task_list_view)
-                manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
             } else {
                 val activeTab = prefs.getInt("active_widget_tab", 0)
                 if (activeTab == 0) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.task_list_view)
-                if (activeTab == 2) manager.notifyAppWidgetViewDataChanged(widgetId, R.id.gmail_list_view)
             }
 
             manager.updateAppWidget(widgetId, views)
@@ -994,83 +950,6 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.cal_day_empty, backIntent)
         }
 
-        // ─────────────────────────────────────────────────────────────────
-        //  Gmail 섹션
-        // ─────────────────────────────────────────────────────────────────
-        private fun bindGmail(context: Context, views: RemoteViews, prefs: android.content.SharedPreferences, widgetWidth: Int = 300, widgetHeight: Int = 300, isCover: Boolean = false, isTablet: Boolean = false, isDark: Boolean = true, widgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID) {
-            val count = try {
-                prefs.getInt("gmail_count", 0)
-            } catch (e: ClassCastException) {
-                prefs.getString("gmail_count", "0")?.toIntOrNull() ?: 0
-            }
-
-            val primaryColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
-            val secondaryColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
-            views.setTextColor(R.id.gmail_header_title, primaryColor)
-            views.setTextColor(R.id.gmail_empty, secondaryColor)
-            views.setInt(R.id.gmail_launch_btn, "setColorFilter", secondaryColor)
-            views.setInt(R.id.gmail_refresh_btn, "setColorFilter", secondaryColor)
-            views.setInt(R.id.gmail_compose_btn, "setColorFilter", secondaryColor)
-
-            if (count == 0) {
-                views.setViewVisibility(R.id.gmail_list_view, View.GONE)
-                views.setViewVisibility(R.id.gmail_empty, View.VISIBLE)
-            } else {
-                views.setViewVisibility(R.id.gmail_list_view, View.VISIBLE)
-                views.setViewVisibility(R.id.gmail_empty, View.GONE)
-
-                // Bind ListView to RemoteViewsService
-                val gmailSvcClass = if (isCover) GmailWidgetServiceCover::class.java else GmailWidgetService::class.java
-                
-                val adapterIntent = Intent(context, gmailSvcClass).apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                    data = android.net.Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
-                }
-                views.setRemoteAdapter(R.id.gmail_list_view, adapterIntent)
-
-                // Broadcast template → HomeWidgetProvider handles open/delete
-                val template = PendingIntent.getBroadcast(
-                    context, 350,
-                    Intent(context, HomeWidgetProvider::class.java).apply {
-                        action = ACTION_GMAIL_ITEM
-                    },
-                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-                views.setPendingIntentTemplate(R.id.gmail_list_view, template)
-
-                // 상단 스크롤 플래그 확인 및 스크롤 처리
-                val scrollToTop = prefs.getBoolean("gmail_scroll_to_top", false)
-                if (scrollToTop) {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                        views.setScrollPosition(R.id.gmail_list_view, 0)
-                    }
-                    prefs.edit().putBoolean("gmail_scroll_to_top", false).apply()
-                }
-            }
-
-            val headerSp = if (isCover) 20f
-                           else if (isTablet) 12f
-                           else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
-            views.setTextViewTextSize(R.id.gmail_header_title, android.util.TypedValue.COMPLEX_UNIT_SP, headerSp)
-
-
-            // 앱 실행 숏컷 버튼
-            views.setOnClickPendingIntent(R.id.gmail_launch_btn, openAppIntent(context, 2))
-            // 새로고침 버튼 → GmailSyncJobService 스케줄
-            views.setOnClickPendingIntent(R.id.gmail_refresh_btn, PendingIntent.getBroadcast(
-                context, 460,
-                Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_REFRESH_GMAIL },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            ))
-            // compose 버튼 → 앱의 Gmail 작성 화면
-            views.setOnClickPendingIntent(R.id.gmail_compose_btn, openAppWithActionIntent(context, "compose_email"))
-            if (!isTablet) {
-                // 하단 스와이프 존: 탭 이동
-                views.setOnClickPendingIntent(R.id.swipe_prev_gmail, switchTabIntent(context, 1))
-                views.setOnClickPendingIntent(R.id.swipe_next_gmail, switchTabIntent(context, 0))
-            }
-        }
-
         // 가로(클수록 큰 글씨) × 세로(짧을수록 작은 글씨) 두 제약 중 작은 쪽을 따름
         // DisplayManager로 폴더블 기기 여부 확인
         // 폴더블이면 커버/홈 구분 로직 활성화, 단일 디스플레이 기기는 항상 false
@@ -1176,36 +1055,9 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-        private fun deleteGmailItemLocal(
-            context: Context,
-            prefs: android.content.SharedPreferences,
-            idx: Int
-        ) {
-            val count = try { prefs.getInt("gmail_count", 0) }
-                        catch (e: ClassCastException) { prefs.getString("gmail_count","0")?.toIntOrNull() ?: 0 }
-            if (idx < 0 || idx >= count) return
-
-            val edit = prefs.edit()
-            for (i in idx until count - 1) {
-                edit.putString("gmail_${i}_sender",  prefs.getString("gmail_${i+1}_sender",  ""))
-                edit.putString("gmail_${i}_time",    prefs.getString("gmail_${i+1}_time",    ""))
-                edit.putString("gmail_${i}_subject", prefs.getString("gmail_${i+1}_subject", ""))
-                edit.putString("gmail_${i}_unread",  prefs.getString("gmail_${i+1}_unread",  "false"))
-                edit.putString("gmail_${i}_id",      prefs.getString("gmail_${i+1}_id",      ""))
-            }
-            val last = count - 1
-            edit.putString("gmail_${last}_sender",  "")
-            edit.putString("gmail_${last}_time",    "")
-            edit.putString("gmail_${last}_subject", "")
-            edit.putString("gmail_${last}_unread",  "false")
-            edit.putString("gmail_${last}_id",      "")
-            edit.putInt("gmail_count", last)
-            edit.apply()
-        }
-
         private fun openAppWithActionIntent(context: Context, action: String): PendingIntent =
             PendingIntent.getActivity(
-                context, when (action) { "create_task" -> 500; "create_event" -> 501; "compose_email" -> 503; else -> 502 },
+                context, when (action) { "create_task" -> 500; "create_event" -> 501; else -> 502 },
                 Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("action", action)

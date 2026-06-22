@@ -13,7 +13,7 @@
 
   "loginError": "로그인 실패. 다시 시도해주세요.",
   "loginButton": "Google로 로그인",
-  "loginDescription": "로그인하면 Google 계정의 Tasks,\nCalendar, Gmail에 접근합니다.",
+  "loginDescription": "로그인하면 Google 계정의 Tasks,\nCalendar에 접근합니다.",
 
   "navTasks": "태스크",
   "navCalendar": "캘린더",
@@ -135,46 +135,7 @@
   },
   "taskDeletedSnack": "할 일이 삭제되었습니다",
 
-  "gmailInbox": "받은편지함",
-  "gmailStarred": "중요",
-  "gmailSent": "보낸편지함",
-  "gmailSpam": "스팸",
-  "gmailTrash": "휴지통",
-  "gmailSearchHint": "메일 검색…",
-  "composeButton": "작성",
   "noSubject": "(제목 없음)",
-  "gmailEmpty": "메일이 없어요",
-  "gmailLoadError": "메일을 불러올 수 없어요",
-
-  "emailTitle": "메일",
-  "emailFrom": "보낸사람",
-  "emailTo": "받는사람",
-  "emailDateHeader": "날짜",
-  "emailLoadError": "메일을 불러올 수 없어요",
-  "openInGmail": "Gmail 앱 열기",
-  "fileOpenError": "파일 열기 실패: {error}",
-  "@fileOpenError": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-  "fileAlreadyDownloadedTitle": "이미 다운로드된 파일",
-  "fileAlreadyDownloadedMessage": "\"{filename}\"이 이미 다운로드되어 있어요.\n다시 받을까요?",
-  "@fileAlreadyDownloadedMessage": {
-    "placeholders": { "filename": { "type": "String" } }
-  },
-  "openFileButton": "바로 열기",
-  "redownloadButton": "다시 받기",
-  "downloadCompleted": "\"{filename}\" 다운로드 완료",
-  "@downloadCompleted": {
-    "placeholders": { "filename": { "type": "String" } }
-  },
-  "downloadError": "다운로드 실패: {error}",
-  "@downloadError": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-  "attachmentCount": "첨부파일 {count}개",
-  "@attachmentCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
 
   "themeTitle": "화면 테마",
   "darkMode": "다크 모드",
@@ -206,7 +167,7 @@
   "privacyPolicyTitle": "마이보드 개인정보 처리방침",
   "privacyPolicyLastModified": "최종 수정일: 2026년 6월 12일",
   "privacySection1Title": "1. 수집하는 정보",
-  "privacySection1Body": "본 앱은 Google 계정을 통해 다음 정보에 접근합니다:\n• Google Tasks: 할 일 목록 조회 및 관리\n• Google Calendar: 일정 조회 및 관리\n• Gmail: 이메일 조회, 전송, 삭제\n\n이 정보는 기기에서만 처리되며, 외부 서버로 전송되지 않습니다.",
+  "privacySection1Body": "본 앱은 Google 계정을 통해 다음 정보에 접근합니다:\n• Google Tasks: 할 일 목록 조회 및 관리\n• Google Calendar: 일정 조회 및 관리\n\n이 정보는 기기에서만 처리되며, 외부 서버로 전송되지 않습니다.",
   "privacySection2Title": "2. 데이터 저장",
   "privacySection2Body": "• 인증 토큰: 기기의 암호화된 저장소(EncryptedSharedPreferences)에 저장\n• 위젯 데이터: 기기의 SharedPreferences에 캐시\n• 모든 데이터는 기기에만 저장되며 외부로 전송되지 않습니다.",
   "privacySection3Title": "3. 데이터 삭제",
@@ -217,14 +178,6 @@
   "privacySection5Body": "본 앱의 Google 사용자 데이터 사용 및 전송은 Google API Services User Data Policy(제한적 사용 요건 포함)를 준수합니다.",
   "privacySection6Title": "6. 문의",
   "privacySection6Body": "개인정보 관련 문의: dhwjdghddd@gmail.com",
-
-  "mailNotificationTitle": "새 메일 {count}통",
-  "@mailNotificationTitle": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "mailNotificationDefaultSender": "새 메일이 도착했습니다",
-  "mailChannelName": "새 메일 알림",
-  "mailChannelDesc": "새 Gmail 메일 도착 시 알림",
 
   "errorTimeout": "연결 시간이 초과되었습니다.",
   "errorNetwork": "네트워크에 연결할 수 없습니다.",

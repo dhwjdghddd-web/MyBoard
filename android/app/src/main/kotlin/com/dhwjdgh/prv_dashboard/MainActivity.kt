@@ -26,7 +26,6 @@ class MainActivity : FlutterActivity() {
         methodChannel!!.setMethodCallHandler { call, result ->
             when (call.method) {
                 "getInitialTab"     -> result.success(intent?.getIntExtra("tab", -1) ?: -1)
-                "getInitialEmailId" -> result.success(intent?.getStringExtra("email_id") ?: "")
                 "getInitialAction"  -> result.success(intent?.getStringExtra("action") ?: "")
                 "getInitialEventId" -> result.success(intent?.getStringExtra("event_id") ?: "")
                 "getInitialDateKey" -> result.success(intent?.getStringExtra("date_key") ?: "")
@@ -94,16 +93,6 @@ class MainActivity : FlutterActivity() {
                 "findExistingDownload" -> {
                     val filename = call.arguments as String
                     result.success(findExistingDownload(filename))
-                }
-                "launchGmail" -> {
-                    val launch = packageManager.getLaunchIntentForPackage("com.google.android.gm")
-                    if (launch != null) {
-                        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(launch)
-                        result.success(true)
-                    } else {
-                        result.success(false)
-                    }
                 }
                 else -> result.notImplemented()
             }
@@ -217,23 +206,18 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun processIntentAction(intent: Intent) {
-        val emailId = intent.getStringExtra("email_id") ?: ""
         val eventId = intent.getStringExtra("event_id") ?: ""
         val dateKey = intent.getStringExtra("date_key") ?: ""
         val action  = intent.getStringExtra("action") ?: ""
         val tab     = intent.getIntExtra("tab", -1)
 
         when {
-            emailId.isNotEmpty() ->
-                methodChannel?.invokeMethod("openEmail", emailId)
             action == "create_event" ->
                 methodChannel?.invokeMethod("openCreateEvent", dateKey.ifEmpty { null })
             dateKey.isNotEmpty() ->
                 methodChannel?.invokeMethod("openCalendarDate", mapOf("eventId" to eventId, "dateKey" to dateKey))
             action == "create_task" ->
                 methodChannel?.invokeMethod("openCreateTask", null)
-            action == "compose_email" ->
-                methodChannel?.invokeMethod("openComposeEmail", null)
             tab >= 0 ->
                 methodChannel?.invokeMethod("switchTab", tab)
         }

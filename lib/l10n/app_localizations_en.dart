@@ -43,7 +43,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginDescription =>
-      'Sign in to access your Google\nTasks, Calendar, and Gmail.';
+      'Sign in to access your Google\nTasks and Calendar.';
 
   @override
   String get navTasks => 'Tasks';
@@ -263,86 +263,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taskDeletedSnack => 'Task deleted';
 
   @override
-  String get gmailInbox => 'Inbox';
-
-  @override
-  String get gmailStarred => 'Starred';
-
-  @override
-  String get gmailSent => 'Sent';
-
-  @override
-  String get gmailSpam => 'Spam';
-
-  @override
-  String get gmailTrash => 'Trash';
-
-  @override
-  String get gmailSearchHint => 'Search mail…';
-
-  @override
-  String get composeButton => 'Compose';
-
-  @override
   String get noSubject => '(No subject)';
-
-  @override
-  String get gmailEmpty => 'No mail';
-
-  @override
-  String get gmailLoadError => 'Could not load mail';
-
-  @override
-  String get emailTitle => 'Mail';
-
-  @override
-  String get emailFrom => 'From';
-
-  @override
-  String get emailTo => 'To';
-
-  @override
-  String get emailDateHeader => 'Date';
-
-  @override
-  String get emailLoadError => 'Could not load email';
-
-  @override
-  String get openInGmail => 'Open in Gmail';
-
-  @override
-  String fileOpenError(String error) {
-    return 'Failed to open file: $error';
-  }
-
-  @override
-  String get fileAlreadyDownloadedTitle => 'File Already Downloaded';
-
-  @override
-  String fileAlreadyDownloadedMessage(String filename) {
-    return '\"$filename\" is already downloaded.\nDownload again?';
-  }
-
-  @override
-  String get openFileButton => 'Open Now';
-
-  @override
-  String get redownloadButton => 'Re-download';
-
-  @override
-  String downloadCompleted(String filename) {
-    return '\"$filename\" downloaded';
-  }
-
-  @override
-  String downloadError(String error) {
-    return 'Download failed: $error';
-  }
-
-  @override
-  String attachmentCount(int count) {
-    return '$count attachment(s)';
-  }
 
   @override
   String get themeTitle => 'Display Theme';
@@ -428,7 +349,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacySection1Body =>
-      'This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n• Gmail: View, send, and delete emails\n\nThis information is processed only on your device and is not sent to external servers.';
+      'This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n\nThis information is processed only on your device and is not sent to external servers.';
 
   @override
   String get privacySection2Title => '2. Data Storage';
@@ -463,20 +384,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacySection6Body => 'Privacy inquiries: dhwjdghddd@gmail.com';
-
-  @override
-  String mailNotificationTitle(int count) {
-    return '$count new emails';
-  }
-
-  @override
-  String get mailNotificationDefaultSender => 'New mail arrived';
-
-  @override
-  String get mailChannelName => 'New mail';
-
-  @override
-  String get mailChannelDesc => 'Notifies when new Gmail arrives';
 
   @override
   String get errorTimeout => 'Connection timed out.';

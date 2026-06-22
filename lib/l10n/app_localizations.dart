@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginDescription.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to access your Google\nTasks, Calendar, and Gmail.'**
+  /// **'Sign in to access your Google\nTasks and Calendar.'**
   String get loginDescription;
 
   /// No description provided for @navTasks.
@@ -554,149 +554,11 @@ abstract class AppLocalizations {
   /// **'Task deleted'**
   String get taskDeletedSnack;
 
-  /// No description provided for @gmailInbox.
-  ///
-  /// In en, this message translates to:
-  /// **'Inbox'**
-  String get gmailInbox;
-
-  /// No description provided for @gmailStarred.
-  ///
-  /// In en, this message translates to:
-  /// **'Starred'**
-  String get gmailStarred;
-
-  /// No description provided for @gmailSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Sent'**
-  String get gmailSent;
-
-  /// No description provided for @gmailSpam.
-  ///
-  /// In en, this message translates to:
-  /// **'Spam'**
-  String get gmailSpam;
-
-  /// No description provided for @gmailTrash.
-  ///
-  /// In en, this message translates to:
-  /// **'Trash'**
-  String get gmailTrash;
-
-  /// No description provided for @gmailSearchHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search mail…'**
-  String get gmailSearchHint;
-
-  /// No description provided for @composeButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Compose'**
-  String get composeButton;
-
   /// No description provided for @noSubject.
   ///
   /// In en, this message translates to:
   /// **'(No subject)'**
   String get noSubject;
-
-  /// No description provided for @gmailEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No mail'**
-  String get gmailEmpty;
-
-  /// No description provided for @gmailLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load mail'**
-  String get gmailLoadError;
-
-  /// No description provided for @emailTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Mail'**
-  String get emailTitle;
-
-  /// No description provided for @emailFrom.
-  ///
-  /// In en, this message translates to:
-  /// **'From'**
-  String get emailFrom;
-
-  /// No description provided for @emailTo.
-  ///
-  /// In en, this message translates to:
-  /// **'To'**
-  String get emailTo;
-
-  /// No description provided for @emailDateHeader.
-  ///
-  /// In en, this message translates to:
-  /// **'Date'**
-  String get emailDateHeader;
-
-  /// No description provided for @emailLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load email'**
-  String get emailLoadError;
-
-  /// No description provided for @openInGmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Open in Gmail'**
-  String get openInGmail;
-
-  /// No description provided for @fileOpenError.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to open file: {error}'**
-  String fileOpenError(String error);
-
-  /// No description provided for @fileAlreadyDownloadedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'File Already Downloaded'**
-  String get fileAlreadyDownloadedTitle;
-
-  /// No description provided for @fileAlreadyDownloadedMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'\"{filename}\" is already downloaded.\nDownload again?'**
-  String fileAlreadyDownloadedMessage(String filename);
-
-  /// No description provided for @openFileButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Open Now'**
-  String get openFileButton;
-
-  /// No description provided for @redownloadButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Re-download'**
-  String get redownloadButton;
-
-  /// No description provided for @downloadCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'\"{filename}\" downloaded'**
-  String downloadCompleted(String filename);
-
-  /// No description provided for @downloadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Download failed: {error}'**
-  String downloadError(String error);
-
-  /// No description provided for @attachmentCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} attachment(s)'**
-  String attachmentCount(int count);
 
   /// No description provided for @themeTitle.
   ///
@@ -857,7 +719,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacySection1Body.
   ///
   /// In en, this message translates to:
-  /// **'This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n• Gmail: View, send, and delete emails\n\nThis information is processed only on your device and is not sent to external servers.'**
+  /// **'This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n\nThis information is processed only on your device and is not sent to external servers.'**
   String get privacySection1Body;
 
   /// No description provided for @privacySection2Title.
@@ -919,30 +781,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy inquiries: dhwjdghddd@gmail.com'**
   String get privacySection6Body;
-
-  /// No description provided for @mailNotificationTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} new emails'**
-  String mailNotificationTitle(int count);
-
-  /// No description provided for @mailNotificationDefaultSender.
-  ///
-  /// In en, this message translates to:
-  /// **'New mail arrived'**
-  String get mailNotificationDefaultSender;
-
-  /// No description provided for @mailChannelName.
-  ///
-  /// In en, this message translates to:
-  /// **'New mail'**
-  String get mailChannelName;
-
-  /// No description provided for @mailChannelDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifies when new Gmail arrives'**
-  String get mailChannelDesc;
 
   /// No description provided for @errorTimeout.
   ///

@@ -13,7 +13,7 @@
 
   "loginError": "Login failed. Please try again.",
   "loginButton": "Sign in with Google",
-  "loginDescription": "Sign in to access your Google\nTasks, Calendar, and Gmail.",
+  "loginDescription": "Sign in to access your Google\nTasks and Calendar.",
 
   "navTasks": "Tasks",
   "navCalendar": "Calendar",
@@ -135,46 +135,7 @@
   },
   "taskDeletedSnack": "Task deleted",
 
-  "gmailInbox": "Inbox",
-  "gmailStarred": "Starred",
-  "gmailSent": "Sent",
-  "gmailSpam": "Spam",
-  "gmailTrash": "Trash",
-  "gmailSearchHint": "Search mail…",
-  "composeButton": "Compose",
   "noSubject": "(No subject)",
-  "gmailEmpty": "No mail",
-  "gmailLoadError": "Could not load mail",
-
-  "emailTitle": "Mail",
-  "emailFrom": "From",
-  "emailTo": "To",
-  "emailDateHeader": "Date",
-  "emailLoadError": "Could not load email",
-  "openInGmail": "Open in Gmail",
-  "fileOpenError": "Failed to open file: {error}",
-  "@fileOpenError": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-  "fileAlreadyDownloadedTitle": "File Already Downloaded",
-  "fileAlreadyDownloadedMessage": "\"{filename}\" is already downloaded.\nDownload again?",
-  "@fileAlreadyDownloadedMessage": {
-    "placeholders": { "filename": { "type": "String" } }
-  },
-  "openFileButton": "Open Now",
-  "redownloadButton": "Re-download",
-  "downloadCompleted": "\"{filename}\" downloaded",
-  "@downloadCompleted": {
-    "placeholders": { "filename": { "type": "String" } }
-  },
-  "downloadError": "Download failed: {error}",
-  "@downloadError": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-  "attachmentCount": "{count} attachment(s)",
-  "@attachmentCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
 
   "themeTitle": "Display Theme",
   "darkMode": "Dark mode",
@@ -206,7 +167,7 @@
   "privacyPolicyTitle": "MyBoard Privacy Policy",
   "privacyPolicyLastModified": "Last Modified: June 12, 2026",
   "privacySection1Title": "1. Information We Collect",
-  "privacySection1Body": "This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n• Gmail: View, send, and delete emails\n\nThis information is processed only on your device and is not sent to external servers.",
+  "privacySection1Body": "This app accesses the following information through your Google account:\n• Google Tasks: View and manage to-do lists\n• Google Calendar: View and manage events\n\nThis information is processed only on your device and is not sent to external servers.",
   "privacySection2Title": "2. Data Storage",
   "privacySection2Body": "• Authentication tokens: Stored in the device's encrypted storage (EncryptedSharedPreferences)\n• Widget data: Cached in the device's SharedPreferences\n• All data is stored only on the device and is not transmitted externally.",
   "privacySection3Title": "3. Data Deletion",
@@ -217,14 +178,6 @@
   "privacySection5Body": "The use and transfer of Google user data by this app complies with the Google API Services User Data Policy (including the Limited Use requirements).",
   "privacySection6Title": "6. Contact",
   "privacySection6Body": "Privacy inquiries: dhwjdghddd@gmail.com",
-
-  "mailNotificationTitle": "{count} new emails",
-  "@mailNotificationTitle": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "mailNotificationDefaultSender": "New mail arrived",
-  "mailChannelName": "New mail",
-  "mailChannelDesc": "Notifies when new Gmail arrives",
 
   "errorTimeout": "Connection timed out.",
   "errorNetwork": "Cannot connect to the network.",

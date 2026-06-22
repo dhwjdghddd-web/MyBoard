@@ -18,10 +18,6 @@
     <string name="widget_dow_sat">토</string>
     <string name="widget_cal_day_empty">이 날 일정이 없어요</string>
 
-    <!-- Widget: Gmail section -->
-    <string name="widget_gmail_title">받은편지함</string>
-    <string name="widget_gmail_empty">새 메일 없음</string>
-
     <!-- Widget: Tab labels -->
     <string name="widget_tab_tasks">할 일</string>
     <string name="widget_tab_calendar">캘린더</string>

@@ -3,7 +3,6 @@ import 'package:home_widget/home_widget.dart';
 import 'l10n_helper.dart';
 import '../features/tasks/task_service.dart';
 import '../features/calendar/calendar_service.dart';
-import '../features/gmail/gmail_service.dart';
 
 class WidgetService {
   // 위젯 프로바이더의 정규화된 클래스명. 코틀린 네임스페이스(namespace)는
@@ -140,48 +139,6 @@ class WidgetService {
     }
   }
 
-  static Future<void> updateGmail(List<GmailMessage> messages) async {
-    try {
-      final noSubject = appL10n().noSubject;
-      final sorted = List<GmailMessage>.from(messages);
-      sorted.sort((a, b) {
-        final valA = int.tryParse(a.internalDate) ?? 0;
-        final valB = int.tryParse(b.internalDate) ?? 0;
-        return valB.compareTo(valA);
-      });
-
-      final unread = sorted.where((m) => m.isUnread).length;
-      final gmailCount = sorted.length < 25 ? sorted.length : 25;
-      final gmailFutures = <Future>[
-        HomeWidget.saveWidgetData<String>('gmail_unread', '$unread'),
-        HomeWidget.saveWidgetData<int>('gmail_count', gmailCount),
-      ];
-      for (var i = 0; i < 25; i++) {
-        if (i < sorted.length) {
-          final m = sorted[i];
-          final sender = m.displayName.isNotEmpty ? m.displayName : m.from;
-          final timeStr = formatEmailDate(m.date, isEnglish: isEnglishLocale());
-          final subjectLine = m.subject.isNotEmpty ? m.subject : noSubject;
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  sender));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time',    timeStr));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', subjectLine));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread',  m.isUnread ? 'true' : 'false'));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id',      m.id));
-        } else {
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender',  ''));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time',    ''));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', ''));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread',  'false'));
-          gmailFutures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id',      ''));
-        }
-      }
-      await Future.wait(gmailFutures);
-      await HomeWidget.updateWidget(qualifiedAndroidName: _providerClass);
-    } catch (e, st) {
-      debugPrint('WidgetService.updateGmail error: $e\n$st');
-    }
-  }
-
   static Future<void> clearAllData() async {
     try {
       final now = DateTime.now();
@@ -194,16 +151,6 @@ class WidgetService {
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_id', ''));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_done', 'false'));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_due', ''));
-      }
-
-      // Gmail
-      futures.add(HomeWidget.saveWidgetData<int>('gmail_count', 0));
-      for (var i = 0; i < 25; i++) {
-        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_sender', ''));
-        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_time', ''));
-        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_subject', ''));
-        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_unread', 'false'));
-        futures.add(HomeWidget.saveWidgetData<String>('gmail_${i}_id', ''));
       }
 
       // 캘린더 — updateCalendar와 동일 범위로 정리

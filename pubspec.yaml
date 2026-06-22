@@ -1,5 +1,5 @@
 name: google_dashboard
-description: "Google Tasks + Calendar + Gmail unified Android app."
+description: "Google Tasks + Calendar unified Android app."
 publish_to: 'none'
 
 # The following defines the version and build number for your application.
@@ -14,7 +14,7 @@ publish_to: 'none'
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.10+16
+version: 1.0.11+17
 
 environment:
   sdk: ^3.12.1
@@ -53,14 +53,6 @@ dependencies:
   # 토큰 저장
   flutter_secure_storage: ^9.2.4
 
-  # 메일 본문 렌더링
-  webview_flutter: ^4.10.0
-
-  # 로컬 알림
-  flutter_local_notifications: ^18.0.1
-
-  # Gmail 앱 열기
-  url_launcher: ^6.3.1
   firebase_core: ^4.10.0
   firebase_crashlytics: ^5.2.3
 
