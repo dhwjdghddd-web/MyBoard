@@ -20,13 +20,21 @@
 
     <TextView
         android:id="@+id/task_item_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="16sp"
         android:textColor="#FFFFFF"
         android:maxLines="1"
         android:ellipsize="end"
         android:paddingStart="8dp"
         android:paddingEnd="12dp"/>
+
+    <ImageView
+        android:id="@+id/task_item_delete"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="6dp"
+        android:src="@drawable/ic_delete"/>
 
 </LinearLayout>

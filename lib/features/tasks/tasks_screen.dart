@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_client.dart';
 import '../../core/snackbar_helper.dart';
 import '../../l10n/app_localizations.dart';
@@ -7,11 +8,34 @@ import 'add_task_sheet.dart';
 import 'task_service.dart';
 import '../settings/widget_settings_screen.dart';
 
-class TasksScreen extends ConsumerWidget {
+class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TasksScreen> createState() => _TasksScreenState();
+}
+
+class _TasksScreenState extends ConsumerState<TasksScreen> {
+  static const _prefKey = 'tasks_show_completed';
+  bool _showCompleted = true;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      final v = prefs.getBool(_prefKey) ?? true;
+      if (mounted && v != _showCompleted) setState(() => _showCompleted = v);
+    });
+  }
+
+  Future<void> _toggleShowCompleted() async {
+    setState(() => _showCompleted = !_showCompleted);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_prefKey, _showCompleted);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final tasksAsync = ref.watch(taskServiceProvider);
     final l = AppLocalizations.of(context)!;
 
@@ -19,6 +43,13 @@ class TasksScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l.navTasks),
         actions: [
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            icon: Icon(_showCompleted ? Icons.visibility : Icons.visibility_off),
+            tooltip: _showCompleted ? l.tasksHideCompleted : l.tasksShowCompleted,
+            onPressed: _toggleShowCompleted,
+          ),
           IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
@@ -41,7 +72,7 @@ class TasksScreen extends ConsumerWidget {
           message: apiErrorMessage(e),
           onRetry: () => ref.read(taskServiceProvider.notifier).loadTasks(),
         ),
-        data: (tasks) => _TaskListView(tasks: tasks),
+        data: (tasks) => _TaskListView(tasks: tasks, showCompleted: _showCompleted),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showModalBottomSheet(
@@ -61,8 +92,9 @@ class TasksScreen extends ConsumerWidget {
 // ── 목록 ──────────────────────────────────────────────────────────────────
 
 class _TaskListView extends ConsumerWidget {
-  const _TaskListView({required this.tasks});
+  const _TaskListView({required this.tasks, required this.showCompleted});
   final List<Task> tasks;
+  final bool showCompleted;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,7 +114,7 @@ class _TaskListView extends ConsumerWidget {
           for (final task in active)
             _TaskItem(task: task),
 
-          if (done.isNotEmpty) ...[
+          if (showCompleted && done.isNotEmpty) ...[
             _SectionHeader(l.taskCompletedSection(done.length)),
             for (final task in done)
               _TaskItem(task: task),

@@ -111,7 +111,21 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String calendarMonthRemainingHeader(int year, int month, int count) {
+    return '$year년 $month월 남은 일정 ($count)';
+  }
+
+  @override
   String get calendarEmpty => '이번 달 일정이 없어요';
+
+  @override
+  String get calendarNoRemaining => '이번 달 남은 일정이 없어요';
+
+  @override
+  String get tasksShowCompleted => '완료된 할 일 표시';
+
+  @override
+  String get tasksHideCompleted => '완료된 할 일 숨기기';
 
   @override
   String get allDay => '종일';

@@ -68,6 +68,7 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
 
         views.setTextColor(R.id.task_item_title, if (item.done) doneTextColor else activeTextColor)
         views.setTextColor(R.id.task_item_check, if (item.done) doneTextColor else checkColor)
+        views.setInt(R.id.task_item_delete, "setColorFilter", doneTextColor)
 
         val completeIntent = Intent().apply {
             putExtra("task_item_action", "complete")
@@ -75,6 +76,13 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
             putExtra("task_index", item.prefsIndex)
         }
         views.setOnClickFillInIntent(R.id.task_item_check, completeIntent)
+
+        val deleteIntent = Intent().apply {
+            putExtra("task_item_action", "delete")
+            putExtra("task_id", item.id)
+            putExtra("task_index", item.prefsIndex)
+        }
+        views.setOnClickFillInIntent(R.id.task_item_delete, deleteIntent)
 
         val openIntent = Intent().apply {
             putExtra("task_item_action", "open")
@@ -88,11 +96,13 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         tasksList.clear()
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val count = prefs.getString("task_count", "0")?.toIntOrNull() ?: 0
+        // widget_show_completed 가 켜져 있으면 완료된 할 일도 함께 표시한다.
+        val showCompleted = prefs.getBoolean("widget_show_completed", false)
         for (i in 0 until count) {
             val title = prefs.getString("task_$i", "") ?: ""
             val id = prefs.getString("task_${i}_id", "") ?: ""
             val done = prefs.getString("task_${i}_done", "false") == "true"
-            if (title.isNotEmpty() && !done) {
+            if (title.isNotEmpty() && (showCompleted || !done)) {
                 tasksList.add(TaskItem(title, id, done, i))
             }
         }

@@ -278,11 +278,35 @@ abstract class AppLocalizations {
   /// **'{year}/{month} events ({count})'**
   String calendarMonthItemsHeader(int year, int month, int count);
 
+  /// No description provided for @calendarMonthRemainingHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'{year}/{month} remaining ({count})'**
+  String calendarMonthRemainingHeader(int year, int month, int count);
+
   /// No description provided for @calendarEmpty.
   ///
   /// In en, this message translates to:
   /// **'No events this month'**
   String get calendarEmpty;
+
+  /// No description provided for @calendarNoRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'No remaining events this month'**
+  String get calendarNoRemaining;
+
+  /// No description provided for @tasksShowCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Show completed tasks'**
+  String get tasksShowCompleted;
+
+  /// No description provided for @tasksHideCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide completed tasks'**
+  String get tasksHideCompleted;
 
   /// No description provided for @allDay.
   ///

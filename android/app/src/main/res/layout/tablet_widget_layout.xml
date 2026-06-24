@@ -2921,6 +2921,10 @@
                             android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                             android:text="@string/widget_tasks_title" android:textSize="16sp" android:textStyle="bold"
                             android:textColor="@color/widget_text_primary"/>
+                        <ImageView android:id="@+id/task_toggle_done_btn"
+                            android:layout_width="36dp" android:layout_height="36dp"
+                            android:src="@drawable/ic_visibility" android:tint="@color/widget_text_secondary" android:padding="6dp"
+                            android:background="@drawable/widget_icon_ripple" android:focusable="true"/>
                         <ImageView android:id="@+id/task_launch_btn"
                             android:layout_width="36dp" android:layout_height="36dp"
                             android:src="@drawable/ic_launch" android:tint="@color/widget_text_secondary" android:padding="6dp"

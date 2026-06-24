@@ -112,7 +112,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String calendarMonthRemainingHeader(int year, int month, int count) {
+    return '$year/$month remaining ($count)';
+  }
+
+  @override
   String get calendarEmpty => 'No events this month';
+
+  @override
+  String get calendarNoRemaining => 'No remaining events this month';
+
+  @override
+  String get tasksShowCompleted => 'Show completed tasks';
+
+  @override
+  String get tasksHideCompleted => 'Hide completed tasks';
 
   @override
   String get allDay => 'All day';

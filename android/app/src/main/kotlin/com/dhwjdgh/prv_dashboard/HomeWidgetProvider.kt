@@ -157,6 +157,15 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     pendingResult.finish()
                 }
             }
+            ACTION_TOGGLE_DONE_TASKS -> {
+                // 위젯 완료 할 일 표시 토글: pref 뒤집고 리스트 어댑터 재로드 + 위젯 갱신
+                val cur = prefs.getBoolean("widget_show_completed", false)
+                prefs.edit().putBoolean("widget_show_completed", !cur).apply()
+                val mgr = AppWidgetManager.getInstance(context)
+                val ids = mgr.getAppWidgetIds(ComponentName(context, HomeWidgetProvider::class.java))
+                ids.forEach { mgr.notifyAppWidgetViewDataChanged(it, R.id.task_list_view) }
+                redraw(context)
+            }
             ACTION_REFRESH_CALENDAR -> {
                 val y = prefs.getInt("cal_display_year",  now().get(java.util.Calendar.YEAR))
                 val m = prefs.getInt("cal_display_month", now().get(java.util.Calendar.MONTH) + 1)
@@ -303,6 +312,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
         const val ACTION_CAL_SELECT_DATE = "com.dhwjdgh.prv_dashboard.CAL_SELECT_DATE"
         const val ACTION_CAL_BACK        = "com.dhwjdgh.prv_dashboard.CAL_BACK"
         const val ACTION_REFRESH_TASKS   = "com.dhwjdgh.prv_dashboard.REFRESH_TASKS"
+        const val ACTION_TOGGLE_DONE_TASKS = "com.dhwjdgh.prv_dashboard.TOGGLE_DONE_TASKS"
         const val ACTION_REFRESH_CALENDAR = "com.dhwjdgh.prv_dashboard.REFRESH_CALENDAR"
 
         private val CELL_IDS = arrayOf(
@@ -485,6 +495,16 @@ class HomeWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.task_refresh_btn, PendingIntent.getBroadcast(
                 context, 150,
                 Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_REFRESH_TASKS },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ))
+
+            // 완료 할 일 표시 토글 버튼: 켜져 있으면 강조색, 꺼져 있으면 보조색
+            val showCompleted = prefs.getBoolean("widget_show_completed", false)
+            views.setInt(R.id.task_toggle_done_btn, "setColorFilter",
+                if (showCompleted) Color.parseColor("#4285F4") else secondaryColor)
+            views.setOnClickPendingIntent(R.id.task_toggle_done_btn, PendingIntent.getBroadcast(
+                context, 151,
+                Intent(context, HomeWidgetProvider::class.java).apply { action = ACTION_TOGGLE_DONE_TASKS },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
         }

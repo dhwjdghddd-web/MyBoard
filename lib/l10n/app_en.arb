@@ -62,7 +62,18 @@
       "count": { "type": "int" }
     }
   },
+  "calendarMonthRemainingHeader": "{year}/{month} remaining ({count})",
+  "@calendarMonthRemainingHeader": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "count": { "type": "int" }
+    }
+  },
   "calendarEmpty": "No events this month",
+  "calendarNoRemaining": "No remaining events this month",
+  "tasksShowCompleted": "Show completed tasks",
+  "tasksHideCompleted": "Hide completed tasks",
   "allDay": "All day",
   "taskDue": "Due",
   "weekdaySun": "Sun",

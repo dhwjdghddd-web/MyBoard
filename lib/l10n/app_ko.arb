@@ -62,7 +62,18 @@
       "count": { "type": "int" }
     }
   },
+  "calendarMonthRemainingHeader": "{year}년 {month}월 남은 일정 ({count})",
+  "@calendarMonthRemainingHeader": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "count": { "type": "int" }
+    }
+  },
   "calendarEmpty": "이번 달 일정이 없어요",
+  "calendarNoRemaining": "이번 달 남은 일정이 없어요",
+  "tasksShowCompleted": "완료된 할 일 표시",
+  "tasksHideCompleted": "완료된 할 일 숨기기",
   "allDay": "종일",
   "taskDue": "마감",
   "weekdaySun": "일",

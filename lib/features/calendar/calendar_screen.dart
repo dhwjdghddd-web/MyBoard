@@ -45,6 +45,19 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     }
     allMonthItems.sort((a, b) => a.sortKey.compareTo(b.sortKey));
 
+    // 현재 달이면 '오늘 이후 남은 일정'만, 다른 달은 그 달 전체를 표시한다.
+    final now = DateTime.now();
+    final isCurrentMonth = cal.year == now.year && cal.month == now.month;
+    final todayKey =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final monthItems = isCurrentMonth
+        ? allMonthItems.where((it) => it.dateKey.compareTo(todayKey) >= 0).toList()
+        : allMonthItems;
+    final monthHeaderText = isCurrentMonth
+        ? l.calendarMonthRemainingHeader(cal.year, cal.month, monthItems.length)
+        : l.calendarMonthItemsHeader(cal.year, cal.month, monthItems.length);
+    final emptyText = isCurrentMonth ? l.calendarNoRemaining : l.calendarEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: _MonthNav(cal: cal, ref: ref),
@@ -113,7 +126,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            l.calendarMonthItemsHeader(cal.year, cal.month, allMonthItems.length),
+                            monthHeaderText,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -123,25 +136,21 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           ),
                         ),
                         Expanded(
-                          child: allMonthItems.isEmpty
+                          child: monthItems.isEmpty
                               ? Center(
                                   child: Padding(
                                     padding: const EdgeInsets.all(32),
                                     child: Text(
-                                      l.calendarEmpty,
+                                      emptyText,
                                       style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     ),
                                   ),
                                 )
-                              : Builder(builder: (ctx) {
-                                  final now = DateTime.now();
-                                  final todayKey = '${now.year}-${now.month.toString().padLeft(2,'0')}-${now.day.toString().padLeft(2,'0')}';
-                                  return ListView.separated(
-                                    itemCount: allMonthItems.length,
-                                    separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
-                                    itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i], todayKey: todayKey),
-                                  );
-                                }),
+                              : ListView.separated(
+                                  itemCount: monthItems.length,
+                                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                                  itemBuilder: (ctx, i) => _MonthItemTile(item: monthItems[i]),
+                                ),
                         ),
                       ]),
                     ),
@@ -162,7 +171,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        l.calendarMonthItemsHeader(cal.year, cal.month, allMonthItems.length),
+                        monthHeaderText,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -171,27 +180,23 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                         ),
                       ),
                     ),
-                    allMonthItems.isEmpty
+                    monthItems.isEmpty
                         ? Center(
                             child: Padding(
                               padding: const EdgeInsets.all(32),
                               child: Text(
-                                l.calendarEmpty,
+                                emptyText,
                                 style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                               ),
                             ),
                           )
-                        : Builder(builder: (ctx) {
-                            final now = DateTime.now();
-                            final todayKey = '${now.year}-${now.month.toString().padLeft(2,'0')}-${now.day.toString().padLeft(2,'0')}';
-                            return ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: allMonthItems.length,
-                              separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
-                              itemBuilder: (ctx, i) => _MonthItemTile(item: allMonthItems[i], todayKey: todayKey),
-                            );
-                          }),
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: monthItems.length,
+                            separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                            itemBuilder: (ctx, i) => _MonthItemTile(item: monthItems[i]),
+                          ),
                   ]),
                 ),
         ),
@@ -289,9 +294,8 @@ class _MonthItem {
 // ── 이달 일정 타일 ────────────────────────────────────────────────────────
 
 class _MonthItemTile extends StatelessWidget {
-  const _MonthItemTile({required this.item, required this.todayKey});
+  const _MonthItemTile({required this.item});
   final _MonthItem item;
-  final String todayKey;
 
   @override
   Widget build(BuildContext context) {
@@ -301,17 +305,9 @@ class _MonthItemTile extends StatelessWidget {
     final weekdayNames = [
       l.weekdayMon, l.weekdayTue, l.weekdayWed, l.weekdayThu, l.weekdayFri, l.weekdaySat, l.weekdaySun,
     ];
-    final isToday = item.dateKey == todayKey;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: isToday
-          ? BoxDecoration(
-              color: scheme.primary.withAlpha(20),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: scheme.primary.withAlpha(50), width: 0.8),
-            )
-          : null,
       child: InkWell(
         onTap: () {
           showModalBottomSheet(
@@ -330,18 +326,12 @@ class _MonthItemTile extends StatelessWidget {
             Container(
               width: 50,
               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
-              decoration: isToday
-                  ? BoxDecoration(
-                      color: scheme.primary,
-                      borderRadius: BorderRadius.circular(4),
-                    )
-                  : null,
               child: Text(
                 item.displayDate(weekdayNames),
                 style: TextStyle(
                   fontSize: 10.5,
-                  color: isToday ? Colors.white : scheme.onSurfaceVariant,
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -356,10 +346,7 @@ class _MonthItemTile extends StatelessWidget {
                 item.title,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: isToday
-                      ? FontWeight.bold
-                      : (item.isTask ? FontWeight.normal : FontWeight.w500),
-                  color: isToday ? scheme.primary : null,
+                  fontWeight: item.isTask ? FontWeight.normal : FontWeight.w500,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -370,8 +357,8 @@ class _MonthItemTile extends StatelessWidget {
                 item.timeLabel,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isToday ? scheme.primary : scheme.onSurfaceVariant,
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
           ]),
