@@ -54,7 +54,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ? allMonthItems.where((it) => it.dateKey.compareTo(todayKey) >= 0).toList()
         : allMonthItems;
     final monthHeaderText = isCurrentMonth
-        ? l.calendarMonthRemainingHeader(cal.year, cal.month, monthItems.length)
+        ? l.calendarMonthRemainingHeader(monthItems.length)
         : l.calendarMonthItemsHeader(cal.year, cal.month, monthItems.length);
     final emptyText = isCurrentMonth ? l.calendarNoRemaining : l.calendarEmpty;
 

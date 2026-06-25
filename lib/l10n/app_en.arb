@@ -62,11 +62,9 @@
       "count": { "type": "int" }
     }
   },
-  "calendarMonthRemainingHeader": "{year}/{month} remaining ({count})",
+  "calendarMonthRemainingHeader": "📅 Upcoming events ({count})",
   "@calendarMonthRemainingHeader": {
     "placeholders": {
-      "year": { "type": "int" },
-      "month": { "type": "int" },
       "count": { "type": "int" }
     }
   },

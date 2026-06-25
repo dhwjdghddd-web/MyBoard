@@ -62,11 +62,9 @@
       "count": { "type": "int" }
     }
   },
-  "calendarMonthRemainingHeader": "{year}년 {month}월 남은 일정 ({count})",
+  "calendarMonthRemainingHeader": "📅 다가오는 일정 목록 ({count})",
   "@calendarMonthRemainingHeader": {
     "placeholders": {
-      "year": { "type": "int" },
-      "month": { "type": "int" },
       "count": { "type": "int" }
     }
   },

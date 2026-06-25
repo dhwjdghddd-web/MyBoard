@@ -111,8 +111,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String calendarMonthRemainingHeader(int year, int month, int count) {
-    return '$year년 $month월 남은 일정 ($count)';
+  String calendarMonthRemainingHeader(int count) {
+    return '📅 다가오는 일정 목록 ($count)';
   }
 
   @override

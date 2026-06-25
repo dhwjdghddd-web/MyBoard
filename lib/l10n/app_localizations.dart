@@ -281,8 +281,8 @@ abstract class AppLocalizations {
   /// No description provided for @calendarMonthRemainingHeader.
   ///
   /// In en, this message translates to:
-  /// **'{year}/{month} remaining ({count})'**
-  String calendarMonthRemainingHeader(int year, int month, int count);
+  /// **'📅 Upcoming events ({count})'**
+  String calendarMonthRemainingHeader(int count);
 
   /// No description provided for @calendarEmpty.
   ///
