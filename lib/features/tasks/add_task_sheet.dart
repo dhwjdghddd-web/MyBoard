@@ -17,11 +17,13 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
   final _titleFocus = FocusNode();
   DateTime? _dueDate;
   bool _saving = false;
+  String? _listId;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _titleFocus.requestFocus());
+    _listId = ref.read(taskServiceProvider.notifier).defaultListId;
   }
 
   @override
@@ -55,6 +57,7 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
             title,
             due: _dueDate,
             notes: _notesCtrl.text.trim(),
+            listId: _listId,
           );
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -142,6 +145,41 @@ class _AddTaskSheetState extends ConsumerState<AddTaskSheet> {
             ),
           ),
           const SizedBox(height: 12),
+
+          Builder(builder: (context) {
+            final lists = ref.read(taskServiceProvider.notifier).taskLists;
+            if (lists.length < 2) return const SizedBox.shrink();
+            final value = lists.any((l) => l.id == _listId) ? _listId : lists.first.id;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: scheme.outline),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.checklist, size: 18, color: scheme.primary),
+                    const SizedBox(width: 10),
+                    Text(l.taskListLabel, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14)),
+                    const Spacer(),
+                    DropdownButton<String>(
+                      value: value,
+                      underline: const SizedBox(),
+                      items: lists
+                          .map((tl) => DropdownMenuItem(
+                                value: tl.id,
+                                child: Text(tl.title, overflow: TextOverflow.ellipsis),
+                              ))
+                          .toList(),
+                      onChanged: (v) { if (v != null) setState(() => _listId = v); },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
 
           TextField(
             controller: _notesCtrl,

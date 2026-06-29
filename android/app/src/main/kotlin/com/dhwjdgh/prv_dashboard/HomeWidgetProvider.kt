@@ -41,6 +41,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             ACTION_COMPLETE_TASK -> {
                 val taskId    = intent.getStringExtra("task_id") ?: return
+                val taskList  = intent.getStringExtra("task_list") ?: ""
                 val taskIndex = intent.getIntExtra("task_index", -1)
                 val current   = prefs.getString("pending_completions", "") ?: ""
                 prefs.edit()
@@ -51,7 +52,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
 
                 // 백그라운드 API 동기화 구동 (앱 켜짐 없음)
                 val pendingResult = goAsync()
-                TasksSyncJobService.executeComplete(context, taskId, true) {
+                TasksSyncJobService.executeComplete(context, taskId, true, taskList) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
                         MainActivity.activeChannel?.invokeMethod("taskCompleted", taskId)
                     }
@@ -60,19 +61,21 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             ACTION_DELETE_TASK -> {
                 val taskId    = intent.getStringExtra("task_id") ?: return
+                val taskList  = intent.getStringExtra("task_list") ?: ""
                 val taskIndex = intent.getIntExtra("task_index", -1)
                 val current   = prefs.getString("pending_deletions", "") ?: ""
                 prefs.edit()
                     .putString("pending_deletions", if (current.isEmpty()) taskId else "$current,$taskId")
                     .putString("task_$taskIndex", "")
                     .putString("task_${taskIndex}_id", "")
+                    .putString("task_${taskIndex}_list", "")
                     .putString("task_${taskIndex}_done", "false")
                     .apply()
                 redraw(context)
 
                 // 백그라운드 API 동기화 구동 (앱 켜짐 없음)
                 val pendingResult = goAsync()
-                TasksSyncJobService.executeDelete(context, taskId) {
+                TasksSyncJobService.executeDelete(context, taskId, taskList) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
                         MainActivity.activeChannel?.invokeMethod("taskDeleted", taskId)
                     }
@@ -183,6 +186,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
             ACTION_TASK_ITEM -> {
                 val taskId    = intent.getStringExtra("task_id") ?: ""
+                val taskList  = intent.getStringExtra("task_list") ?: ""
                 val taskIndex = intent.getIntExtra("task_index", -1)
                 when (intent.getStringExtra("task_item_action")) {
                     "complete" -> {
@@ -195,7 +199,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         redraw(context)
                         if (taskId.isNotEmpty()) {
                             val pendingResult = goAsync()
-                            TasksSyncJobService.executeComplete(context, taskId, true) {
+                            TasksSyncJobService.executeComplete(context, taskId, true, taskList) {
                                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                                     MainActivity.activeChannel?.invokeMethod("taskCompleted", taskId)
                                 }
@@ -208,6 +212,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             prefs.edit()
                                 .putString("task_$taskIndex", "")
                                 .putString("task_${taskIndex}_id", "")
+                                .putString("task_${taskIndex}_list", "")
                                 .putString("task_${taskIndex}_done", "false")
                                 .apply()
                         }
@@ -217,7 +222,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         redraw(context)
                         if (taskId.isNotEmpty()) {
                             val pendingResult = goAsync()
-                            TasksSyncJobService.executeDelete(context, taskId) {
+                            TasksSyncJobService.executeDelete(context, taskId, taskList) {
                                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                                     MainActivity.activeChannel?.invokeMethod("taskDeleted", taskId)
                                 }

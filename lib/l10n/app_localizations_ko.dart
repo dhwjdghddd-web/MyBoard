@@ -18,6 +18,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get refreshTooltip => '새로고침';
 
   @override
+  String get taskListLabel => '목록';
+
+  @override
   String get cancelButton => '취소';
 
   @override

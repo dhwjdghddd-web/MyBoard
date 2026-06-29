@@ -333,7 +333,7 @@ class _TaskCard extends ConsumerWidget {
       ),
     );
     if (ok == true) {
-      await ref.read(taskServiceProvider.notifier).deleteTask(task.id);
+      await ref.read(taskServiceProvider.notifier).deleteTask(task);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showAutoDismissSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.taskDeletedSnack)),

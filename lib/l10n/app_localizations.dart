@@ -116,6 +116,12 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get refreshTooltip;
 
+  /// No description provided for @taskListLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get taskListLabel;
+
   /// No description provided for @cancelButton.
   ///
   /// In en, this message translates to:

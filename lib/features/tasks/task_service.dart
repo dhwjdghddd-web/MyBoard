@@ -10,6 +10,7 @@ const _base = 'https://tasks.googleapis.com/tasks/v1';
 
 class Task {
   final String id;
+  final String listId;
   final String title;
   final String status;
   final DateTime? due;
@@ -17,6 +18,7 @@ class Task {
 
   const Task({
     required this.id,
+    required this.listId,
     required this.title,
     required this.status,
     this.due,
@@ -28,8 +30,9 @@ class Task {
   bool get isOverdue =>
       due != null && !isCompleted && due!.isBefore(DateTime.now());
 
-  factory Task.fromJson(Map<String, dynamic> j) => Task(
+  factory Task.fromJson(Map<String, dynamic> j, {required String listId}) => Task(
         id: j['id'] as String,
+        listId: listId,
         title: (j['title'] as String?) ?? '',
         status: (j['status'] as String?) ?? 'needsAction',
         due: j['due'] != null ? DateTime.tryParse(j['due'] as String) : null,
@@ -38,6 +41,7 @@ class Task {
 
   Task copyWith({String? status}) => Task(
         id: id,
+        listId: listId,
         title: title,
         status: status ?? this.status,
         due: due,
@@ -55,35 +59,59 @@ final taskServiceProvider =
 
 // ── Notifier ──────────────────────────────────────────────────────────────
 
+class TaskListInfo {
+  final String id;
+  final String title;
+  const TaskListInfo({required this.id, required this.title});
+}
+
 class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   TaskNotifier(this._api) : super(const AsyncValue.loading()) {
     loadTasks();
   }
 
   final ApiClient _api;
-  String? _listId;
+  String? _listId; // 신규 추가 기본 대상(첫 번째 목록)
+  List<TaskListInfo> taskLists = const []; // 추가 시트의 목록 선택용
+
+  String? get defaultListId => _listId;
 
   Future<void> loadTasks() async {
     state = const AsyncValue<List<Task>>.loading().copyWithPrevious(state);
     try {
       final lists = await _api.get('$_base/users/@me/lists');
       if (!mounted) return;
-      final items = lists['items'] as List?;
-      if (items == null || items.isEmpty) {
+      final items = (lists['items'] as List?) ?? [];
+      if (items.isEmpty) {
         state = const AsyncValue.data([]);
         return;
       }
-      _listId = items[0]['id'] as String; // 기본 리스트(첫 번째)만 사용 — 다중 리스트 지원은 미구현
-      await WidgetService.saveTaskListId(_listId!);
-      final data = await _api.get(
-        '$_base/lists/$_listId/tasks',
-        params: {'showCompleted': 'true', 'maxResults': '100'},
-      );
-      final tasks = ((data['items'] as List?) ?? [])
-          .map((j) => Task.fromJson(j as Map<String, dynamic>))
+      taskLists = items
+          .map((e) => TaskListInfo(
+                id: (e as Map<String, dynamic>)['id'] as String,
+                title: (e['title'] as String?) ?? '',
+              ))
           .toList();
-      final sorted = _sorted(tasks);
+      _listId = taskLists.first.id;
+      await WidgetService.saveTaskListId(_listId!);
+
+      // 모든 목록의 태스크를 병렬 조회해 병합한다.
+      final perList = await Future.wait(taskLists.map((tl) async {
+        try {
+          final data = await _api.get(
+            '$_base/lists/${tl.id}/tasks',
+            params: {'showCompleted': 'true', 'maxResults': '100'},
+          );
+          return ((data['items'] as List?) ?? [])
+              .map((j) => Task.fromJson(j as Map<String, dynamic>, listId: tl.id))
+              .toList();
+        } catch (e) {
+          debugPrint('태스크 목록 로드 실패 (${tl.id}): $e');
+          return <Task>[];
+        }
+      }));
       if (!mounted) return;
+      final sorted = _sorted(perList.expand((x) => x).toList());
       state = AsyncValue.data(sorted);
       await WidgetService.updateTasks(sorted);
 
@@ -104,10 +132,11 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     }
   }
 
-  Future<void> addTask(String title, {DateTime? due, String? notes}) async {
+  Future<void> addTask(String title, {DateTime? due, String? notes, String? listId}) async {
     // 목록 로드 전/실패 상태에서 추가 시도 시 조용히 무시하지 않고 예외를 던져
     // 호출부(시트)가 실패를 사용자에게 안내하도록 한다.
-    if (_listId == null) {
+    final targetList = listId ?? _listId;
+    if (targetList == null) {
       throw StateError('task list not loaded');
     }
     final body = <String, dynamic>{'title': title};
@@ -117,9 +146,9 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     if (notes != null && notes.isNotEmpty) body['notes'] = notes;
 
     try {
-      final data = await _api.post('$_base/lists/$_listId/tasks', body: body);
+      final data = await _api.post('$_base/lists/$targetList/tasks', body: body);
       if (!mounted) return;
-      final newTask = Task.fromJson(data as Map<String, dynamic>);
+      final newTask = Task.fromJson(data as Map<String, dynamic>, listId: targetList);
       final current = state.valueOrNull ?? [];
       final sorted = _sorted([newTask, ...current]);
       state = AsyncValue.data(sorted);
@@ -131,7 +160,6 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   }
 
   Future<void> toggleComplete(Task task) async {
-    if (_listId == null) return;
     final newStatus = task.isCompleted ? 'needsAction' : 'completed';
     final body = <String, dynamic>{'status': newStatus};
     if (newStatus == 'needsAction') body['completed'] = null;
@@ -143,7 +171,7 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     );
 
     try {
-      await _api.patch('$_base/lists/$_listId/tasks/${task.id}', body: body);
+      await _api.patch('$_base/lists/${task.listId}/tasks/${task.id}', body: body);
       if (!mounted) return;
       await WidgetService.updateTasks(state.valueOrNull ?? []);
     } catch (e) {
@@ -167,12 +195,16 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
       }
     }
 
-    // 삭제 동기화
+    // 삭제 동기화 (위젯이 네이티브에서 이미 API 삭제했을 수 있으므로 목록에 남아있을 때만)
     final deletions = await WidgetService.getPendingDeletions();
     if (deletions.isNotEmpty) {
       await WidgetService.clearPendingDeletions();
+      final cur = state.valueOrNull ?? [];
       for (final taskId in deletions) {
-        try { await deleteTask(taskId); } catch (e) { debugPrint('태스크 삭제 실패: $e'); }
+        try {
+          final task = cur.firstWhere((t) => t.id == taskId);
+          await deleteTask(task);
+        } catch (e) { debugPrint('태스크 삭제 실패: $e'); }
       }
     }
 
@@ -189,13 +221,12 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     await loadTasks();
   }
 
-  Future<void> deleteTask(String taskId) async {
-    if (_listId == null) return;
+  Future<void> deleteTask(Task task) async {
     final current = state.valueOrNull ?? [];
-    state = AsyncValue.data(current.where((t) => t.id != taskId).toList());
+    state = AsyncValue.data(current.where((t) => t.id != task.id).toList());
 
     try {
-      await _api.delete('$_base/lists/$_listId/tasks/$taskId');
+      await _api.delete('$_base/lists/${task.listId}/tasks/${task.id}');
       if (!mounted) return;
       await WidgetService.updateTasks(state.valueOrNull ?? []);
     } catch (e) {

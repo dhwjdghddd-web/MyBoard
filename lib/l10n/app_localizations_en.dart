@@ -18,6 +18,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refreshTooltip => 'Refresh';
 
   @override
+  String get taskListLabel => 'List';
+
+  @override
   String get cancelButton => 'Cancel';
 
   @override

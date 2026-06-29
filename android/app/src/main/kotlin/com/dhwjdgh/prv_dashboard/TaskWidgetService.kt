@@ -22,7 +22,7 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
     private val PREFS = "HomeWidgetPreferences"
     private var tasksList = mutableListOf<TaskItem>()
 
-    data class TaskItem(val title: String, val id: String, val done: Boolean, val prefsIndex: Int)
+    data class TaskItem(val title: String, val id: String, val listId: String, val done: Boolean, val prefsIndex: Int)
 
     override fun onCreate() { loadData() }
     override fun onDataSetChanged() { loadData() }
@@ -73,6 +73,7 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         val completeIntent = Intent().apply {
             putExtra("task_item_action", "complete")
             putExtra("task_id", item.id)
+            putExtra("task_list", item.listId)
             putExtra("task_index", item.prefsIndex)
         }
         views.setOnClickFillInIntent(R.id.task_item_check, completeIntent)
@@ -80,6 +81,7 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         val deleteIntent = Intent().apply {
             putExtra("task_item_action", "delete")
             putExtra("task_id", item.id)
+            putExtra("task_list", item.listId)
             putExtra("task_index", item.prefsIndex)
         }
         views.setOnClickFillInIntent(R.id.task_item_delete, deleteIntent)
@@ -101,9 +103,10 @@ class TaskWidgetFactory(private val context: Context, private val isCover: Boole
         for (i in 0 until count) {
             val title = prefs.getString("task_$i", "") ?: ""
             val id = prefs.getString("task_${i}_id", "") ?: ""
+            val listId = prefs.getString("task_${i}_list", "") ?: ""
             val done = prefs.getString("task_${i}_done", "false") == "true"
             if (title.isNotEmpty() && (showCompleted || !done)) {
-                tasksList.add(TaskItem(title, id, done, i))
+                tasksList.add(TaskItem(title, id, listId, done, i))
             }
         }
     }

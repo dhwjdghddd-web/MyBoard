@@ -4,6 +4,7 @@
   "settingsTitle": "Settings",
   "retryButton": "Retry",
   "refreshTooltip": "Refresh",
+  "taskListLabel": "List",
   "cancelButton": "Cancel",
   "deleteButton": "Delete",
   "saveButton": "Save",

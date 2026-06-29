@@ -17,6 +17,7 @@ class TasksSyncJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         val action = params?.extras?.getString("action", "sync") ?: "sync"
         val taskId = params?.extras?.getString("task_id", "") ?: ""
+        val listId = params?.extras?.getString("list_id", "") ?: ""
         val isCompleted = params?.extras?.getBoolean("is_completed", true) ?: true
         val ctx = applicationContext
 
@@ -24,10 +25,10 @@ class TasksSyncJobService : JobService() {
             try {
                 when (action) {
                     "complete" -> {
-                        if (taskId.isNotEmpty()) executeCompleteInternal(ctx, taskId, isCompleted)
+                        if (taskId.isNotEmpty()) executeCompleteInternal(ctx, taskId, isCompleted, listId)
                     }
                     "delete" -> {
-                        if (taskId.isNotEmpty()) executeDeleteInternal(ctx, taskId)
+                        if (taskId.isNotEmpty()) executeDeleteInternal(ctx, taskId, listId)
                     }
                     else -> {
                         executeSyncInternal(ctx)
@@ -70,32 +71,31 @@ class TasksSyncJobService : JobService() {
             }.start()
         }
 
-        fun executeComplete(context: Context, taskId: String, isCompleted: Boolean, onDone: () -> Unit = {}) {
+        fun executeComplete(context: Context, taskId: String, isCompleted: Boolean, listId: String? = null, onDone: () -> Unit = {}) {
             Thread {
-                executeCompleteInternal(context, taskId, isCompleted)
+                executeCompleteInternal(context, taskId, isCompleted, listId)
                 onDone()
             }.start()
         }
 
-        fun executeDelete(context: Context, taskId: String, onDone: () -> Unit = {}) {
+        fun executeDelete(context: Context, taskId: String, listId: String? = null, onDone: () -> Unit = {}) {
             Thread {
-                executeDeleteInternal(context, taskId)
+                executeDeleteInternal(context, taskId, listId)
                 onDone()
             }.start()
         }
 
         private fun executeSyncInternal(context: Context) {
             Log.d(TAG, "executeSyncInternal: start")
-            val listId = readListId(context) ?: "@default"
             var token = readToken(context)
             if (token.isNullOrEmpty()) token = freshToken(context)
             if (!token.isNullOrEmpty()) {
-                runCatching { syncTasks(context, token!!, listId) }
+                runCatching { syncTasks(context, token!!) }
                     .onSuccess { Log.d(TAG, "syncTasks success") }
                     .onFailure { e ->
                         Log.e(TAG, "syncTasks failed: $e — retrying with fresh token")
                         freshToken(context)?.let { t ->
-                            runCatching { syncTasks(context, t, listId) }
+                            runCatching { syncTasks(context, t) }
                                 .onSuccess { Log.d(TAG, "syncTasks retry success") }
                                 .onFailure { e2 -> Log.e(TAG, "syncTasks retry failed: $e2") }
                         }
@@ -105,64 +105,82 @@ class TasksSyncJobService : JobService() {
             }
         }
 
-        private fun executeCompleteInternal(context: Context, taskId: String, isCompleted: Boolean) {
-            val listId = readListId(context) ?: "@default"
+        // 모든 태스크 목록을 조회해 ID 집합을 반환한다. 실패 시 기본 목록만.
+        private fun fetchListIds(token: String): List<String> {
+            return try {
+                val body = doGet(token, URL("https://tasks.googleapis.com/tasks/v1/users/@me/lists"))
+                    ?: return listOf("@default")
+                val items = JSONObject(body).optJSONArray("items") ?: return listOf("@default")
+                val ids = mutableListOf<String>()
+                for (i in 0 until items.length()) {
+                    val id = items.getJSONObject(i).optString("id", "")
+                    if (id.isNotEmpty()) ids.add(id)
+                }
+                if (ids.isEmpty()) listOf("@default") else ids
+            } catch (e: Exception) {
+                Log.e(TAG, "fetchListIds failed: $e")
+                listOf("@default")
+            }
+        }
+
+        private fun executeCompleteInternal(context: Context, taskId: String, isCompleted: Boolean, listId: String?) {
+            val targetList = listId?.takeIf { it.isNotEmpty() } ?: readListId(context) ?: "@default"
             var token = readToken(context)
             if (token.isNullOrEmpty()) token = freshToken(context)
             if (!token.isNullOrEmpty()) {
-                runCatching { completeTask(token!!, listId, taskId, isCompleted) }.onFailure {
-                    freshToken(context)?.let { t -> runCatching { completeTask(t, listId, taskId, isCompleted) } }
+                runCatching { completeTask(token!!, targetList, taskId, isCompleted) }.onFailure {
+                    freshToken(context)?.let { t -> runCatching { completeTask(t, targetList, taskId, isCompleted) } }
                 }
             }
         }
 
-        private fun executeDeleteInternal(context: Context, taskId: String) {
-            val listId = readListId(context) ?: "@default"
+        private fun executeDeleteInternal(context: Context, taskId: String, listId: String?) {
+            val targetList = listId?.takeIf { it.isNotEmpty() } ?: readListId(context) ?: "@default"
             var token = readToken(context)
             if (token.isNullOrEmpty()) token = freshToken(context)
             if (!token.isNullOrEmpty()) {
-                runCatching { deleteTask(token!!, listId, taskId) }.onFailure {
-                    freshToken(context)?.let { t -> runCatching { deleteTask(t, listId, taskId) } }
+                runCatching { deleteTask(token!!, targetList, taskId) }.onFailure {
+                    freshToken(context)?.let { t -> runCatching { deleteTask(t, targetList, taskId) } }
                 }
             }
         }
 
-        private fun syncTasks(context: Context, token: String, listId: String) {
-            val urlStr = "https://tasks.googleapis.com/tasks/v1/lists/$listId/tasks?showCompleted=true&maxResults=100"
-            val body = doGet(token, URL(urlStr)) ?: return
-            
-            val items = JSONObject(body).optJSONArray("items") ?: org.json.JSONArray()
-            
+        private fun syncTasks(context: Context, token: String) {
+            val listIds = fetchListIds(token)
+
             val activeTasks = mutableListOf<TaskItem>()
             val completedTasks = mutableListOf<TaskItem>()
-            
-            for (i in 0 until items.length()) {
-                val item = items.getJSONObject(i)
-                val id = item.optString("id", "")
-                val title = item.optString("title", "")
-                val status = item.optString("status", "needsAction")
-                val due = if (item.has("due")) item.optString("due", null) else null
-                if (id.isEmpty()) continue
-                
-                val task = TaskItem(id, title, status == "completed", due)
-                if (task.isCompleted) {
-                    completedTasks.add(task)
-                } else {
-                    activeTasks.add(task)
+
+            for (listId in listIds) {
+                val urlStr = "https://tasks.googleapis.com/tasks/v1/lists/$listId/tasks?showCompleted=true&maxResults=100"
+                val body = doGet(token, URL(urlStr)) ?: continue
+                val items = JSONObject(body).optJSONArray("items") ?: continue
+                for (i in 0 until items.length()) {
+                    val item = items.getJSONObject(i)
+                    val id = item.optString("id", "")
+                    val title = item.optString("title", "")
+                    val status = item.optString("status", "needsAction")
+                    val due = if (item.has("due")) item.optString("due", null) else null
+                    if (id.isEmpty()) continue
+
+                    val task = TaskItem(id, listId, title, status == "completed", due)
+                    if (task.isCompleted) completedTasks.add(task) else activeTasks.add(task)
                 }
             }
-            
+
+            // 미완료 먼저, 완료 나중 (앱/위젯 표시 순서와 동일)
             val sorted = activeTasks + completedTasks
-            
+
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val edit = prefs.edit()
-            
+
             edit.putString("task_count", sorted.size.toString())
 
             for (i in sorted.indices) {
                 val task = sorted[i]
                 edit.putString("task_$i", task.title)
                 edit.putString("task_${i}_id", task.id)
+                edit.putString("task_${i}_list", task.listId)
                 edit.putString("task_${i}_done", if (task.isCompleted) "true" else "false")
                 edit.putString("task_${i}_due", task.due ?: "")
             }
@@ -171,11 +189,12 @@ class TasksSyncJobService : JobService() {
                 if ((prefs.getString("task_$i", "") ?: "").isEmpty()) break
                 edit.putString("task_$i", "")
                 edit.putString("task_${i}_id", "")
+                edit.putString("task_${i}_list", "")
                 edit.putString("task_${i}_done", "false")
                 edit.putString("task_${i}_due", "")
             }
             edit.commit()
-            Log.d(TAG, "syncTasks written ${activeTasks.size} active tasks to prefs")
+            Log.d(TAG, "syncTasks written ${activeTasks.size} active / ${completedTasks.size} done from ${listIds.size} lists")
         }
 
         private fun completeTask(token: String, listId: String, taskId: String, isCompleted: Boolean) {
@@ -252,6 +271,6 @@ class TasksSyncJobService : JobService() {
             TokenManager.fetchFreshToken(context, "oauth2:https://www.googleapis.com/auth/tasks")
     }
 
-    private data class TaskItem(val id: String, val title: String, val isCompleted: Boolean, val due: String?)
+    private data class TaskItem(val id: String, val listId: String, val title: String, val isCompleted: Boolean, val due: String?)
 }
 

@@ -164,7 +164,7 @@ class _TaskItem extends ConsumerWidget {
           if (reason == SnackBarClosedReason.action) {
             notifier.loadTasks(); // 실행취소
           } else {
-            notifier.deleteTask(task.id);
+            notifier.deleteTask(task);
           }
         });
       },

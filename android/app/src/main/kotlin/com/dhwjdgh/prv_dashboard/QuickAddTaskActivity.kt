@@ -173,11 +173,14 @@ class QuickAddTaskActivity : AppCompatActivity() {
         for (i in oldCount downTo 1) {
             edit.putString("task_$i",        prefs.getString("task_${i-1}", "")        ?: "")
             edit.putString("task_${i}_id",   prefs.getString("task_${i-1}_id", "")     ?: "")
+            edit.putString("task_${i}_list", prefs.getString("task_${i-1}_list", "")   ?: "")
             edit.putString("task_${i}_done", prefs.getString("task_${i-1}_done","false") ?: "false")
         }
-        // 새 태스크를 맨 앞에 삽입
+        // 새 태스크를 맨 앞에 삽입 (빠른추가는 기본 목록에 저장)
+        val defaultList = prefs.getString("task_list_id", "") ?: ""
         edit.putString("task_0",       title)
         edit.putString("task_0_id",    newId)
+        edit.putString("task_0_list",  defaultList)
         edit.putString("task_0_done",  "false")
         edit.putString("task_count",   (oldCount + 1).toString())
         edit.apply()

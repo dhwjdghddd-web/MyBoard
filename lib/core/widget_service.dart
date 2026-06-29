@@ -30,6 +30,7 @@ class WidgetService {
       for (var i = 0; i < display.length; i++) {
         futures.add(HomeWidget.saveWidgetData<String>('task_$i', display[i].title));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_id', display[i].id));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_list', display[i].listId));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_done', display[i].isCompleted ? 'true' : 'false'));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_due', display[i].due != null ? display[i].due!.toIso8601String() : ''));
       }
@@ -147,6 +148,7 @@ class WidgetService {
       for (var i = 0; i < 100; i++) {
         futures.add(HomeWidget.saveWidgetData<String>('task_$i', ''));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_id', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('task_${i}_list', ''));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_done', 'false'));
         futures.add(HomeWidget.saveWidgetData<String>('task_${i}_due', ''));
       }
