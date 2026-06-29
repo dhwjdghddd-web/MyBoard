@@ -77,6 +77,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             icon: cal.loading
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.refresh),
+            tooltip: l.refreshTooltip,
             onPressed: () => ref.read(calendarProvider.notifier).loadEvents(),
           ),
           IconButton(
@@ -386,11 +387,26 @@ class _MonthNav extends StatelessWidget {
         onPressed: () => ref.read(calendarProvider.notifier).prevMonth(),
       ),
       Flexible(
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            l.calendarMonthFormat(cal.year, cal.month),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: () async {
+            final picked = await showDialog<int>(
+              context: context,
+              builder: (_) => _YearPickerDialog(initialYear: cal.year),
+            );
+            if (picked != null) {
+              ref.read(calendarProvider.notifier).setYear(picked);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                l.calendarMonthFormat(cal.year, cal.month),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ),
         ),
       ),
@@ -401,6 +417,67 @@ class _MonthNav extends StatelessWidget {
         onPressed: () => ref.read(calendarProvider.notifier).nextMonth(),
       ),
     ]);
+  }
+}
+
+// ── 연도 선택 다이얼로그 ─────────────────────────────────────────────────
+
+class _YearPickerDialog extends StatefulWidget {
+  const _YearPickerDialog({required this.initialYear});
+  final int initialYear;
+
+  @override
+  State<_YearPickerDialog> createState() => _YearPickerDialogState();
+}
+
+class _YearPickerDialogState extends State<_YearPickerDialog> {
+  late int _year;
+
+  @override
+  void initState() {
+    super.initState();
+    _year = widget.initialYear;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return AlertDialog(
+      title: Text(l.calendarYearPickerTitle),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            tooltip: l.calendarPrevYear,
+            onPressed: () => setState(() => _year--),
+          ),
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$_year',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            tooltip: l.calendarNextYear,
+            onPressed: () => setState(() => _year++),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l.cancelButton),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _year),
+          child: Text(l.calendarYearPickerApply),
+        ),
+      ],
+    );
   }
 }
 

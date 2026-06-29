@@ -48,6 +48,14 @@
             android:excludeFromRecents="true"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
+        <!-- 캘린더 연도 이동 다이얼로그 -->
+        <activity
+            android:name=".YearPickerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"
+            android:taskAffinity=""
+            android:excludeFromRecents="true" />
+
         <!-- 부팅 완료 시 위젯 데이터 갱신 -->
         <receiver
             android:name=".BootReceiver"
@@ -100,23 +108,12 @@
         <service
             android:name=".CalendarSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
+            android:exported="false" />
 
         <service
             android:name=".TasksSyncJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
-
-        <!-- 첨부파일 공유용 FileProvider -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
+            android:exported="false" />
 
         <!-- WorkManager DB 초기화 실패로 인한 크래시 방지: auto-init 비활성화 -->
         <provider

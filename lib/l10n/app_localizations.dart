@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get retryButton;
 
+  /// No description provided for @refreshTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refreshTooltip;
+
   /// No description provided for @cancelButton.
   ///
   /// In en, this message translates to:
@@ -265,6 +271,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Calendar Filter'**
   String get calendarFilter;
+
+  /// No description provided for @calendarPrevYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous year'**
+  String get calendarPrevYear;
+
+  /// No description provided for @calendarNextYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Next year'**
+  String get calendarNextYear;
+
+  /// No description provided for @calendarYearPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Year'**
+  String get calendarYearPickerTitle;
+
+  /// No description provided for @calendarYearPickerApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Go'**
+  String get calendarYearPickerApply;
 
   /// No description provided for @calendarMonthFormat.
   ///

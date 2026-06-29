@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryButton => 'Retry';
 
   @override
+  String get refreshTooltip => 'Refresh';
+
+  @override
   String get cancelButton => 'Cancel';
 
   @override
@@ -100,6 +103,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarFilter => 'Calendar Filter';
+
+  @override
+  String get calendarPrevYear => 'Previous year';
+
+  @override
+  String get calendarNextYear => 'Next year';
+
+  @override
+  String get calendarYearPickerTitle => 'Change Year';
+
+  @override
+  String get calendarYearPickerApply => 'Go';
 
   @override
   String calendarMonthFormat(int year, int month) {

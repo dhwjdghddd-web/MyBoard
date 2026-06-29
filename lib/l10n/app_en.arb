@@ -3,6 +3,7 @@
 
   "settingsTitle": "Settings",
   "retryButton": "Retry",
+  "refreshTooltip": "Refresh",
   "cancelButton": "Cancel",
   "deleteButton": "Delete",
   "saveButton": "Save",
@@ -50,6 +51,10 @@
 
   "calendarToday": "Today",
   "calendarFilter": "Calendar Filter",
+  "calendarPrevYear": "Previous year",
+  "calendarNextYear": "Next year",
+  "calendarYearPickerTitle": "Change Year",
+  "calendarYearPickerApply": "Go",
   "calendarMonthFormat": "{year}/{month}",
   "@calendarMonthFormat": {
     "placeholders": { "year": { "type": "int" }, "month": { "type": "int" } }

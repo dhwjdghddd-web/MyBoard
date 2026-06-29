@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/auth_service.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -17,11 +18,22 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
 
   List<Map<String, dynamic>> _widgets = [];
   bool _loading = true;
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
     _loadConfigs();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) setState(() => _appVersion = info.version);
+    } catch (e) {
+      debugPrint('앱 버전 로드 실패: $e');
+    }
   }
 
   Future<void> _loadConfigs() async {
@@ -132,6 +144,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             icon: const Icon(Icons.refresh),
+            tooltip: l.refreshTooltip,
             onPressed: _loadConfigs,
           ),
         ],
@@ -229,7 +242,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                 ListTile(
                   leading: Icon(Icons.privacy_tip_outlined, color: isDark ? accentColor : null),
                   title: Text(l.privacyPolicy),
-                  trailing: const Icon(Icons.open_in_new, size: 18),
+                  trailing: const Icon(Icons.chevron_right, size: 18),
                   onTap: () => _showPrivacyPolicy(context, isDark),
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withAlpha(80)),
@@ -240,7 +253,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                   onTap: () => showLicensePage(
                     context: context,
                     applicationName: 'MyBoard',
-                    applicationVersion: '1.0.0',
+                    applicationVersion: _appVersion,
                   ),
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withAlpha(80)),

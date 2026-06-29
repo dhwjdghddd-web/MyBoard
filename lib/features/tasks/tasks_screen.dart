@@ -54,6 +54,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(Icons.refresh),
+            tooltip: l.refreshTooltip,
             onPressed: () => ref.read(taskServiceProvider.notifier).loadTasks(),
           ),
           IconButton(

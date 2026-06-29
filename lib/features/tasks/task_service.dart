@@ -105,7 +105,11 @@ class TaskNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   }
 
   Future<void> addTask(String title, {DateTime? due, String? notes}) async {
-    if (_listId == null) return;
+    // 목록 로드 전/실패 상태에서 추가 시도 시 조용히 무시하지 않고 예외를 던져
+    // 호출부(시트)가 실패를 사용자에게 안내하도록 한다.
+    if (_listId == null) {
+      throw StateError('task list not loaded');
+    }
     final body = <String, dynamic>{'title': title};
     if (due != null) {
       body['due'] = DateTime(due.year, due.month, due.day).toUtc().toIso8601String();

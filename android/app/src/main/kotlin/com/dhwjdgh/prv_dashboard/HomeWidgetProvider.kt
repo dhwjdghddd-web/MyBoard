@@ -587,6 +587,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                else if (isTablet) 12f
                                else         scaledSp(widgetWidth, widgetHeight, 12f, 15f)
             views.setTextViewTextSize(R.id.cal_month_label, android.util.TypedValue.COMPLEX_UNIT_SP, monthLabelSp)
+            views.setOnClickPendingIntent(R.id.cal_month_label, yearPickerIntent(context))
 
             val primaryColor = if (isDark) Color.WHITE else Color.parseColor("#1C1C1E")
             val secondaryColor = if (isDark) Color.parseColor("#A0A0B0") else Color.parseColor("#707080")
@@ -1101,6 +1102,15 @@ class HomeWidgetProvider : AppWidgetProvider() {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra("action", "create_event")
                     putExtra("date_key", dateKey)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        private fun yearPickerIntent(context: Context): PendingIntent =
+            PendingIntent.getActivity(
+                context, 506,
+                Intent(context, YearPickerActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )

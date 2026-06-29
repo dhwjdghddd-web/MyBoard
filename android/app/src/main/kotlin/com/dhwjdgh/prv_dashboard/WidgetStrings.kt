@@ -39,6 +39,6 @@ object WidgetStrings {
     val taskAdded: String get() = if (isKorean) "태스크가 추가됐어요 ✓" else "Task added ✓"
     val taskAddedPending: String get() = if (isKorean) "태스크가 추가됐어요 (대기 중) ✓" else "Task added (pending) ✓"
 
-    // ── 기타 ──
-    val fileChooserTitle: String get() = if (isKorean) "파일 열기" else "Open file"
+    // ── 연도 이동 ──
+    val yearPickerMoving: String get() = if (isKorean) "이동 중…" else "Moving…"
 }

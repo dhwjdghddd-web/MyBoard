@@ -15,6 +15,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get retryButton => '다시 시도';
 
   @override
+  String get refreshTooltip => '새로고침';
+
+  @override
   String get cancelButton => '취소';
 
   @override
@@ -99,6 +102,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get calendarFilter => '캘린더 필터';
+
+  @override
+  String get calendarPrevYear => '이전 해';
+
+  @override
+  String get calendarNextYear => '다음 해';
+
+  @override
+  String get calendarYearPickerTitle => '연도 이동';
+
+  @override
+  String get calendarYearPickerApply => '이동';
 
   @override
   String calendarMonthFormat(int year, int month) {

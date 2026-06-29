@@ -3,6 +3,7 @@
 
   "settingsTitle": "설정",
   "retryButton": "다시 시도",
+  "refreshTooltip": "새로고침",
   "cancelButton": "취소",
   "deleteButton": "삭제",
   "saveButton": "저장",
@@ -50,6 +51,10 @@
 
   "calendarToday": "오늘",
   "calendarFilter": "캘린더 필터",
+  "calendarPrevYear": "이전 해",
+  "calendarNextYear": "다음 해",
+  "calendarYearPickerTitle": "연도 이동",
+  "calendarYearPickerApply": "이동",
   "calendarMonthFormat": "{year}년 {month}월",
   "@calendarMonthFormat": {
     "placeholders": { "year": { "type": "int" }, "month": { "type": "int" } }

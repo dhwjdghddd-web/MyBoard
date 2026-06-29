@@ -36,7 +36,6 @@ dependencies:
 
   # 상태관리
   flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
 
   # Google 인증
   google_sign_in: ^6.2.2
@@ -50,6 +49,9 @@ dependencies:
   # 로컬 저장
   shared_preferences: ^2.3.3
 
+  # 앱 버전 정보 (라이선스 화면 등)
+  package_info_plus: ^8.0.0
+
   # 토큰 저장
   flutter_secure_storage: ^9.2.4
 
@@ -61,8 +63,6 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
-  riverpod_generator: ^2.6.1
-  build_runner: ^2.4.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

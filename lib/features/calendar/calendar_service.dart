@@ -323,6 +323,12 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
     await loadEvents();
   }
 
+  Future<void> setYear(int year) async {
+    if (year == state.year) return;
+    state = state.copyWith(year: year);
+    await loadEvents();
+  }
+
   Future<void> goToday() async {
     final now = DateTime.now();
     state = state.copyWith(year: now.year, month: now.month);

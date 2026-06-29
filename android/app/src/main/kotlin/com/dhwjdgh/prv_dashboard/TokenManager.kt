@@ -13,6 +13,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
  */
 object TokenManager {
     private const val TAG = "TokenManager"
+
+    // ⚠️ 결합 주의: 아래 두 상수는 Flutter 의 flutter_secure_storage 플러그인이
+    // 내부적으로 쓰는 SharedPreferences 파일명("FlutterSecureStorage")과,
+    // 키 'access_token' 을 플러그인이 해싱한 실제 저장 키 이름이다.
+    // flutter_secure_storage 를 업그레이드하면 키 해싱/파일명 규칙이 바뀌어
+    // readCachedToken() 이 조용히 null 을 반환할 수 있다.
+    //   → 그 경우에도 fetchFreshToken()(GoogleAuthUtil) 으로 자동 폴백되어
+    //     기능은 유지되지만, 위젯 동작이 매번 새 토큰 발급으로 느려진다.
+    //   ★ 플러그인 버전을 올릴 때는 반드시 위젯 토큰 캐시 동작을 재검증하고,
+    //     깨졌으면 아래 상수를 새 키 이름으로 갱신할 것.
     private const val SECURE_PREFS_NAME = "FlutterSecureStorage"
     private const val TOKEN_KEY = "VGtWcmJHbHVaMjl1_access_token"
 
