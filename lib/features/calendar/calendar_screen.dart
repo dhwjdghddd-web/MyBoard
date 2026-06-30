@@ -43,7 +43,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         }
       }
     }
-    allMonthItems.sort((a, b) => a.sortKey.compareTo(b.sortKey));
+    allMonthItems.sort((a, b) {
+      final c = a.sortKey.compareTo(b.sortKey);
+      return c != 0 ? c : a.id.compareTo(b.id); // 동점 시 결정적 tiebreak
+    });
 
     // 현재 달이면 '오늘 이후 남은 일정'만, 다른 달은 그 달 전체를 표시한다.
     final now = DateTime.now();
@@ -232,6 +235,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 // ── 이달 일정 아이템 모델 ─────────────────────────────────────────────────
 
 class _MonthItem {
+  final String id;
   final String dateKey;
   final String sortKey;
   final String title;
@@ -241,6 +245,7 @@ class _MonthItem {
   final String timeLabel;
 
   const _MonthItem({
+    required this.id,
     required this.dateKey,
     required this.sortKey,
     required this.title,
@@ -258,6 +263,7 @@ class _MonthItem {
             : '');
     final sk = e.isAllDay ? '${e.dateKey}T00:00' : (e.startDt?.toLocal().toIso8601String() ?? e.dateKey);
     return _MonthItem(
+      id: e.id,
       dateKey: e.dateKey,
       sortKey: sk,
       title: e.summary,
@@ -270,6 +276,7 @@ class _MonthItem {
 
   factory _MonthItem.fromTask(Task t, String dateKey, {required String dueLabel}) {
     return _MonthItem(
+      id: t.id,
       dateKey: dateKey,
       sortKey: '${dateKey}T00:00',
       title: t.title,
@@ -586,7 +593,7 @@ class _CalendarGrid extends ConsumerWidget {
           child: _DayCell(
             day: dayNum, isToday: isToday, isSunday: isSunday,
             events: dayEvents, tasks: dayTasks, isWeekend: isWeekend,
-            maxSlots: maxSlots,
+            maxSlots: maxSlots, dateKey: dateKey, col: col,
           ),
         );
       },
@@ -600,7 +607,7 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.day, required this.isToday, required this.isSunday,
     required this.events, required this.tasks, required this.isWeekend,
-    required this.maxSlots,
+    required this.maxSlots, required this.dateKey, required this.col,
   });
 
   final int day;
@@ -608,24 +615,35 @@ class _DayCell extends StatelessWidget {
   final List<CalendarEvent> events;
   final List<Task> tasks;
   final int maxSlots;
+  final String dateKey;
+  final int col;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
+    // rank: 0=여러날 종일(연결 막대, 맨 위) → 1=하루 종일 → 2=시간 → 3=태스크
     final allItems = [
-      ...events.map((e) => (title: e.summary, color: e.color, isTask: false, isAllDay: e.isAllDay, startDt: e.startDt)),
-      ...tasks.map((t) => (title: t.title, color: const Color(0xFF1A73E8), isTask: true, isAllDay: false, startDt: t.due)),
+      ...events.map((e) => (
+            id: e.id, title: e.summary, color: e.color, isTask: false,
+            isAllDay: e.isAllDay, startDt: e.startDt, event: e,
+            rank: !e.isAllDay ? 2 : (e.isMultiDay ? 0 : 1),
+          )),
+      ...tasks.map((t) => (
+            id: t.id, title: t.title, color: const Color(0xFF1A73E8), isTask: true,
+            isAllDay: false, startDt: t.due, event: null as CalendarEvent?,
+            rank: 3,
+          )),
     ];
     allItems.sort((a, b) {
-      if (a.isAllDay && !b.isAllDay) return -1;
-      if (!a.isAllDay && b.isAllDay) return 1;
-      if (!a.isTask && b.isTask) return -1;
-      if (a.isTask && !b.isTask) return 1;
+      if (a.rank != b.rank) return a.rank - b.rank;
       if (a.startDt != null && b.startDt != null) {
-        return a.startDt!.toLocal().compareTo(b.startDt!.toLocal());
+        final c = a.startDt!.toLocal().compareTo(b.startDt!.toLocal());
+        if (c != 0) return c;
       }
-      return 0;
+      // 동점 시 id로 결정적 tiebreak (불안정 정렬로 같은 날 일정 순서가 뒤집히던 버그 방지,
+      // 또 여러날 막대가 날짜마다 같은 슬롯에 와서 이어져 보이도록 함)
+      return a.id.compareTo(b.id);
     });
     final visible = allItems.take(maxSlots).toList();
     final extra = allItems.length - visible.length;
@@ -685,6 +703,36 @@ class _DayCell extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     )
+                  else if (item.event != null && item.event!.isMultiDay)
+                    // 여러 날에 걸친 종일 일정: 칸 끝까지 채우고 시작/끝만 둥글게 → 이어진 막대.
+                    // 제목은 막대 시작일 또는 주의 첫 칸(일요일)에만 표시해 반복을 줄인다.
+                    Builder(builder: (_) {
+                      final isStart = item.event!.dateKey == dateKey;
+                      final isEnd = item.event!.lastDateKey == dateKey;
+                      const r = Radius.circular(3);
+                      return Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.only(
+                          top: 2,
+                          left: isStart ? 2 : 0,
+                          right: isEnd ? 2 : 0,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: item.color,
+                          borderRadius: BorderRadius.horizontal(
+                            left: isStart ? r : Radius.zero,
+                            right: isEnd ? r : Radius.zero,
+                          ),
+                        ),
+                        child: Text(
+                          (isStart || col == 0) ? item.title : ' ',
+                          style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    })
                   else
                     Container(
                       width: double.infinity,

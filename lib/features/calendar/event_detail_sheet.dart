@@ -53,7 +53,7 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
     final cal = ref.watch(calendarProvider);
     final tasksAsync = ref.watch(taskServiceProvider);
 
-    final events = cal.events.where((e) => e.dateKey == widget.dateKey).toList();
+    final events = cal.events.where((e) => e.spannedDateKeys().contains(widget.dateKey)).toList();
     final tasks = tasksAsync.valueOrNull ?? [];
     final dayTasks = tasks.where((t) {
       if (t.due == null || t.isCompleted) return false;
@@ -137,9 +137,10 @@ class _EventDetailSheetState extends ConsumerState<EventDetailSheet> {
                                 ),
                               );
                             },
-                            onDelete: () async {
+                            onDelete: (series) async {
                               await ref.read(calendarProvider.notifier).deleteEvent(
-                                    event.calendarId, event.id);
+                                    event.calendarId, event.id,
+                                    seriesId: series ? event.recurringEventId : null);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showAutoDismissSnackBar(
                                   SnackBar(content: Text(AppLocalizations.of(context)!.eventDeletedSnack)),
@@ -165,7 +166,7 @@ class _EventCard extends StatelessWidget {
   const _EventCard({required this.event, required this.onEdit, required this.onDelete});
   final CalendarEvent event;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final void Function(bool series) onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -227,6 +228,31 @@ class _EventCard extends StatelessWidget {
 
   Future<void> _confirmDelete(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
+    if (event.isRecurring) {
+      // 반복 일정: 이 일정만 / 모든 일정 선택
+      final scope = await showDialog<String>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(l.recurringDeleteTitle),
+          content: Text(event.summary),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(l.cancelButton)),
+            TextButton(onPressed: () => Navigator.pop(context, 'this'), child: Text(l.recurringScopeThis)),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, 'all'),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(l.recurringScopeAll),
+            ),
+          ],
+        ),
+      );
+      if (scope == 'this') {
+        onDelete(false);
+      } else if (scope == 'all') {
+        onDelete(true);
+      }
+      return;
+    }
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -242,7 +268,7 @@ class _EventCard extends StatelessWidget {
         ],
       ),
     );
-    if (ok == true) onDelete();
+    if (ok == true) onDelete(false);
   }
 
   String _fmt(DateTime? dt) {

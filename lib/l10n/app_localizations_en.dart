@@ -198,6 +198,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventEnd => 'End';
 
   @override
+  String get allDayStart => 'Start date';
+
+  @override
+  String get allDayEnd => 'End date';
+
+  @override
+  String get recurringDeleteTitle => 'Delete recurring event';
+
+  @override
+  String get recurringEditTitle => 'Edit recurring event';
+
+  @override
+  String get recurringScopeThis => 'This event';
+
+  @override
+  String get recurringScopeAll => 'All events';
+
+  @override
+  String get recurringEditAllNote =>
+      'Editing all events applies only to title, location, description, color, and notification (not date/time).';
+
+  @override
   String get eventRepeat => 'Repeat';
 
   @override

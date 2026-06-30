@@ -67,6 +67,7 @@ class CalendarEvent {
   final String? location;
   final String? description;
   final String? colorId;
+  final String? recurringEventId; // 반복 일정의 원본(시리즈) id. 단일 일정이면 null
 
   const CalendarEvent({
     required this.id,
@@ -82,7 +83,10 @@ class CalendarEvent {
     this.location,
     this.description,
     this.colorId,
+    this.recurringEventId,
   });
+
+  bool get isRecurring => recurringEventId != null && recurringEventId!.isNotEmpty;
 
   String get dateKey {
     if (startDt != null) {
@@ -90,6 +94,61 @@ class CalendarEvent {
       return '${l.year}-${l.month.toString().padLeft(2,'0')}-${l.day.toString().padLeft(2,'0')}';
     }
     return startDate ?? '';
+  }
+
+  static String _fmtDay(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  DateTime? get startDay {
+    if (startDt != null) {
+      final l = startDt!.toLocal();
+      return DateTime(l.year, l.month, l.day);
+    }
+    if (startDate != null) return DateTime.tryParse(startDate!);
+    return null;
+  }
+
+  /// 마지막으로 포함되는 날(포함). 종일은 end.date(exclusive)−1일, 시간 일정은 종료일.
+  DateTime? get lastDay {
+    if (isAllDay) {
+      if (endDate != null) {
+        final e = DateTime.tryParse(endDate!);
+        if (e != null) return e.subtract(const Duration(days: 1));
+      }
+      return startDay;
+    } else {
+      if (endDt != null) {
+        final l = endDt!.toLocal();
+        return DateTime(l.year, l.month, l.day);
+      }
+      return startDay;
+    }
+  }
+
+  bool get isMultiDay {
+    final s = startDay, e = lastDay;
+    return s != null && e != null && e.isAfter(s);
+  }
+
+  String get lastDateKey {
+    final e = lastDay;
+    return e != null ? _fmtDay(e) : dateKey;
+  }
+
+  /// 일정이 걸쳐 있는 모든 날짜 키(시작~마지막, 포함).
+  List<String> spannedDateKeys() {
+    final s = startDay, e = lastDay;
+    if (s == null || e == null) return dateKey.isEmpty ? const [] : [dateKey];
+    final keys = <String>[];
+    // 비정상(과도하게 긴) 범위 방어: 최대 약 2년치만.
+    var d = s;
+    var guard = 0;
+    while (!d.isAfter(e) && guard < 800) {
+      keys.add(_fmtDay(d));
+      d = d.add(const Duration(days: 1));
+      guard++;
+    }
+    return keys;
   }
 
   factory CalendarEvent.fromJson(
@@ -120,6 +179,7 @@ class CalendarEvent {
       location: j['location'] as String?,
       description: j['description'] as String?,
       colorId: colorId,
+      recurringEventId: j['recurringEventId'] as String?,
     );
   }
 }
@@ -168,8 +228,10 @@ class CalendarState {
   Map<String, List<CalendarEvent>> get eventsByDate {
     final map = <String, List<CalendarEvent>>{};
     for (final e in events) {
-      final k = e.dateKey;
-      if (k.isNotEmpty) map.putIfAbsent(k, () => []).add(e);
+      // 여러 날에 걸친 일정은 걸친 모든 날에 표시한다(시작일만이 아니라).
+      for (final k in e.spannedDateKeys()) {
+        if (k.isNotEmpty) map.putIfAbsent(k, () => []).add(e);
+      }
     }
     return map;
   }
@@ -295,7 +357,10 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       events.sort((a, b) {
         final ak = a.isAllDay ? '${a.dateKey}T00:00' : (a.startDt?.toLocal().toIso8601String() ?? '');
         final bk = b.isAllDay ? '${b.dateKey}T00:00' : (b.startDt?.toLocal().toIso8601String() ?? '');
-        return ak.compareTo(bk);
+        final c = ak.compareTo(bk);
+        // 동점(같은 날 종일 일정 등) 시 id로 결정적 tiebreak — Dart sort 는 안정 정렬이
+        // 아니라 tiebreak 이 없으면 일부 날의 일정 순서가 뒤집힌다.
+        return c != 0 ? c : a.id.compareTo(b.id);
       });
 
       if (!mounted) return;
@@ -352,6 +417,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
     DateTime? startDt,
     DateTime? endDt,
     String? startDate,
+    String? endDate, // 종일 일정의 종료일(포함, 마지막 날). null이면 하루짜리(=startDate)
     String? colorId,
     String? location,
     String? description,
@@ -359,12 +425,13 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
     List<String>? attendeeEmails,
     String? notifMethod,
     int? notifMinutes,
+    String? patchTargetId, // 지정 시 이 id로 PATCH(반복 '모든 일정'=원본 id). null이면 eventId
+    bool seriesContentOnly = false, // true면 start/end/recurrence 제외(시리즈 내용만 수정)
   }) async {
     final body = <String, dynamic>{'summary': title};
     if (location?.isNotEmpty == true) body['location'] = location;
     if (description?.isNotEmpty == true) body['description'] = description;
     if (colorId?.isNotEmpty == true) body['colorId'] = colorId;
-    if (recurrence?.isNotEmpty == true) body['recurrence'] = [recurrence];
     if (attendeeEmails?.isNotEmpty == true) {
       body['attendees'] = attendeeEmails!.map((e) => {'email': e}).toList();
     }
@@ -374,30 +441,45 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
         'overrides': [{'method': notifMethod ?? 'popup', 'minutes': notifMinutes}],
       };
     }
-    if (isAllDay) {
-      // 날짜 유효성 방어: 비었거나 형식이 깨졌으면 오늘로 폴백(예외로 저장 자체가
-      // 실패하지 않도록). 시간→종일 변환 시 기존 dateTime 표현을 명시적으로 비운다.
-      final sd = (startDate != null && startDate.length >= 10
-              ? DateTime.tryParse(startDate.substring(0, 10))
-              : null) ??
-          DateTime.now();
-      final startStr =
-          '${sd.year}-${sd.month.toString().padLeft(2, '0')}-${sd.day.toString().padLeft(2, '0')}';
-      // Google Calendar API: end.date는 exclusive → 반드시 다음 날
-      final nextDay = DateTime(sd.year, sd.month, sd.day).add(const Duration(days: 1));
-      final endStr =
-          '${nextDay.year}-${nextDay.month.toString().padLeft(2, '0')}-${nextDay.day.toString().padLeft(2, '0')}';
-      body['start'] = {'date': startStr, 'dateTime': null};
-      body['end'] = {'date': endStr, 'dateTime': null};
-    } else {
-      // 종일→시간 변환 시 기존 date 표현을 명시적으로 비운다.
-      body['start'] = {'dateTime': toRfc3339(startDt!), 'date': null};
-      body['end'] = {'dateTime': toRfc3339(endDt!), 'date': null};
+    // 시리즈 내용만 수정(모든 일정)일 때는 시간/반복 필드를 건드리지 않아 시리즈 앵커가
+    // 깨지지 않게 한다.
+    if (!seriesContentOnly) {
+      if (recurrence?.isNotEmpty == true) body['recurrence'] = [recurrence];
+      if (isAllDay) {
+        // 날짜 유효성 방어: 비었거나 형식이 깨졌으면 오늘로 폴백. 시간→종일 변환 시
+        // 기존 dateTime 표현을 명시적으로 비운다.
+        final sd = (startDate != null && startDate.length >= 10
+                ? DateTime.tryParse(startDate.substring(0, 10))
+                : null) ??
+            DateTime.now();
+        // 종료일(포함): 지정 없으면 시작일과 동일(하루). 시작일보다 앞이면 시작일로 보정.
+        var ed = (endDate != null && endDate.length >= 10
+                ? DateTime.tryParse(endDate.substring(0, 10))
+                : null) ??
+            sd;
+        if (ed.isBefore(sd)) ed = sd;
+        final startStr =
+            '${sd.year}-${sd.month.toString().padLeft(2, '0')}-${sd.day.toString().padLeft(2, '0')}';
+        // Google Calendar API: end.date는 exclusive → 마지막 날 + 1일
+        final endExclusive = DateTime(ed.year, ed.month, ed.day).add(const Duration(days: 1));
+        final endStr =
+            '${endExclusive.year}-${endExclusive.month.toString().padLeft(2, '0')}-${endExclusive.day.toString().padLeft(2, '0')}';
+        body['start'] = {'date': startStr, 'dateTime': null};
+        body['end'] = {'date': endStr, 'dateTime': null};
+      } else {
+        // 종일→시간 변환 시 기존 date 표현을 명시적으로 비운다.
+        body['start'] = {'dateTime': toRfc3339(startDt!), 'date': null};
+        body['end'] = {'dateTime': toRfc3339(endDt!), 'date': null};
+      }
     }
 
     final calEnc = Uri.encodeComponent(calendarId);
     if (eventId != null) {
-      if (originalCalendarId != null && originalCalendarId != calendarId) {
+      final target = patchTargetId ?? eventId;
+      // 캘린더 이동은 단일 인스턴스 편집일 때만(시리즈 대상 패치 시에는 생략)
+      if (patchTargetId == null &&
+          originalCalendarId != null &&
+          originalCalendarId != calendarId) {
         // Move the event to the destination calendar first
         final srcEnc = Uri.encodeComponent(originalCalendarId);
         final evEnc = Uri.encodeComponent(eventId);
@@ -406,7 +488,7 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
         );
       }
       await _api.patch(
-        'https://www.googleapis.com/calendar/v3/calendars/$calEnc/events/${Uri.encodeComponent(eventId)}',
+        'https://www.googleapis.com/calendar/v3/calendars/$calEnc/events/${Uri.encodeComponent(target)}',
         body: body,
       );
     } else {
@@ -418,16 +500,25 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
     await loadEvents();
   }
 
-  Future<void> deleteEvent(String calendarId, String eventId) async {
+  /// [seriesId] 가 주어지면 반복 일정 '모든 일정'(원본 id) 삭제, 아니면 단일/인스턴스 삭제.
+  Future<void> deleteEvent(String calendarId, String eventId, {String? seriesId}) async {
+    final before = state.events;
+    // 낙관적 제거: 시리즈면 같은 recurringEventId(=seriesId) 인스턴스 전부, 아니면 해당 id만.
+    final updatedEvents = seriesId != null
+        ? before.where((e) => e.recurringEventId != seriesId && e.id != seriesId).toList()
+        : before.where((e) => e.id != eventId).toList();
+    state = state.copyWith(events: updatedEvents);
+    await WidgetService.updateCalendar(updatedEvents, year: state.year, month: state.month);
     try {
+      final target = seriesId ?? eventId;
       await _api.delete(
-        'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(calendarId)}/events/${Uri.encodeComponent(eventId)}',
+        'https://www.googleapis.com/calendar/v3/calendars/${Uri.encodeComponent(calendarId)}/events/${Uri.encodeComponent(target)}',
       );
-      final updatedEvents = state.events.where((e) => e.id != eventId).toList();
-      state = state.copyWith(events: updatedEvents);
-      await WidgetService.updateCalendar(updatedEvents, year: state.year, month: state.month);
     } catch (e) {
       debugPrint('deleteEvent 실패: $e');
+      // 실패 시 원복
+      state = state.copyWith(events: before);
+      await WidgetService.updateCalendar(before, year: state.year, month: state.month);
       rethrow;
     }
   }

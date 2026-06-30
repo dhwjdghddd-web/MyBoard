@@ -197,6 +197,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get eventEnd => '종료';
 
   @override
+  String get allDayStart => '시작일';
+
+  @override
+  String get allDayEnd => '종료일';
+
+  @override
+  String get recurringDeleteTitle => '반복 일정 삭제';
+
+  @override
+  String get recurringEditTitle => '반복 일정 수정';
+
+  @override
+  String get recurringScopeThis => '이 일정만';
+
+  @override
+  String get recurringScopeAll => '모든 일정';
+
+  @override
+  String get recurringEditAllNote =>
+      '‘모든 일정’ 수정은 제목·장소·설명·색상·알림에만 적용돼요(날짜·시간 제외).';
+
+  @override
   String get eventRepeat => '반복';
 
   @override

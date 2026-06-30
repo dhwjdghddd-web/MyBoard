@@ -446,6 +446,48 @@ abstract class AppLocalizations {
   /// **'End'**
   String get eventEnd;
 
+  /// No description provided for @allDayStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get allDayStart;
+
+  /// No description provided for @allDayEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get allDayEnd;
+
+  /// No description provided for @recurringDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete recurring event'**
+  String get recurringDeleteTitle;
+
+  /// No description provided for @recurringEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit recurring event'**
+  String get recurringEditTitle;
+
+  /// No description provided for @recurringScopeThis.
+  ///
+  /// In en, this message translates to:
+  /// **'This event'**
+  String get recurringScopeThis;
+
+  /// No description provided for @recurringScopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All events'**
+  String get recurringScopeAll;
+
+  /// No description provided for @recurringEditAllNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Editing all events applies only to title, location, description, color, and notification (not date/time).'**
+  String get recurringEditAllNote;
+
   /// No description provided for @eventRepeat.
   ///
   /// In en, this message translates to:

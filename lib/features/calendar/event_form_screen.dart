@@ -29,6 +29,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
   DateTime _startDt = DateTime.now();
   DateTime _endDt = DateTime.now().add(const Duration(hours: 1));
   String _startDateStr = '';
+  String _endDateStr = ''; // 종일 일정 종료일(포함, 마지막 날)
   String _repeat = '';
   String _notifMethod = 'popup';
   String? _colorId;
@@ -62,8 +63,21 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
           '${baseDate.year}-${baseDate.month.toString().padLeft(2, '0')}-${baseDate.day.toString().padLeft(2, '0')}';
       _startDt = ev.startDt?.toLocal() ?? baseDate.copyWith(hour: 9, minute: 0, second: 0);
       _endDt = ev.endDt?.toLocal() ?? _startDt.add(const Duration(hours: 1));
+      // 종일 종료일: API end.date 는 exclusive(다음날) → 표시는 마지막 날(=end.date - 1).
+      if (ev.isAllDay && ev.endDate != null) {
+        final exEnd = DateTime.tryParse(ev.endDate!);
+        if (exEnd != null) {
+          final last = exEnd.subtract(const Duration(days: 1));
+          _endDateStr =
+              '${last.year}-${last.month.toString().padLeft(2, '0')}-${last.day.toString().padLeft(2, '0')}';
+        }
+      }
+      if (_endDateStr.isEmpty || _endDateStr.compareTo(_startDateStr) < 0) {
+        _endDateStr = _startDateStr;
+      }
     } else {
       _startDateStr = widget.initialDateKey;
+      _endDateStr = widget.initialDateKey;
       _startDt = initDate.copyWith(hour: 9, minute: 0, second: 0);
       _endDt = initDate.copyWith(hour: 10, minute: 0, second: 0);
     }
@@ -79,8 +93,9 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
-    final parts = _startDateStr.split('-');
+  Future<void> _pickDate({required bool isStart}) async {
+    final base = isStart ? _startDateStr : _endDateStr;
+    final parts = base.split('-');
     final init = parts.length == 3
         ? DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]))
         : DateTime.now();
@@ -92,7 +107,14 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     );
     if (picked != null) {
       setState(() {
-        _startDateStr = '${picked.year}-${picked.month.toString().padLeft(2,'0')}-${picked.day.toString().padLeft(2,'0')}';
+        final s = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+        if (isStart) {
+          _startDateStr = s;
+          if (_endDateStr.compareTo(_startDateStr) < 0) _endDateStr = _startDateStr;
+        } else {
+          _endDateStr = s;
+          if (_endDateStr.compareTo(_startDateStr) < 0) _startDateStr = _endDateStr;
+        }
       });
     }
   }
@@ -147,6 +169,15 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
       return;
     }
 
+    // 반복 일정 편집이면 적용 범위(이 일정만 / 모든 일정)를 먼저 묻는다.
+    bool seriesAll = false;
+    final ev = widget.event;
+    if (ev != null && ev.isRecurring) {
+      final scope = await _askRecurringScope();
+      if (scope == null) return; // 취소
+      seriesAll = scope == 'all';
+    }
+
     setState(() => _saving = true);
     try {
       final calState = ref.read(calendarProvider);
@@ -170,6 +201,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
         startDt: _allDay ? null : _startDt,
         endDt: _allDay ? null : _endDt,
         startDate: _allDay ? _startDateStr : null,
+        endDate: _allDay ? _endDateStr : null,
         colorId: _colorId,
         location: _locationCtrl.text.trim(),
         description: _descCtrl.text.trim(),
@@ -177,6 +209,8 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
         attendeeEmails: attendees,
         notifMethod: _notifMethod,
         notifMinutes: notifMin,
+        patchTargetId: seriesAll ? ev!.recurringEventId : null,
+        seriesContentOnly: seriesAll,
       );
 
       if (mounted) Navigator.pop(context);
@@ -190,6 +224,23 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     }
   }
 
+  // 반복 일정 수정 범위 선택. 'this' | 'all' | null(취소)
+  Future<String?> _askRecurringScope() async {
+    final l = AppLocalizations.of(context)!;
+    return showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l.recurringEditTitle),
+        content: Text(l.recurringEditAllNote),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l.cancelButton)),
+          TextButton(onPressed: () => Navigator.pop(context, 'this'), child: Text(l.recurringScopeThis)),
+          FilledButton(onPressed: () => Navigator.pop(context, 'all'), child: Text(l.recurringScopeAll)),
+        ],
+      ),
+    );
+  }
+
   String _fmtDt(DateTime dt) {
     final l = AppLocalizations.of(context)!;
     final local = dt.toLocal();
@@ -200,16 +251,16 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     );
   }
 
-  String _fmtAllDayDate() {
+  String _fmtAllDayDate(String dateStr) {
     final l = AppLocalizations.of(context)!;
-    final parts = _startDateStr.split('-');
+    final parts = dateStr.split('-');
     if (parts.length == 3) {
       final y = int.tryParse(parts[0]) ?? 0;
       final m = int.tryParse(parts[1]) ?? 0;
       final d = int.tryParse(parts[2]) ?? 0;
       return l.dateFormat(y, m, d);
     }
-    return _startDateStr;
+    return dateStr;
   }
 
   @override
@@ -258,8 +309,16 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
             if (_allDay) ...[
               ListTile(
                 leading: const Icon(Icons.calendar_today),
-                title: Text(_fmtAllDayDate()),
-                onTap: _pickDate,
+                title: Text(l.allDayStart),
+                subtitle: Text(_fmtAllDayDate(_startDateStr)),
+                onTap: () => _pickDate(isStart: true),
+              ),
+              const Divider(height: 1, indent: 56),
+              ListTile(
+                leading: const Icon(Icons.event),
+                title: Text(l.allDayEnd),
+                subtitle: Text(_fmtAllDayDate(_endDateStr)),
+                onTap: () => _pickDate(isStart: false),
               ),
             ] else ...[
               ListTile(
