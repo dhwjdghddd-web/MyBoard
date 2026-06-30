@@ -51,12 +51,17 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
       _colorId = ev.colorId;
       _calendarId = ev.calendarId;
       _allDay = ev.isAllDay;
-      if (ev.isAllDay) {
-        _startDateStr = ev.startDate ?? widget.initialDateKey;
-      } else {
-        _startDt = ev.startDt?.toLocal() ?? initDate.copyWith(hour: 9);
-        _endDt = ev.endDt?.toLocal() ?? initDate.copyWith(hour: 10);
-      }
+
+      // 종일↔시간 어느 쪽으로 토글해도 유효한 값이 있도록 셋 다 이벤트 기준으로 초기화한다.
+      // (과거: 시간 일정 편집 시 _startDateStr 이 ''로 남아 종일로 바꿔 저장하면
+      //  saveEvent 의 날짜 파싱에서 예외가 났다.)
+      final DateTime baseDate = ev.startDt?.toLocal() ??
+          (ev.startDate != null ? DateTime.tryParse(ev.startDate!) : null) ??
+          initDate;
+      _startDateStr = ev.startDate ??
+          '${baseDate.year}-${baseDate.month.toString().padLeft(2, '0')}-${baseDate.day.toString().padLeft(2, '0')}';
+      _startDt = ev.startDt?.toLocal() ?? baseDate.copyWith(hour: 9, minute: 0, second: 0);
+      _endDt = ev.endDt?.toLocal() ?? _startDt.add(const Duration(hours: 1));
     } else {
       _startDateStr = widget.initialDateKey;
       _startDt = initDate.copyWith(hour: 9, minute: 0, second: 0);

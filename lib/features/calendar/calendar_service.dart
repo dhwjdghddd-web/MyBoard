@@ -375,18 +375,24 @@ class CalendarNotifier extends StateNotifier<CalendarState> {
       };
     }
     if (isAllDay) {
-      body['start'] = {'date': startDate};
+      // 날짜 유효성 방어: 비었거나 형식이 깨졌으면 오늘로 폴백(예외로 저장 자체가
+      // 실패하지 않도록). 시간→종일 변환 시 기존 dateTime 표현을 명시적으로 비운다.
+      final sd = (startDate != null && startDate.length >= 10
+              ? DateTime.tryParse(startDate.substring(0, 10))
+              : null) ??
+          DateTime.now();
+      final startStr =
+          '${sd.year}-${sd.month.toString().padLeft(2, '0')}-${sd.day.toString().padLeft(2, '0')}';
       // Google Calendar API: end.date는 exclusive → 반드시 다음 날
-      final parts = startDate!.split('-');
-      final nextDay = DateTime(
-        int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]),
-      ).add(const Duration(days: 1));
-      final endDate =
+      final nextDay = DateTime(sd.year, sd.month, sd.day).add(const Duration(days: 1));
+      final endStr =
           '${nextDay.year}-${nextDay.month.toString().padLeft(2, '0')}-${nextDay.day.toString().padLeft(2, '0')}';
-      body['end'] = {'date': endDate};
+      body['start'] = {'date': startStr, 'dateTime': null};
+      body['end'] = {'date': endStr, 'dateTime': null};
     } else {
-      body['start'] = {'dateTime': toRfc3339(startDt!)};
-      body['end'] = {'dateTime': toRfc3339(endDt!)};
+      // 종일→시간 변환 시 기존 date 표현을 명시적으로 비운다.
+      body['start'] = {'dateTime': toRfc3339(startDt!), 'date': null};
+      body['end'] = {'dateTime': toRfc3339(endDt!), 'date': null};
     }
 
     final calEnc = Uri.encodeComponent(calendarId);
