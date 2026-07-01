@@ -171,24 +171,29 @@ class CalendarSyncJobService : JobService() {
                 edit.remove("cal_day_${k}_times")
                 edit.remove("cal_day_${k}_ids")
                 edit.remove("cal_day_${k}_colors")
+                edit.remove("cal_day_${k}_spans")
             }
 
             for ((key, events) in byDay) {
-                // 정렬 키를 Flutter updateCalendar와 동일하게 맞춘다(종일 먼저 → 실제
-                // 시작 instant → id). 두 주체의 출력이 같아야 새로고침 시 깜빡임이 없다.
-                events.sortWith(compareBy({ if (it.isAllDay) 0 else 1 }, { it.startMillis }, { it.id }))
+                // 정렬 키를 Flutter updateCalendar와 동일하게 맞춘다(여러날 종일 먼저 →
+                // 하루 종일 → 시간, 그 안에서 시작 instant → id). 두 주체의 출력이 같아야
+                // 새로고침 시 깜빡임이 없고, 여러날 막대가 날짜마다 같은 줄에 온다.
+                fun rank(it: EventItem) = if (it.span != "o") 0 else if (it.isAllDay) 1 else 2
+                events.sortWith(compareBy({ rank(it) }, { it.startMillis }, { it.id }))
                 val take = events.take(25)
                 edit.putString("cal_day_${key}_titles", take.joinToString("|") { it.title })
                 edit.putString("cal_day_${key}_times",  take.joinToString("|") { it.time })
                 edit.putString("cal_day_${key}_ids",    take.joinToString("|") { it.id })
                 edit.putString("cal_day_${key}_colors", take.joinToString("|") { it.color })
+                edit.putString("cal_day_${key}_spans",  take.joinToString("|") { it.span })
             }
             edit.commit()
             Log.d(TAG, "syncCalendar written ${byDay.size} days to prefs")
             return true
         }
 
-        private data class EventItem(val dayKey: String, val title: String, val time: String, val id: String, val color: String, val isAllDay: Boolean, val startMillis: Long)
+        // span: "o"=하루/단일, "s"=여러날 시작, "m"=중간, "e"=끝 (여러날 '종일'만 s/m/e)
+        private data class EventItem(val dayKey: String, val title: String, val time: String, val id: String, val color: String, val isAllDay: Boolean, val startMillis: Long, val span: String)
 
         private fun fetchCalendarsCached(token: String, context: Context): List<Pair<String, String>> {
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -296,6 +301,9 @@ class CalendarSyncJobService : JobService() {
                 var lDate = lastDate ?: sDate
                 if (lDate.isBefore(sDate)) lDate = sDate
 
+                // 여러 날 '종일' 일정만 연결 막대 대상(s/m/e). 그 외는 "o".
+                val multiDayAllDay = isAllDay && lDate.isAfter(sDate)
+
                 // 이 달 범위로 클램프해 걸친 모든 날에 하나씩 추가(여러 날 일정 반영)
                 val monthFirst = java.time.LocalDate.of(year, month, 1)
                 val monthLast = monthFirst.plusMonths(1).minusDays(1)
@@ -303,7 +311,13 @@ class CalendarSyncJobService : JobService() {
                 val to = if (lDate.isAfter(monthLast)) monthLast else lDate
                 while (!d.isAfter(to)) {
                     val k = "%04d%02d%02d".format(d.year, d.monthValue, d.dayOfMonth)
-                    result.add(EventItem(k, summary, timeLabel, id, color, isAllDay, startMillis))
+                    val span = when {
+                        !multiDayAllDay -> "o"
+                        d == sDate -> "s"
+                        d == lDate -> "e"
+                        else -> "m"
+                    }
+                    result.add(EventItem(k, summary, timeLabel, id, color, isAllDay, startMillis, span))
                     d = d.plusDays(1)
                 }
             }

@@ -109,13 +109,28 @@ class WidgetService {
         await HomeWidget.saveWidgetData<String>('cal_event_days', days.join(','));
       }
 
+      // 여러날 종일 여부 및 특정 날의 span 코드(연결 막대용)
+      bool multiAllDay(CalendarEvent e) => e.isAllDay && e.isMultiDay;
+      int rank(CalendarEvent e) => multiAllDay(e) ? 0 : (e.isAllDay ? 1 : 2);
+      String spanOf(CalendarEvent e, int dayNum) {
+        if (!multiAllDay(e)) return 'o';
+        final dayDate = DateTime(year, month, dayNum);
+        final s = e.startDay, l = e.lastDay;
+        if (s != null && !dayDate.isAfter(s)) return 's';
+        if (l != null && !dayDate.isBefore(l)) return 'e';
+        return 'm';
+      }
+
       final dayFutures = <Future>[];
       for (final entry in byDay.entries) {
-        final key = '${year.toString().padLeft(4, '0')}${month.toString().padLeft(2, '0')}${entry.key.toString().padLeft(2, '0')}';
+        final dayNum = entry.key;
+        final key = '${year.toString().padLeft(4, '0')}${month.toString().padLeft(2, '0')}${dayNum.toString().padLeft(2, '0')}';
         final evList = entry.value;
         evList.sort((a, b) {
-          // 종일 먼저 → 실제 시작 instant → id (네이티브와 동일 순서)
-          if (a.isAllDay != b.isAllDay) return a.isAllDay ? -1 : 1;
+          // 여러날 종일 먼저 → 하루 종일 → 시간, 그 안에서 시작 instant → id
+          // (네이티브 CalendarSyncJobService와 동일 순서)
+          final r = rank(a).compareTo(rank(b));
+          if (r != 0) return r;
           final c = startMs(a).compareTo(startMs(b));
           return c != 0 ? c : a.id.compareTo(b.id);
         });
@@ -134,10 +149,12 @@ class WidgetService {
           final hex = e.color.toARGB32().toRadixString(16).padLeft(8, '0');
           return '#$hex';
         }).join('|');
+        final spans = take.map((e) => spanOf(e, dayNum)).join('|');
         dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_titles', titles));
         dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_times',  times));
         dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_ids',    ids));
         dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_colors', colors));
+        dayFutures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_spans',  spans));
       }
       await Future.wait(dayFutures);
 
@@ -176,6 +193,7 @@ class WidgetService {
         futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_times', ''));
         futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_ids', ''));
         futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_colors', ''));
+        futures.add(HomeWidget.saveWidgetData<String>('cal_day_${key}_spans', ''));
       }
 
       await Future.wait(futures);

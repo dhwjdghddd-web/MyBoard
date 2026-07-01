@@ -261,7 +261,8 @@ class HomeWidgetProvider : AppWidgetProvider() {
             return if (lum > 180) Color.BLACK else Color.WHITE
         }
 
-        private class DisplayItem(val title: String, val isTask: Boolean, val color: Int)
+        // span: "o"=단일, "s"=여러날 시작, "m"=중간, "e"=끝 (연결 막대용)
+        private class DisplayItem(val title: String, val isTask: Boolean, val color: Int, val span: String = "o")
 
         private fun getLocalDateKey(dueStr: String): String {
             if (dueStr.length < 10) return ""
@@ -279,19 +280,37 @@ class HomeWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun bindEventOrTask(views: RemoteViews, viewId: Int, item: DisplayItem, textDp: Float, isDark: Boolean) {
+        private fun bindEventOrTask(views: RemoteViews, viewId: Int, item: DisplayItem, textDp: Float, isDark: Boolean, col: Int = 0) {
             views.setTextViewTextSize(viewId, android.util.TypedValue.COMPLEX_UNIT_DIP, textDp)
             if (item.isTask) {
                 views.setInt(viewId, "setBackgroundColor", Color.TRANSPARENT)
-                
+
                 val ssb = SpannableStringBuilder("● ${item.title}")
                 ssb.setSpan(ForegroundColorSpan(Color.parseColor("#4285F4")), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 val textColor = if (isDark) Color.WHITE else Color.parseColor("#1F2937")
                 ssb.setSpan(ForegroundColorSpan(textColor), 2, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                
+
                 views.setTextViewText(viewId, ssb)
                 views.setTextColor(viewId, textColor)
+            } else if (item.span != "o") {
+                // 여러 날 종일 일정: 끝만 둥근 배경으로 이어진 막대. 제목은 시작 칸 또는
+                // 주의 첫 칸(일요일)에만 → 같은 일정끼리 이어져 보이게 한다.
+                val bg = when (item.span) {
+                    "s" -> R.drawable.bar_bg_left
+                    "e" -> R.drawable.bar_bg_right
+                    else -> R.drawable.bar_bg_mid
+                }
+                views.setInt(viewId, "setBackgroundResource", bg)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    views.setColorStateList(viewId, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(item.color))
+                } else {
+                    views.setInt(viewId, "setBackgroundColor", item.color)
+                }
+                val showTitle = item.span == "s" || col == 0
+                views.setTextViewText(viewId, if (showTitle) item.title else " ")
+                views.setTextColor(viewId, getContrastColor(item.color))
+                return
             } else {
                 views.setInt(viewId, "setBackgroundResource", R.drawable.event_chip_bg)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -299,10 +318,10 @@ class HomeWidgetProvider : AppWidgetProvider() {
                 } else {
                     views.setInt(viewId, "setBackgroundColor", item.color)
                 }
-                
+
                 val ssb = SpannableStringBuilder(item.title)
                 ssb.setSpan(android.text.style.TypefaceSpan("sans-serif"), 0, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                
+
                 views.setTextViewText(viewId, ssb)
                 views.setTextColor(viewId, getContrastColor(item.color))
             }
@@ -706,10 +725,12 @@ class HomeWidgetProvider : AppWidgetProvider() {
                         val titlesRaw = (allPrefs["cal_day_${compactKey}_titles"] as? String) ?: ""
                         val colorsRaw = (allPrefs["cal_day_${compactKey}_colors"] as? String) ?: ""
                         val timesRaw = (allPrefs["cal_day_${compactKey}_times"] as? String) ?: ""
+                        val spansRaw = (allPrefs["cal_day_${compactKey}_spans"] as? String) ?: ""
 
                         val titles = if (titlesRaw.isEmpty()) emptyList() else titlesRaw.split("|")
                         val colors = if (colorsRaw.isEmpty()) emptyList() else colorsRaw.split("|")
                         val times = if (timesRaw.isEmpty()) emptyList() else timesRaw.split("|")
+                        val spans = if (spansRaw.isEmpty()) emptyList() else spansRaw.split("|")
 
                         // 1. 날짜 설정
                         views.setTextViewText(cellId, day.toString())
@@ -743,7 +764,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                             } catch (e: Exception) {
                                 Color.parseColor("#ff4285f4")
                             }
-                            displayItems.add(DisplayItem(t, false, c))
+                            displayItems.add(DisplayItem(t, false, c, spans.getOrNull(i) ?: "o"))
                         }
                         for (t in dayTasks) {
                             displayItems.add(DisplayItem(t, true, Color.parseColor("#4285F4")))
@@ -781,7 +802,7 @@ class HomeWidgetProvider : AppWidgetProvider() {
                                 val item = displayItems.getOrNull(s)
                                 if (item != null) {
                                     views.setViewVisibility(slotId, View.VISIBLE)
-                                    bindEventOrTask(views, slotId, item, eventDp, isDark)
+                                    bindEventOrTask(views, slotId, item, eventDp, isDark, col)
                                 } else {
                                     views.setViewVisibility(slotId, View.GONE)
                                 }
