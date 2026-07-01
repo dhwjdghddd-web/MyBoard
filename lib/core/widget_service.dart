@@ -52,25 +52,29 @@ class WidgetService {
     try {
       final allDayLabel = appL10n().allDay;
 
-      bool inTargetMonth(CalendarEvent e) {
-        final dt = e.startDt?.toLocal();
-        if (dt != null) return dt.year == year && dt.month == month;
-        if (e.startDate != null && e.startDate!.length >= 10) {
-          return int.tryParse(e.startDate!.substring(0, 4)) == year &&
-                 int.tryParse(e.startDate!.substring(5, 7)) == month;
-        }
-        return false;
+      final firstOfMonth = DateTime(year, month, 1);
+      final lastOfMonth = DateTime(year, month + 1, 0);
+
+      // 이 달과 겹치는 일정(여러 날 일정은 시작이 다른 달이어도 포함)
+      bool overlapsMonth(CalendarEvent e) {
+        final s = e.startDay, l = e.lastDay;
+        if (s == null || l == null) return false;
+        return !s.isAfter(lastOfMonth) && !l.isBefore(firstOfMonth);
       }
 
-      final monthEvents = events.where(inTargetMonth).toList();
-
-      int? dayOf(CalendarEvent e) {
-        if (e.startDt != null) return e.startDt!.toLocal().day;
-        if (e.startDate != null && e.startDate!.length >= 10) {
-          return int.tryParse(e.startDate!.substring(8, 10));
+      // 이 달 안에서 일정이 걸친 날짜(일) 목록 — 여러 날 일정은 걸친 모든 날 반영
+      List<int> coveredDays(CalendarEvent e) {
+        final s = e.startDay!, l = e.lastDay!;
+        final from = s.isBefore(firstOfMonth) ? firstOfMonth : s;
+        final to = l.isAfter(lastOfMonth) ? lastOfMonth : l;
+        final out = <int>[];
+        for (var d = from; !d.isAfter(to); d = d.add(const Duration(days: 1))) {
+          out.add(d.day);
         }
-        return null;
+        return out;
       }
+
+      final monthEvents = events.where(overlapsMonth).toList();
 
       // 네이티브 CalendarSyncJobService와 동일한 정렬 키(시작 instant epoch millis).
       int startMs(CalendarEvent e) {
@@ -82,22 +86,27 @@ class WidgetService {
         return 0;
       }
 
+      // 일별 데이터: 해당 월의 모든 날을 빈값으로 초기화 후 이벤트로 채운다.
+      final daysInMonth = lastOfMonth.day;
+      final Map<int, List<CalendarEvent>> byDay = {
+        for (var d = 1; d <= daysInMonth; d++) d: <CalendarEvent>[],
+      };
+      final daySet = <int>{};
+      for (final e in monthEvents) {
+        for (final d in coveredDays(e)) {
+          if (byDay.containsKey(d)) {
+            byDay[d]!.add(e);
+            daySet.add(d);
+          }
+        }
+      }
+
       // 월별 이벤트 날짜 집합 (해당 월만)
-      final days = monthEvents.map(dayOf).whereType<int>().where((d) => d > 0).toSet();
+      final days = daySet;
       await HomeWidget.saveWidgetData<String>('cal_ev_${year}_$month', days.join(','));
       final now = DateTime.now();
       if (year == now.year && month == now.month) {
         await HomeWidget.saveWidgetData<String>('cal_event_days', days.join(','));
-      }
-
-      // 일별 데이터: 해당 월의 모든 날을 빈값으로 초기화 후 이벤트로 채운다.
-      final daysInMonth = DateTime(year, month + 1, 0).day;
-      final Map<int, List<CalendarEvent>> byDay = {
-        for (var d = 1; d <= daysInMonth; d++) d: <CalendarEvent>[],
-      };
-      for (final e in monthEvents) {
-        final day = dayOf(e);
-        if (day != null && byDay.containsKey(day)) byDay[day]!.add(e);
       }
 
       final dayFutures = <Future>[];

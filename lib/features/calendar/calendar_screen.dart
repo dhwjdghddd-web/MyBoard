@@ -553,6 +553,43 @@ class _CalendarGrid extends ConsumerWidget {
     final calculatedSlots = (availableForEvents / 15.0).floor();
     final maxSlots = isTablet ? calculatedSlots.clamp(2, 6) : 2;
 
+    // 다중일 '종일' 일정 레인 배정: 각 일정이 걸친 모든 날 동안 같은 줄(lane)에 오도록 해
+    // 서로 다른 일정이 같은 줄에서 이어져 보이는 것을 막는다.
+    final multiSet = <String, CalendarEvent>{};
+    for (final list in eventsByDate.values) {
+      for (final e in list) {
+        if (e.isAllDay && e.isMultiDay) multiSet[e.id] = e;
+      }
+    }
+    final multiEvents = multiSet.values.toList()
+      ..sort((a, b) {
+        final s = (a.startDay ?? DateTime(2000)).compareTo(b.startDay ?? DateTime(2000));
+        if (s != 0) return s;
+        // 더 긴 일정 먼저(같은 시작이면 오래 가는 것을 위 레인에)
+        final d = (b.lastDay ?? DateTime(2000)).compareTo(a.lastDay ?? DateTime(2000));
+        return d != 0 ? d : a.id.compareTo(b.id);
+      });
+    bool overlaps(CalendarEvent a, CalendarEvent b) {
+      final as_ = a.startDay, ae = a.lastDay, bs = b.startDay, be = b.lastDay;
+      if (as_ == null || ae == null || bs == null || be == null) return false;
+      return !(ae.isBefore(bs) || be.isBefore(as_));
+    }
+    final laneOf = <String, int>{};
+    final lanes = <List<CalendarEvent>>[];
+    for (final e in multiEvents) {
+      var lane = 0;
+      while (true) {
+        if (lane >= lanes.length) lanes.add([]);
+        if (lanes[lane].any((o) => overlaps(o, e))) {
+          lane++;
+        } else {
+          lanes[lane].add(e);
+          laneOf[e.id] = lane;
+          break;
+        }
+      }
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -593,7 +630,7 @@ class _CalendarGrid extends ConsumerWidget {
           child: _DayCell(
             day: dayNum, isToday: isToday, isSunday: isSunday,
             events: dayEvents, tasks: dayTasks, isWeekend: isWeekend,
-            maxSlots: maxSlots, dateKey: dateKey, col: col,
+            maxSlots: maxSlots, dateKey: dateKey, col: col, laneOf: laneOf,
           ),
         );
       },
@@ -608,6 +645,7 @@ class _DayCell extends StatelessWidget {
     required this.day, required this.isToday, required this.isSunday,
     required this.events, required this.tasks, required this.isWeekend,
     required this.maxSlots, required this.dateKey, required this.col,
+    required this.laneOf,
   });
 
   final int day;
@@ -617,36 +655,117 @@ class _DayCell extends StatelessWidget {
   final int maxSlots;
   final String dateKey;
   final int col;
+  final Map<String, int> laneOf; // 다중일 종일 일정 id → 레인(줄) 번호
+
+  // 여러 날에 걸친 종일 일정 막대(칸 끝까지, 시작/끝만 둥글게 → 같은 일정끼리 이어짐)
+  Widget _bar(CalendarEvent e) {
+    final isStart = e.dateKey == dateKey;
+    final isEnd = e.lastDateKey == dateKey;
+    const r = Radius.circular(3);
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(top: 2, left: isStart ? 2 : 0, right: isEnd ? 2 : 0),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+      decoration: BoxDecoration(
+        color: e.color,
+        borderRadius: BorderRadius.horizontal(
+          left: isStart ? r : Radius.zero,
+          right: isEnd ? r : Radius.zero,
+        ),
+      ),
+      child: Text(
+        // 막대 시작일 또는 주의 첫 칸(일요일)에만 제목 → 이어지는 느낌 유지하되 빈 칸 방지
+        (isStart || col == 0) ? e.summary : ' ',
+        style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  // 레인 정렬용 빈 자리(같은 일정이 날짜마다 같은 줄에 오도록 높이만 확보)
+  Widget _placeholder() => Container(
+        margin: const EdgeInsets.only(top: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+        child: const Text(' ', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold)),
+      );
+
+  Widget _chip(String title, Color color) => Container(
+        width: double.infinity,
+        margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
+
+  Widget _taskRow(BuildContext context, String title) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
+        child: Text.rich(
+          TextSpan(children: [
+            const TextSpan(text: '● ', style: TextStyle(color: Color(0xFF1A73E8), fontWeight: FontWeight.bold)),
+            TextSpan(text: title),
+          ]),
+          style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    // rank: 0=여러날 종일(연결 막대, 맨 위) → 1=하루 종일 → 2=시간 → 3=태스크
-    final allItems = [
-      ...events.map((e) => (
+    // 1) 다중일 종일 일정 → 레인 배치 (같은 일정이 날짜마다 같은 줄에)
+    final laneEvent = <int, CalendarEvent>{};
+    var maxLane = -1;
+    for (final e in events) {
+      if (e.isAllDay && e.isMultiDay) {
+        final lane = laneOf[e.id] ?? 0;
+        laneEvent[lane] = e;
+        if (lane > maxLane) maxLane = lane;
+      }
+    }
+
+    // 2) 그 외(하루 종일 / 시간 / 태스크) 정렬: 종일 → 시간 → 태스크, 그 안에서 시각·id
+    final others = <({String id, String title, Color color, bool isTask, int rank, DateTime? startDt})>[
+      ...events.where((e) => !(e.isAllDay && e.isMultiDay)).map((e) => (
             id: e.id, title: e.summary, color: e.color, isTask: false,
-            isAllDay: e.isAllDay, startDt: e.startDt, event: e,
-            rank: !e.isAllDay ? 2 : (e.isMultiDay ? 0 : 1),
+            rank: e.isAllDay ? 1 : 2, startDt: e.startDt,
           )),
       ...tasks.map((t) => (
             id: t.id, title: t.title, color: const Color(0xFF1A73E8), isTask: true,
-            isAllDay: false, startDt: t.due, event: null as CalendarEvent?,
-            rank: 3,
+            rank: 3, startDt: t.due,
           )),
     ];
-    allItems.sort((a, b) {
+    others.sort((a, b) {
       if (a.rank != b.rank) return a.rank - b.rank;
       if (a.startDt != null && b.startDt != null) {
         final c = a.startDt!.toLocal().compareTo(b.startDt!.toLocal());
         if (c != 0) return c;
       }
-      // 동점 시 id로 결정적 tiebreak (불안정 정렬로 같은 날 일정 순서가 뒤집히던 버그 방지,
-      // 또 여러날 막대가 날짜마다 같은 슬롯에 와서 이어져 보이도록 함)
       return a.id.compareTo(b.id);
     });
-    final visible = allItems.take(maxSlots).toList();
-    final extra = allItems.length - visible.length;
+
+    // 3) 행 구성: 레인(0..maxLane, 빈 레인은 placeholder) → 그 외 항목
+    final rows = <({Widget w, bool isEvent})>[];
+    for (var lane = 0; lane <= maxLane; lane++) {
+      final e = laneEvent[lane];
+      rows.add((w: e != null ? _bar(e) : _placeholder(), isEvent: e != null));
+    }
+    for (final o in others) {
+      rows.add((w: o.isTask ? _taskRow(context, o.title) : _chip(o.title, o.color), isEvent: true));
+    }
+
+    final visible = rows.take(maxSlots).toList();
+    final shownEvents = visible.where((r) => r.isEvent).length;
+    final totalEvents = laneEvent.length + others.length;
+    final extra = totalEvents - shownEvents;
 
     return Container(
       decoration: BoxDecoration(
@@ -683,83 +802,17 @@ class _DayCell extends StatelessWidget {
               alignment: Alignment.topLeft,
               maxHeight: double.infinity,
               child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final item in visible)
-                  if (item.isTask)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            const TextSpan(text: '● ', style: TextStyle(color: Color(0xFF1A73E8), fontWeight: FontWeight.bold)),
-                            TextSpan(text: item.title),
-                          ],
-                        ),
-                        style: TextStyle(fontSize: 9.5, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  else if (item.event != null && item.event!.isMultiDay)
-                    // 여러 날에 걸친 종일 일정: 칸 끝까지 채우고 시작/끝만 둥글게 → 이어진 막대.
-                    // 제목은 막대 시작일 또는 주의 첫 칸(일요일)에만 표시해 반복을 줄인다.
-                    Builder(builder: (_) {
-                      final isStart = item.event!.dateKey == dateKey;
-                      final isEnd = item.event!.lastDateKey == dateKey;
-                      const r = Radius.circular(3);
-                      return Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.only(
-                          top: 2,
-                          left: isStart ? 2 : 0,
-                          right: isEnd ? 2 : 0,
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
-                        decoration: BoxDecoration(
-                          color: item.color,
-                          borderRadius: BorderRadius.horizontal(
-                            left: isStart ? r : Radius.zero,
-                            right: isEnd ? r : Radius.zero,
-                          ),
-                        ),
-                        child: Text(
-                          (isStart || col == 0) ? item.title : ' ',
-                          style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    })
-                  else
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
-                      decoration: BoxDecoration(
-                        color: item.color,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontSize: 9.5,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final r in visible) r.w,
+                  if (extra > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 3),
+                      child: Text('+$extra', style: TextStyle(fontSize: 8, color: scheme.onSurfaceVariant)),
                     ),
-                if (extra > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 3),
-                    child: Text('+$extra', style: TextStyle(fontSize: 8, color: scheme.onSurfaceVariant)),
-                  ),
-              ],
-            ),
+                ],
+              ),
             ),
           ),
         ),

@@ -257,26 +257,55 @@ class CalendarSyncJobService : JobService() {
                 val color   = if (colorId.isNotEmpty()) EVENT_COLORS[colorId] ?: calColor else calColor
 
                 val start   = item.optJSONObject("start") ?: continue
+                val end     = item.optJSONObject("end")
                 val dtStr   = start.optString("dateTime", "")
                 val dateStr = start.optString("date", "")
 
-                val parsed: EventItem? = when {
-                    dtStr.isNotEmpty() -> runCatching {
-                        val zdt   = OffsetDateTime.parse(dtStr).atZoneSameInstant(zone)
-                        val local = zdt.toLocalDateTime()
-                        val k = "%04d%02d%02d".format(local.year, local.monthValue, local.dayOfMonth)
-                        EventItem(k, summary, "%02d:%02d".format(local.hour, local.minute), id, color,
-                            isAllDay = false, startMillis = zdt.toInstant().toEpochMilli())
-                    }.getOrNull()
-                    dateStr.length >= 10 -> runCatching {
-                        val d = java.time.LocalDate.parse(dateStr)
-                        val k = "%04d%02d%02d".format(d.year, d.monthValue, d.dayOfMonth)
-                        EventItem(k, summary, WidgetStrings.allDay, id, color,
-                            isAllDay = true, startMillis = d.atStartOfDay(zone).toInstant().toEpochMilli())
-                    }.getOrNull()
-                    else -> null
+                // 시작/마지막(포함) 날짜, 종일 여부, 시각 라벨, 정렬용 시작 millis 계산.
+                var startDate: java.time.LocalDate? = null
+                var lastDate: java.time.LocalDate? = null
+                var isAllDay = false
+                var timeLabel = ""
+                var startMillis = 0L
+                runCatching {
+                    when {
+                        dtStr.isNotEmpty() -> {
+                            val zdt = OffsetDateTime.parse(dtStr).atZoneSameInstant(zone)
+                            startDate = zdt.toLocalDate()
+                            val eDt = end?.optString("dateTime", "") ?: ""
+                            lastDate = if (eDt.isNotEmpty())
+                                OffsetDateTime.parse(eDt).atZoneSameInstant(zone).toLocalDate() else startDate
+                            isAllDay = false
+                            timeLabel = "%02d:%02d".format(zdt.hour, zdt.minute)
+                            startMillis = zdt.toInstant().toEpochMilli()
+                        }
+                        dateStr.length >= 10 -> {
+                            val s = java.time.LocalDate.parse(dateStr)
+                            startDate = s
+                            val eDate = end?.optString("date", "") ?: ""
+                            // 종일 end.date 는 exclusive → 마지막 포함일은 -1일
+                            lastDate = if (eDate.length >= 10)
+                                java.time.LocalDate.parse(eDate).minusDays(1) else s
+                            isAllDay = true
+                            timeLabel = WidgetStrings.allDay
+                            startMillis = s.atStartOfDay(zone).toInstant().toEpochMilli()
+                        }
+                    }
                 }
-                if (parsed != null) result.add(parsed)
+                val sDate = startDate ?: continue
+                var lDate = lastDate ?: sDate
+                if (lDate.isBefore(sDate)) lDate = sDate
+
+                // 이 달 범위로 클램프해 걸친 모든 날에 하나씩 추가(여러 날 일정 반영)
+                val monthFirst = java.time.LocalDate.of(year, month, 1)
+                val monthLast = monthFirst.plusMonths(1).minusDays(1)
+                var d = if (sDate.isBefore(monthFirst)) monthFirst else sDate
+                val to = if (lDate.isAfter(monthLast)) monthLast else lDate
+                while (!d.isAfter(to)) {
+                    val k = "%04d%02d%02d".format(d.year, d.monthValue, d.dayOfMonth)
+                    result.add(EventItem(k, summary, timeLabel, id, color, isAllDay, startMillis))
+                    d = d.plusDays(1)
+                }
             }
             return result
         }
