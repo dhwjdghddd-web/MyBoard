@@ -126,6 +126,19 @@
                 android:value="androidx.startup.InitializationProvider"
                 tools:node="remove" />
         </provider>
+
+        <!-- home_widget 가 끌고 온 androidx.glance 의 트램폴린 액티비티 제거.
+             본 앱은 Glance 위젯을 전혀 쓰지 않는데(고전 RemoteViews 사용), 외부 위젯
+             호스트가 이 트램폴린을 target intent 없이 실행하면
+             "List adapter activity trampoline invoked without specifying target intent"
+             으로 앱이 강제 종료됐다(Crashlytics 1.0.14+20). 선언을 제거하면 우리 앱에서는
+             실행 자체가 불가능해져 해당 크래시가 사라진다. -->
+        <activity
+            android:name="androidx.glance.appwidget.action.ActionTrampolineActivity"
+            tools:node="remove" />
+        <activity
+            android:name="androidx.glance.appwidget.action.InvisibleActionTrampolineActivity"
+            tools:node="remove" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
